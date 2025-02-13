@@ -1,0 +1,5 @@
+{
+    "require": {
+        "symfony/asset-mapper": "^7.2"
+    }
+}

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="{{ asset('img/favico32.png') }}">
+    <title>Dawn, le GN</title>
+    <style>
+        body {
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .logo {
+            max-width: 500px;
+            width: 90%; /* Pour s'assurer que le logo ne dépasse pas les marges sur mobile */
+            height: auto;
+        }
+
+        /* Pour les très petits écrans (smartphones) */
+        @media screen and (max-width: 480px) {
+            .logo {
+                max-width: 280px;
+            }
+        }
+
+        /* Pour les tablettes */
+        @media screen and (min-width: 481px) and (max-width: 768px) {
+            .logo {
+                max-width: 400px;
+            }
+        }
+
+        /* Pour les grands écrans */
+        @media screen and (min-width: 1200px) {
+            .logo {
+                max-width: 600px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <img src="{{ asset('img/logo.jpg') }}" alt="Logo" class="logo">
+</body>
+</html> 
