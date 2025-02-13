@@ -6,9 +6,11 @@ use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
-class User
+class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -18,11 +20,14 @@ class User
     #[ORM\Column(length: 127)]
     private ?string $name = null;
 
-    #[ORM\Column(length: 127)]
+    #[ORM\Column(length: 127, unique: true)]
     private ?string $email = null;
 
-    #[ORM\Column(length: 31)]
-    private ?string $role = null;
+    #[ORM\Column]
+    private array $roles = [];
+
+    #[ORM\Column]
+    private ?string $password = null;
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Character::class)]
     private Collection $characters;
@@ -34,6 +39,7 @@ class User
     {
         $this->characters = new ArrayCollection();
         $this->registrations = new ArrayCollection();
+        $this->roles = ['ROLE_USER'];
     }
 
     public function getId(): ?int
@@ -72,15 +78,25 @@ class User
         return $this;
     }
 
-    public function getRole(): ?string
+    public function getPassword(): string
     {
-        return $this->role;
+        return $this->password;
     }
 
-    public function setRole(string $role): static
+    public function setPassword(string $password): self
     {
-        $this->role = $role;
+        $this->password = $password;
+        return $this;
+    }
 
+    public function getRoles(): array
+    {
+        return $this->roles;
+    }
+
+    public function setRoles(array $roles): self
+    {
+        $this->roles = $roles;
         return $this;
     }
 
@@ -98,5 +114,15 @@ class User
     public function getRegistrations(): Collection
     {
         return $this->registrations;
+    }
+
+    public function eraseCredentials(): void
+    {
+        // If you store any temporary, sensitive data on the user, clear it here
+    }
+
+    public function getUserIdentifier(): string
+    {
+        return $this->email;
     }
 }
