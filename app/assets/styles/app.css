@@ -1,3 +1,32 @@
-body {
-    background-color: skyblue;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  .hover\:shadow-soft-2xl:hover {
+    box-shadow: 0 23px 45px -11px hsla(0,0%,8%,.25);
+  }
+  .hover\:scale-102:hover {
+    transform: scale(1.02);
+  }
+  .focus\:shadow-soft-primary-outline:focus {
+    box-shadow: 0 0 0 2px rgba(203, 12, 159, 0.2);
+  }
+  .leading-5\.6 {
+    line-height: 1.4rem;
+  }
+  .ease-soft {
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+/* Custom styles */
+@layer components {
+  .btn-soft-primary {
+    @apply px-6 py-3 font-bold text-white uppercase transition-all rounded-lg cursor-pointer bg-gradient-to-tl from-purple-700 to-pink-500;
+  }
+  
+  .input-soft {
+    @apply text-sm leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding px-3 py-2 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-fuchsia-300 focus:outline-none;
+  }
 }

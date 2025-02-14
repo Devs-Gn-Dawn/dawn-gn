@@ -1,17 +1,47 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
     <head>
         <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{% block title %}Dawn, le GN{% endblock %}</title>
+        <link rel="icon" type="image/png" href="{{ asset('img/favico32.png') }}">
+        
         {% block stylesheets %}
-        {% endblock %}
-
-        {% block javascripts %}
-            {% block importmap %}{{ importmap('app') }}{% endblock %}
+            {# Fonts and icons #}
+            <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
+            <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+            
+            {# Nucleo Icons #}
+            <link href="{{ asset('css/nucleo-icons.css') }}" rel="stylesheet" />
+            <link href="{{ asset('css/nucleo-svg.css') }}" rel="stylesheet" />
+            
+            {# Main Styling #}
+            <link href="{{ asset('css/soft-ui-dashboard-tailwind.css') }}" rel="stylesheet" />
+            
+            {# App Styling #}
+            {{ encore_entry_link_tags('app') }}
         {% endblock %}
     </head>
-    <body>
+    <body class="m-0 font-sans antialiased font-normal text-base leading-default bg-gray-50 text-slate-500">
         {% block body %}{% endblock %}
+        
+        {% block javascripts %}
+            {# Core Scripts #}
+            {{ encore_entry_script_tags('app') }}
+            
+            {# Sweet Alert #}
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+            
+            {# Plugins Scripts #}
+            <script src="https://unpkg.com/@popperjs/core@2"></script>
+            <script src="{{ asset('js/plugins/perfect-scrollbar.min.js') }}"></script>
+            
+            {# Main Scripts #}
+            <script src="{{ asset('js/soft-ui-dashboard-tailwind.js') }}"></script>
+            
+            {# Additional Scripts #}
+            {% block additional_scripts %}{% endblock %}
+        {% endblock %}
     </body>
 </html>
