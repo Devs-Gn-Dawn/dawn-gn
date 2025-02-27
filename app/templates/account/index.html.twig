@@ -6,6 +6,92 @@
     {{ parent() }}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Fonction générique pour afficher une alerte de succès
+            function showSuccessAlert(title, text) {
+                return Swal.fire({
+                    title: title,
+                    text: text,
+                    icon: 'success',
+                    customClass: {
+                        confirmButton: "border-0 inline-flex justify-center rounded-md bg-gradient-to-tl from-gray-900 to-slate-800 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:scale-102 hover:bg-slate-800 w-30"
+                    }
+                }).then(() => {
+                    window.location.reload();
+                });
+            }
+
+            // Fonction générique pour afficher une alerte d'erreur
+            function showErrorAlert(error) {
+                return Swal.fire({
+                    title: 'Erreur !',
+                    text: error.message,
+                    icon: 'error',
+                    customClass: {
+                        confirmButton: "border-0 inline-flex justify-center rounded-md bg-gradient-to-tl from-gray-900 to-slate-800 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:scale-102 hover:bg-slate-800 w-30"
+                    }
+                });
+            }
+
+            // Fonction générique pour la confirmation de suppression
+            function showDeleteConfirmation(deleteCallback) {
+                return Swal.fire({
+                    title: 'Êtes-vous sûr ?',
+                    text: 'Cette action est irréversible',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Oui, supprimer',
+                    cancelButtonText: 'Annuler',
+                    customClass: {
+                        confirmButton: "border-0 inline-flex justify-center rounded-md bg-gradient-to-tl from-red-600 to-rose-400 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:scale-102 hover:opacity-75 w-40",
+                        cancelButton: "border-0 inline-flex justify-center rounded-md bg-gradient-to-tl from-slate-600 to-slate-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:scale-102 hover:opacity-75 w-40",
+                        actions: 'flex gap-4 justify-center mt-4',
+                        popup: 'w-96'
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        deleteCallback();
+                    }
+                });
+            }
+
+            // Mettre à jour les classes des boutons dans tous les modals
+            const modalClasses = {
+                confirmButton: "border-0 inline-flex justify-center rounded-md bg-gradient-to-tl from-gray-900 to-slate-800 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:scale-102 hover:bg-slate-800 w-30",
+                cancelButton: "border-0 inline-flex justify-center rounded-md bg-gradient-to-tl from-slate-600 to-slate-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:scale-102 hover:opacity-75 w-30",
+                actions: 'flex gap-4 justify-center mt-4',
+                popup: 'w-96'
+            };
+
+            // Fonction pour tronquer le texte
+            function truncateText(text, maxLength = 100) {
+                if (text.length <= maxLength) return text;
+                return text.substr(0, maxLength) + '...';
+            }
+
+            // Fonction pour afficher la note complète
+            window.viewFullNote = function(content) {
+                // Convertir les retours à la ligne en <br>
+                const formattedContent = content.replace(/\n/g, '<br>');
+                
+                Swal.fire({
+                    title: 'Note',
+                    html: `<div class="text-left break-words p-4 text-sm">${formattedContent}</div>`,
+                    confirmButtonText: 'Fermer',
+                    customClass: {
+                        confirmButton: "border-0 inline-flex justify-center rounded-md bg-gradient-to-tl from-gray-900 to-slate-800 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:scale-102 hover:bg-slate-800 w-30",
+                        htmlContainer: 'max-h-[60vh] overflow-y-auto',
+                        popup: 'w-[32rem]'
+                    },
+                    showClass: {
+                        popup: 'animate__animated animate__fadeIn'
+                    },
+                    hideClass: {
+                        popup: 'animate__animated animate__fadeOut'
+                    }
+                });
+            };
+
+            // Contacts d'urgence
             window.openEmergencyContactModal = function() {
                 Swal.fire({
                     title: 'Ajouter un contact d\'urgence',
@@ -20,10 +106,7 @@
                     showCancelButton: true,
                     confirmButtonText: 'Ajouter',
                     cancelButtonText: 'Annuler',
-                    customClass: {
-                        confirmButton: "border-0 inline-flex w-full justify-center rounded-md bg-gradient-to-tl from-gray-900 to-slate-800 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:scale-102 hover:bg-slate-800 sm:ml-3 sm:w-auto",
-                        cancelButton: "mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
-                    },
+                    customClass: modalClasses,
                     preConfirm: () => {
                         const name = document.getElementById('emergency-contact-name').value;
                         const phone = document.getElementById('emergency-contact-phone').value;
@@ -55,16 +138,7 @@
                     }
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        Swal.fire({
-                            title: 'Contact ajouté !',
-                            text: 'Le contact d\'urgence a été ajouté avec succès.',
-                            icon: 'success',
-                            customClass: {
-                                confirmButton: "border-0 inline-flex w-full justify-center rounded-md bg-gradient-to-tl from-gray-900 to-slate-800 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:scale-102 hover:bg-slate-800 sm:ml-3 sm:w-auto"
-                            }
-                        }).then(() => {
-                            window.location.reload();
-                        });
+                        showSuccessAlert('Contact ajouté !', 'Le contact d\'urgence a été ajouté avec succès.');
                     }
                 });
             };
@@ -74,18 +148,19 @@
                     title: 'Modifier le contact d\'urgence',
                     html: `
                         <div class="mb-4">
-                            <input type="text" id="emergency-contact-name" value="${name}" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow" placeholder="Nom du contact" required>
+                            <input type="text" id="emergency-contact-name" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow" placeholder="Nom du contact" required>
                         </div>
                         <div class="mb-4">
-                            <input type="tel" id="emergency-contact-phone" value="${phone}" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow" placeholder="Numéro de téléphone" required>
+                            <input type="tel" id="emergency-contact-phone" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow" placeholder="Numéro de téléphone" required>
                         </div>
                     `,
                     showCancelButton: true,
                     confirmButtonText: 'Modifier',
                     cancelButtonText: 'Annuler',
-                    customClass: {
-                        confirmButton: "border-0 inline-flex w-full justify-center rounded-md bg-gradient-to-tl from-gray-900 to-slate-800 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:scale-102 hover:bg-slate-800 sm:ml-3 sm:w-auto",
-                        cancelButton: "mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
+                    customClass: modalClasses,
+                    didOpen: () => {
+                        document.getElementById('emergency-contact-name').value = name;
+                        document.getElementById('emergency-contact-phone').value = phone;
                     },
                     preConfirm: () => {
                         const name = document.getElementById('emergency-contact-name').value;
@@ -118,63 +193,251 @@
                     }
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        Swal.fire({
-                            title: 'Contact modifié !',
-                            text: 'Le contact d\'urgence a été modifié avec succès.',
-                            icon: 'success',
-                            customClass: {
-                                confirmButton: "border-0 inline-flex w-full justify-center rounded-md bg-gradient-to-tl from-gray-900 to-slate-800 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:scale-102 hover:bg-slate-800 sm:ml-3 sm:w-auto"
-                            }
-                        }).then(() => {
-                            window.location.reload();
-                        });
+                        showSuccessAlert('Contact modifié !', 'Le contact d\'urgence a été modifié avec succès.');
                     }
                 });
             };
 
             window.deleteEmergencyContact = function(id) {
+                showDeleteConfirmation(() => {
+                    fetch(`{{ path('app_account_emergency_contact_delete', {'id': 'CONTACT_ID'}) }}`.replace('CONTACT_ID', id), {
+                        method: 'DELETE'
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Une erreur est survenue');
+                        }
+                        showSuccessAlert('Contact supprimé !', 'Le contact d\'urgence a été supprimé avec succès.');
+                    })
+                    .catch(error => {
+                        showErrorAlert(error);
+                    });
+                });
+            };
+
+            // Allergies
+            window.openAllergyModal = function() {
                 Swal.fire({
-                    title: 'Êtes-vous sûr ?',
-                    text: 'Cette action est irréversible',
-                    icon: 'warning',
+                    title: 'Ajouter une allergie',
+                    html: `
+                        <div class="mb-4">
+                            <input type="text" id="allergy-name" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow" placeholder="Nom de l'allergie" required>
+                        </div>
+                    `,
                     showCancelButton: true,
-                    confirmButtonText: 'Oui, supprimer',
+                    confirmButtonText: 'Ajouter',
                     cancelButtonText: 'Annuler',
-                    customClass: {
-                        confirmButton: "border-0 inline-flex w-full justify-center rounded-md bg-gradient-to-tl from-red-600 to-rose-400 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:scale-102 hover:opacity-75 sm:ml-3 sm:w-auto",
-                        cancelButton: "mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
-                    }
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        fetch(`{{ path('app_account_emergency_contact_delete', {'id': 'CONTACT_ID'}) }}`.replace('CONTACT_ID', id), {
-                            method: 'DELETE'
+                    customClass: modalClasses,
+                    preConfirm: () => {
+                        const name = document.getElementById('allergy-name').value;
+                        
+                        if (!name) {
+                            Swal.showValidationMessage('Veuillez remplir le champ');
+                            return false;
+                        }
+                        
+                        return fetch('{{ path('app_account_allergy_add') }}', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                name: name
+                            })
                         })
                         .then(response => {
                             if (!response.ok) {
                                 throw new Error('Une erreur est survenue');
                             }
-                            Swal.fire({
-                                title: 'Contact supprimé !',
-                                text: 'Le contact d\'urgence a été supprimé avec succès.',
-                                icon: 'success',
-                                customClass: {
-                                    confirmButton: "border-0 inline-flex w-full justify-center rounded-md bg-gradient-to-tl from-gray-900 to-slate-800 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:scale-102 hover:bg-slate-800 sm:ml-3 sm:w-auto"
-                                }
-                            }).then(() => {
-                                window.location.reload();
-                            });
+                            return response.json();
                         })
                         .catch(error => {
-                            Swal.fire({
-                                title: 'Erreur !',
-                                text: error.message,
-                                icon: 'error',
-                                customClass: {
-                                    confirmButton: "border-0 inline-flex w-full justify-center rounded-md bg-gradient-to-tl from-gray-900 to-slate-800 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:scale-102 hover:bg-slate-800 sm:ml-3 sm:w-auto"
-                                }
-                            });
+                            Swal.showValidationMessage(error.message);
                         });
                     }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        showSuccessAlert('Allergie ajoutée !', 'L\'allergie a été ajoutée avec succès.');
+                    }
+                });
+            };
+
+            window.editAllergy = function(id, name) {
+                Swal.fire({
+                    title: 'Modifier l\'allergie',
+                    html: `
+                        <div class="mb-4">
+                            <input type="text" id="allergy-name" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow" placeholder="Nom de l'allergie" required>
+                        </div>
+                    `,
+                    showCancelButton: true,
+                    confirmButtonText: 'Modifier',
+                    cancelButtonText: 'Annuler',
+                    customClass: modalClasses,
+                    didOpen: () => {
+                        document.getElementById('allergy-name').value = name;
+                    },
+                    preConfirm: () => {
+                        const name = document.getElementById('allergy-name').value;
+                        
+                        if (!name) {
+                            Swal.showValidationMessage('Veuillez remplir le champ');
+                            return false;
+                        }
+                        
+                        return fetch(`{{ path('app_account_allergy_edit', {'id': 'ALLERGY_ID'}) }}`.replace('ALLERGY_ID', id), {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                name: name
+                            })
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Une erreur est survenue');
+                            }
+                            return response.json();
+                        })
+                        .catch(error => {
+                            Swal.showValidationMessage(error.message);
+                        });
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        showSuccessAlert('Allergie modifiée !', 'L\'allergie a été modifiée avec succès.');
+                    }
+                });
+            };
+
+            window.deleteAllergy = function(id) {
+                showDeleteConfirmation(() => {
+                    fetch(`{{ path('app_account_allergy_delete', {'id': 'ALLERGY_ID'}) }}`.replace('ALLERGY_ID', id), {
+                        method: 'DELETE'
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Une erreur est survenue');
+                        }
+                        showSuccessAlert('Allergie supprimée !', 'L\'allergie a été supprimée avec succès.');
+                    })
+                    .catch(error => {
+                        showErrorAlert(error);
+                    });
+                });
+            };
+
+            // Notes
+            window.openNoteModal = function() {
+                Swal.fire({
+                    title: 'Ajouter une note',
+                    html: `
+                        <div class="mb-4">
+                            <textarea id="note-content" rows="4" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow" placeholder="Contenu de la note" required></textarea>
+                        </div>
+                    `,
+                    showCancelButton: true,
+                    confirmButtonText: 'Ajouter',
+                    cancelButtonText: 'Annuler',
+                    customClass: modalClasses,
+                    preConfirm: () => {
+                        const content = document.getElementById('note-content').value;
+                        
+                        if (!content) {
+                            Swal.showValidationMessage('Veuillez remplir le champ');
+                            return false;
+                        }
+                        
+                        return fetch('{{ path('app_account_note_add') }}', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                content: content
+                            })
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Une erreur est survenue');
+                            }
+                            return response.json();
+                        })
+                        .catch(error => {
+                            Swal.showValidationMessage(error.message);
+                        });
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        showSuccessAlert('Note ajoutée !', 'La note a été ajoutée avec succès.');
+                    }
+                });
+            };
+
+            window.editNote = function(id, content) {
+                Swal.fire({
+                    title: 'Modifier la note',
+                    html: `
+                        <div class="mb-4">
+                            <textarea id="note-content" rows="4" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow" placeholder="Contenu de la note" required></textarea>
+                        </div>
+                    `,
+                    showCancelButton: true,
+                    confirmButtonText: 'Modifier',
+                    cancelButtonText: 'Annuler',
+                    customClass: modalClasses,
+                    didOpen: () => {
+                        document.getElementById('note-content').value = content;
+                    },
+                    preConfirm: () => {
+                        const content = document.getElementById('note-content').value;
+                        
+                        if (!content) {
+                            Swal.showValidationMessage('Veuillez remplir le champ');
+                            return false;
+                        }
+                        
+                        return fetch(`{{ path('app_account_note_edit', {'id': 'NOTE_ID'}) }}`.replace('NOTE_ID', id), {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                content: content
+                            })
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Une erreur est survenue');
+                            }
+                            return response.json();
+                        })
+                        .catch(error => {
+                            Swal.showValidationMessage(error.message);
+                        });
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        showSuccessAlert('Note modifiée !', 'La note a été modifiée avec succès.');
+                    }
+                });
+            };
+
+            window.deleteNote = function(id) {
+                showDeleteConfirmation(() => {
+                    fetch(`{{ path('app_account_note_delete', {'id': 'NOTE_ID'}) }}`.replace('NOTE_ID', id), {
+                        method: 'DELETE'
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Une erreur est survenue');
+                        }
+                        showSuccessAlert('Note supprimée !', 'La note a été supprimée avec succès.');
+                    })
+                    .catch(error => {
+                        showErrorAlert(error);
+                    });
                 });
             };
 
@@ -182,7 +445,7 @@
                 Swal.fire({
                     customClass: {
                         text: "!mt-2 sm:!mt-0 !m-0 !text-center sm:!text-left !text-s !text-gray-500 !pl-4 sm:!pl-0 !pr-4 !pb-4 sm:!pr-6 sm:!pb-4 sm:!ml-4 !col-start-1 sm:!col-start-2 !col-end-3",
-                        confirmButton: "border-0 inline-flex w-full justify-center rounded-md bg-gradient-to-tl from-gray-900 to-slate-800 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:scale-102 hover:bg-slate-800 sm:ml-3 sm:w-auto",
+                        confirmButton: "border-0 inline-flex justify-center rounded-md bg-gradient-to-tl from-gray-900 to-slate-800 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:scale-102 hover:bg-slate-800 w-30"
                     },    
                     width:"50%",
                     text: "Vous le trouverez ici, sur le billet HelloAsso reçu par mail.",
@@ -258,8 +521,12 @@
                                                 <h6 class="mb-0 leading-normal text-sm">{{ contact.name }}</h6>
                                                 <p class="mb-0 leading-tight text-xs">{{ contact.phone }}</p>
                                             </div>
-                                            <a onclick="editEmergencyContact('{{ contact.id }}', '{{ contact.name }}', '{{ contact.phone }}')" class="inline-block pl-0 pr-4 mb-0 ml-auto font-bold text-center align-middle transition-all bg-transparent border-0 rounded-lg shadow-none cursor-pointer leading-pro text-xs ease-soft-in text-slate-400 hover:text-slate-700 hover:underline" href="javascript:;">Modifier</a>
-                                            <a onclick="deleteEmergencyContact('{{ contact.id }}')" class="inline-block pl-4 mb-0 ml-0 font-bold text-center align-middle transition-all bg-transparent border-0 shadow-none cursor-pointer leading-pro text-xs ease-soft-in text-slate-400 hover:text-red-600 hover:underline rounded-none border-l border-slate-300" href="javascript:;">Supprimer</a>
+                                            <a onclick="editEmergencyContact({{ contact.id }}, '{{ contact.name|e('js') }}', '{{ contact.phone|e('js') }}')"
+                                               class="inline-block pl-0 pr-4 mb-0 ml-auto font-bold text-center align-middle transition-all bg-transparent border-0 rounded-lg shadow-none cursor-pointer leading-pro text-xs ease-soft-in text-slate-400 hover:text-slate-700 hover:underline"
+                                               href="javascript:;">Modifier</a>
+                                            <a onclick="deleteEmergencyContact({{ contact.id }})"
+                                               class="inline-block pl-4 mb-0 ml-0 font-bold text-center align-middle transition-all bg-transparent border-0 shadow-none cursor-pointer leading-pro text-xs ease-soft-in text-slate-400 hover:text-red-600 hover:underline rounded-none border-l border-slate-300"
+                                               href="javascript:;">Supprimer</a>
                                         </li>
                                     {% endfor %}
                                     <li class="relative flex items-center px-0 py-2 bg-white border-0 rounded-t-lg text-inherit">
@@ -275,7 +542,7 @@
                                 {% if user.allergies is empty %}
                                     <li class="relative flex items-center px-0 py-2 bg-white border-0 rounded-t-lg text-inherit">
                                         <div class="w-full mx-2 p-1 text-center justify-center bg-slate-100 bg-opacity-40 border rounded border-dashed border-slate-300">
-                                            <span class="text-xs font-semibold leading-tight text-slate-300 cursor-pointer hover:scale-102 hover:text-slate-700 hover:underline"><strong class="font-extrabold">+ </strong>Ajouter une allergie</span>
+                                            <span onclick="openAllergyModal()" class="text-xs font-semibold leading-tight text-slate-300 cursor-pointer hover:scale-102 hover:text-slate-700 hover:underline"><strong class="font-extrabold">+ </strong>Ajouter une allergie</span>
                                         </div>
                                     </li>
                                 {% else %}
@@ -284,13 +551,17 @@
                                             <div class="flex flex-col items-start justify-center">
                                                 <h6 class="mb-0 leading-normal text-sm">{{ allergy.name }}</h6>
                                             </div>
-                                            <a class="inline-block pl-0 pr-4 mb-0 ml-auto font-bold text-center align-middle transition-all bg-transparent border-0 rounded-lg shadow-none cursor-pointer leading-pro text-xs ease-soft-in text-slate-400 hover:text-slate-700 hover:underline" href="javascript:;">Modifier</a>
-                                            <a class="inline-block pl-4 mb-0 ml-0 font-bold text-center align-middle transition-all bg-transparent border-0 shadow-none cursor-pointer leading-pro text-xs ease-soft-in text-slate-400 hover:text-red-600 hover:underline rounded-none border-l border-slate-300" href="javascript:;">Supprimer</a>
+                                            <a onclick="editAllergy({{ allergy.id }}, '{{ allergy.name|e('js') }}')"
+                                               class="inline-block pl-0 pr-4 mb-0 ml-auto font-bold text-center align-middle transition-all bg-transparent border-0 rounded-lg shadow-none cursor-pointer leading-pro text-xs ease-soft-in text-slate-400 hover:text-slate-700 hover:underline"
+                                               href="javascript:;">Modifier</a>
+                                            <a onclick="deleteAllergy({{ allergy.id }})"
+                                               class="inline-block pl-4 mb-0 ml-0 font-bold text-center align-middle transition-all bg-transparent border-0 shadow-none cursor-pointer leading-pro text-xs ease-soft-in text-slate-400 hover:text-red-600 hover:underline rounded-none border-l border-slate-300"
+                                               href="javascript:;">Supprimer</a>
                                         </li>
                                     {% endfor %}
                                     <li class="relative flex items-center px-0 py-2 bg-white border-0 rounded-t-lg text-inherit">
                                         <div class="w-full mx-2 p-1 text-center justify-center bg-slate-100 bg-opacity-40 border rounded border-dashed border-slate-300">
-                                            <span class="text-xs font-semibold leading-tight text-slate-300 cursor-pointer hover:scale-102 hover:text-slate-700 hover:underline"><strong class="font-extrabold">+ </strong>Ajouter une allergie</span>
+                                            <span onclick="openAllergyModal()" class="text-xs font-semibold leading-tight text-slate-300 cursor-pointer hover:scale-102 hover:text-slate-700 hover:underline"><strong class="font-extrabold">+ </strong>Ajouter une allergie</span>
                                         </div>
                                     </li>
                                 {% endif %}
@@ -337,22 +608,36 @@
                                 {% if user.notes is empty %}
                                     <li class="relative flex items-center px-0 py-2 bg-white border-0 rounded-t-lg text-inherit">
                                         <div class="w-full mx-2 p-1 text-center justify-center bg-slate-100 bg-opacity-40 border rounded border-dashed border-slate-300">
-                                            <span class="text-xs font-semibold leading-tight text-slate-300 cursor-pointer hover:scale-102 hover:text-slate-700 hover:underline"><strong class="font-extrabold">+ </strong>Ajouter un commentaire</span>
+                                            <span onclick="openNoteModal()" class="text-xs font-semibold leading-tight text-slate-300 cursor-pointer hover:scale-102 hover:text-slate-700 hover:underline"><strong class="font-extrabold">+ </strong>Ajouter un commentaire</span>
                                         </div>
                                     </li>
                                 {% else %}
                                     {% for note in user.notes %}
                                         <li class="relative flex items-center px-0 py-2 bg-white border-0 rounded-t-lg text-inherit">
-                                            <div class="flex flex-col items-start justify-center">
-                                                <h6 class="mb-0 leading-normal text-sm">{{ note.content }}</h6>
+                                            <div class="flex flex-col items-start justify-center w-full">
+                                                <h6 class="mb-0 leading-normal text-sm">
+                                                    <span class="whitespace-pre-line break-words">{{ note.content|length > 100 ? note.content|slice(0, 100) ~ '...' : note.content }}</span>
+                                                    {% if note.content|length > 100 %}
+                                                        <a onclick="viewFullNote(`{{ note.content|e('js') }}`)"
+                                                           class="inline-block ml-1 text-xs font-semibold text-slate-400 hover:text-slate-700 hover:underline cursor-pointer">
+                                                            Voir plus
+                                                        </a>
+                                                    {% endif %}
+                                                </h6>
                                             </div>
-                                            <a class="inline-block pl-0 pr-4 mb-0 ml-auto font-bold text-center align-middle transition-all bg-transparent border-0 rounded-lg shadow-none cursor-pointer leading-pro text-xs ease-soft-in text-slate-400 hover:text-slate-700 hover:underline" href="javascript:;">Modifier</a>
-                                            <a class="inline-block pl-4 mb-0 ml-0 font-bold text-center align-middle transition-all bg-transparent border-0 shadow-none cursor-pointer leading-pro text-xs ease-soft-in text-slate-400 hover:text-red-600 hover:underline rounded-none border-l border-slate-300" href="javascript:;">Supprimer</a>
+                                            <div class="flex items-center ml-auto">
+                                                <a onclick="editNote({{ note.id }}, `{{ note.content|e('js') }}`)"
+                                                   class="inline-block pl-0 pr-4 mb-0 font-bold text-center align-middle transition-all bg-transparent border-0 rounded-lg shadow-none cursor-pointer leading-pro text-xs ease-soft-in text-slate-400 hover:text-slate-700 hover:underline" 
+                                                   href="javascript:;">Modifier</a>
+                                                <a onclick="deleteNote({{ note.id }})"
+                                                   class="inline-block pl-4 mb-0 font-bold text-center align-middle transition-all bg-transparent border-0 shadow-none cursor-pointer leading-pro text-xs ease-soft-in text-slate-400 hover:text-red-600 hover:underline rounded-none border-l border-slate-300" 
+                                                   href="javascript:;">Supprimer</a>
+                                            </div>
                                         </li>
                                     {% endfor %}
                                     <li class="relative flex items-center px-0 py-2 bg-white border-0 rounded-t-lg text-inherit">
                                         <div class="w-full mx-2 p-1 text-center justify-center bg-slate-100 bg-opacity-40 border rounded border-dashed border-slate-300">
-                                            <span class="text-xs font-semibold leading-tight text-slate-300 cursor-pointer hover:scale-102 hover:text-slate-700 hover:underline"><strong class="font-extrabold">+ </strong>Ajouter un commentaire</span>
+                                            <span onclick="openNoteModal()" class="text-xs font-semibold leading-tight text-slate-300 cursor-pointer hover:scale-102 hover:text-slate-700 hover:underline"><strong class="font-extrabold">+ </strong>Ajouter un commentaire</span>
                                         </div>
                                     </li>
                                 {% endif %}
