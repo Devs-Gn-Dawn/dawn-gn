@@ -2,6 +2,200 @@
 
 {% block title %}Mes informations - Dawn GN{% endblock %}
 
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            window.openEmergencyContactModal = function() {
+                Swal.fire({
+                    title: 'Ajouter un contact d\'urgence',
+                    html: `
+                        <div class="mb-4">
+                            <input type="text" id="emergency-contact-name" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow" placeholder="Nom du contact" required>
+                        </div>
+                        <div class="mb-4">
+                            <input type="tel" id="emergency-contact-phone" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow" placeholder="Numéro de téléphone" required>
+                        </div>
+                    `,
+                    showCancelButton: true,
+                    confirmButtonText: 'Ajouter',
+                    cancelButtonText: 'Annuler',
+                    customClass: {
+                        confirmButton: "border-0 inline-flex w-full justify-center rounded-md bg-gradient-to-tl from-gray-900 to-slate-800 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:scale-102 hover:bg-slate-800 sm:ml-3 sm:w-auto",
+                        cancelButton: "mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
+                    },
+                    preConfirm: () => {
+                        const name = document.getElementById('emergency-contact-name').value;
+                        const phone = document.getElementById('emergency-contact-phone').value;
+                        
+                        if (!name || !phone) {
+                            Swal.showValidationMessage('Veuillez remplir tous les champs');
+                            return false;
+                        }
+                        
+                        return fetch('{{ path('app_account_emergency_contact_add') }}', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                name: name,
+                                phone: phone
+                            })
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Une erreur est survenue');
+                            }
+                            return response.json();
+                        })
+                        .catch(error => {
+                            Swal.showValidationMessage(error.message);
+                        });
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire({
+                            title: 'Contact ajouté !',
+                            text: 'Le contact d\'urgence a été ajouté avec succès.',
+                            icon: 'success',
+                            customClass: {
+                                confirmButton: "border-0 inline-flex w-full justify-center rounded-md bg-gradient-to-tl from-gray-900 to-slate-800 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:scale-102 hover:bg-slate-800 sm:ml-3 sm:w-auto"
+                            }
+                        }).then(() => {
+                            window.location.reload();
+                        });
+                    }
+                });
+            };
+
+            window.editEmergencyContact = function(id, name, phone) {
+                Swal.fire({
+                    title: 'Modifier le contact d\'urgence',
+                    html: `
+                        <div class="mb-4">
+                            <input type="text" id="emergency-contact-name" value="${name}" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow" placeholder="Nom du contact" required>
+                        </div>
+                        <div class="mb-4">
+                            <input type="tel" id="emergency-contact-phone" value="${phone}" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow" placeholder="Numéro de téléphone" required>
+                        </div>
+                    `,
+                    showCancelButton: true,
+                    confirmButtonText: 'Modifier',
+                    cancelButtonText: 'Annuler',
+                    customClass: {
+                        confirmButton: "border-0 inline-flex w-full justify-center rounded-md bg-gradient-to-tl from-gray-900 to-slate-800 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:scale-102 hover:bg-slate-800 sm:ml-3 sm:w-auto",
+                        cancelButton: "mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
+                    },
+                    preConfirm: () => {
+                        const name = document.getElementById('emergency-contact-name').value;
+                        const phone = document.getElementById('emergency-contact-phone').value;
+                        
+                        if (!name || !phone) {
+                            Swal.showValidationMessage('Veuillez remplir tous les champs');
+                            return false;
+                        }
+                        
+                        return fetch(`{{ path('app_account_emergency_contact_edit', {'id': 'CONTACT_ID'}) }}`.replace('CONTACT_ID', id), {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                name: name,
+                                phone: phone
+                            })
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Une erreur est survenue');
+                            }
+                            return response.json();
+                        })
+                        .catch(error => {
+                            Swal.showValidationMessage(error.message);
+                        });
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire({
+                            title: 'Contact modifié !',
+                            text: 'Le contact d\'urgence a été modifié avec succès.',
+                            icon: 'success',
+                            customClass: {
+                                confirmButton: "border-0 inline-flex w-full justify-center rounded-md bg-gradient-to-tl from-gray-900 to-slate-800 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:scale-102 hover:bg-slate-800 sm:ml-3 sm:w-auto"
+                            }
+                        }).then(() => {
+                            window.location.reload();
+                        });
+                    }
+                });
+            };
+
+            window.deleteEmergencyContact = function(id) {
+                Swal.fire({
+                    title: 'Êtes-vous sûr ?',
+                    text: 'Cette action est irréversible',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Oui, supprimer',
+                    cancelButtonText: 'Annuler',
+                    customClass: {
+                        confirmButton: "border-0 inline-flex w-full justify-center rounded-md bg-gradient-to-tl from-red-600 to-rose-400 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:scale-102 hover:opacity-75 sm:ml-3 sm:w-auto",
+                        cancelButton: "mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        fetch(`{{ path('app_account_emergency_contact_delete', {'id': 'CONTACT_ID'}) }}`.replace('CONTACT_ID', id), {
+                            method: 'DELETE'
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Une erreur est survenue');
+                            }
+                            Swal.fire({
+                                title: 'Contact supprimé !',
+                                text: 'Le contact d\'urgence a été supprimé avec succès.',
+                                icon: 'success',
+                                customClass: {
+                                    confirmButton: "border-0 inline-flex w-full justify-center rounded-md bg-gradient-to-tl from-gray-900 to-slate-800 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:scale-102 hover:bg-slate-800 sm:ml-3 sm:w-auto"
+                                }
+                            }).then(() => {
+                                window.location.reload();
+                            });
+                        })
+                        .catch(error => {
+                            Swal.fire({
+                                title: 'Erreur !',
+                                text: error.message,
+                                icon: 'error',
+                                customClass: {
+                                    confirmButton: "border-0 inline-flex w-full justify-center rounded-md bg-gradient-to-tl from-gray-900 to-slate-800 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:scale-102 hover:bg-slate-800 sm:ml-3 sm:w-auto"
+                                }
+                            });
+                        });
+                    }
+                });
+            };
+
+            window.sweetTicket = function() {
+                Swal.fire({
+                    customClass: {
+                        text: "!mt-2 sm:!mt-0 !m-0 !text-center sm:!text-left !text-s !text-gray-500 !pl-4 sm:!pl-0 !pr-4 !pb-4 sm:!pr-6 sm:!pb-4 sm:!ml-4 !col-start-1 sm:!col-start-2 !col-end-3",
+                        confirmButton: "border-0 inline-flex w-full justify-center rounded-md bg-gradient-to-tl from-gray-900 to-slate-800 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:scale-102 hover:bg-slate-800 sm:ml-3 sm:w-auto",
+                    },    
+                    width:"50%",
+                    text: "Vous le trouverez ici, sur le billet HelloAsso reçu par mail.",
+                    imageUrl: "{{ asset('img/billet_info.jpg') }}",
+                    imageWidth: "100%",
+                    confirmButtonText: "J'ai compris !",
+                    animation: false
+                });
+            };
+        });
+    </script>
+{% endblock %}
+
 {% block body %}
     {% include 'partials/_sidebar.html.twig' %}
 
@@ -54,7 +248,7 @@
                                 {% if user.emergencyContacts is empty %}
                                     <li class="relative flex items-center px-0 py-2 bg-white border-0 rounded-t-lg text-inherit">
                                         <div class="w-full mx-2 p-1 text-center justify-center bg-slate-100 bg-opacity-40 border rounded border-dashed border-slate-300">
-                                            <span class="text-xs font-semibold leading-tight text-slate-300 cursor-pointer hover:scale-102 hover:text-slate-700 hover:underline"><strong class="font-extrabold">+ </strong>Ajouter un contact</span>
+                                            <span onclick="openEmergencyContactModal()" class="text-xs font-semibold leading-tight text-slate-300 cursor-pointer hover:scale-102 hover:text-slate-700 hover:underline"><strong class="font-extrabold">+ </strong>Ajouter un contact</span>
                                         </div>
                                     </li>
                                 {% else %}
@@ -64,13 +258,13 @@
                                                 <h6 class="mb-0 leading-normal text-sm">{{ contact.name }}</h6>
                                                 <p class="mb-0 leading-tight text-xs">{{ contact.phone }}</p>
                                             </div>
-                                            <a class="inline-block pl-0 pr-4 mb-0 ml-auto font-bold text-center align-middle transition-all bg-transparent border-0 rounded-lg shadow-none cursor-pointer leading-pro text-xs ease-soft-in text-slate-400 hover:text-slate-700 hover:underline" href="javascript:;">Modifier</a>
-                                            <a class="inline-block pl-4 mb-0 ml-0 font-bold text-center align-middle transition-all bg-transparent border-0 shadow-none cursor-pointer leading-pro text-xs ease-soft-in text-slate-400 hover:text-red-600 hover:underline rounded-none border-l border-slate-300" href="javascript:;">Supprimer</a>
+                                            <a onclick="editEmergencyContact('{{ contact.id }}', '{{ contact.name }}', '{{ contact.phone }}')" class="inline-block pl-0 pr-4 mb-0 ml-auto font-bold text-center align-middle transition-all bg-transparent border-0 rounded-lg shadow-none cursor-pointer leading-pro text-xs ease-soft-in text-slate-400 hover:text-slate-700 hover:underline" href="javascript:;">Modifier</a>
+                                            <a onclick="deleteEmergencyContact('{{ contact.id }}')" class="inline-block pl-4 mb-0 ml-0 font-bold text-center align-middle transition-all bg-transparent border-0 shadow-none cursor-pointer leading-pro text-xs ease-soft-in text-slate-400 hover:text-red-600 hover:underline rounded-none border-l border-slate-300" href="javascript:;">Supprimer</a>
                                         </li>
                                     {% endfor %}
                                     <li class="relative flex items-center px-0 py-2 bg-white border-0 rounded-t-lg text-inherit">
                                         <div class="w-full mx-2 p-1 text-center justify-center bg-slate-100 bg-opacity-40 border rounded border-dashed border-slate-300">
-                                            <span class="text-xs font-semibold leading-tight text-slate-300 cursor-pointer hover:scale-102 hover:text-slate-700 hover:underline"><strong class="font-extrabold">+ </strong>Ajouter un contact</span>
+                                            <span onclick="openEmergencyContactModal()" class="text-xs font-semibold leading-tight text-slate-300 cursor-pointer hover:scale-102 hover:text-slate-700 hover:underline"><strong class="font-extrabold">+ </strong>Ajouter un contact</span>
                                         </div>
                                     </li>
                                 {% endif %}
@@ -173,21 +367,4 @@
     </div>
 {% endblock %}
 
-{% block additional_scripts %}
-    <script>
-        function sweetTicket(){
-            Swal.fire({
-                customClass: {
-                    text: "!mt-2 sm:!mt-0 !m-0 !text-center sm:!text-left !text-s !text-gray-500 !pl-4 sm:!pl-0 !pr-4 !pb-4 sm:!pr-6 sm:!pb-4 sm:!ml-4 !col-start-1 sm:!col-start-2 !col-end-3",
-                    confirmButton: "border-0 inline-flex w-full justify-center rounded-md bg-gradient-to-tl from-gray-900 to-slate-800 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:scale-102 hover:bg-slate-800 sm:ml-3 sm:w-auto",
-                },    
-                width:"50%",
-                text: "Vous le trouverez ici, sur le billet HelloAsso reçu par mail.",
-                imageUrl: "{{ asset('img/billet_info.jpg') }}",
-                imageWidth: "100%",
-                confirmButtonText: "J'ai compris !",
-                animation: false
-            });
-        }
-    </script>
-{% endblock %} 
+{% block additional_scripts %}{% endblock %} 
