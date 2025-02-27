@@ -35,10 +35,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Registration::class)]
     private Collection $registrations;
 
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: EmergencyContact::class, orphanRemoval: true)]
+    private Collection $emergencyContacts;
+
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Allergy::class, orphanRemoval: true)]
+    private Collection $allergies;
+
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Note::class, orphanRemoval: true)]
+    private Collection $notes;
+
     public function __construct()
     {
         $this->characters = new ArrayCollection();
         $this->registrations = new ArrayCollection();
+        $this->emergencyContacts = new ArrayCollection();
+        $this->allergies = new ArrayCollection();
+        $this->notes = new ArrayCollection();
         $this->roles = ['ROLE_USER'];
     }
 
@@ -114,6 +126,93 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getRegistrations(): Collection
     {
         return $this->registrations;
+    }
+
+    /**
+     * @return Collection<int, EmergencyContact>
+     */
+    public function getEmergencyContacts(): Collection
+    {
+        return $this->emergencyContacts;
+    }
+
+    public function addEmergencyContact(EmergencyContact $contact): self
+    {
+        if (!$this->emergencyContacts->contains($contact)) {
+            $this->emergencyContacts->add($contact);
+            $contact->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEmergencyContact(EmergencyContact $contact): self
+    {
+        if ($this->emergencyContacts->removeElement($contact)) {
+            if ($contact->getUser() === $this) {
+                $contact->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Allergy>
+     */
+    public function getAllergies(): Collection
+    {
+        return $this->allergies;
+    }
+
+    public function addAllergy(Allergy $allergy): self
+    {
+        if (!$this->allergies->contains($allergy)) {
+            $this->allergies->add($allergy);
+            $allergy->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAllergy(Allergy $allergy): self
+    {
+        if ($this->allergies->removeElement($allergy)) {
+            if ($allergy->getUser() === $this) {
+                $allergy->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Note>
+     */
+    public function getNotes(): Collection
+    {
+        return $this->notes;
+    }
+
+    public function addNote(Note $note): self
+    {
+        if (!$this->notes->contains($note)) {
+            $this->notes->add($note);
+            $note->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeNote(Note $note): self
+    {
+        if ($this->notes->removeElement($note)) {
+            if ($note->getUser() === $this) {
+                $note->setUser(null);
+            }
+        }
+
+        return $this;
     }
 
     public function eraseCredentials(): void

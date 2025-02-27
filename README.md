@@ -5,6 +5,8 @@
 - Docker
 - Docker Compose
 - Git
+- Node.js (pour le développement local)
+- npm (pour le développement local)
 
 ## Installation
 
@@ -19,11 +21,13 @@ chmod +x install-symfony.sh
 
 Ce script va :
 
-- Créer et configurer le fichier `.env`
+- Créer et configurer les fichiers `.env`
 - Générer les secrets de sécurité
 - Configurer la base de données
-- Installer les dépendances
+- Installer les dépendances Composer
+- Installer les dépendances npm
 - Configurer les permissions
+- Préparer l'environnement de développement
 
 ### Option 2 : Installation Manuelle
 
@@ -36,30 +40,35 @@ git clone [URL_DU_PROJET]
 cd [NOM_DU_PROJET]
 ```
 
-2. Copier le fichier d'environnement
+2. Copier les fichiers d'environnement
 
 ```bash
 cp .env.dist .env
+cp .env.dev.dist .env.dev
+cp .env.test.dist .env.test
 ```
 
 3. Construire et démarrer les conteneurs Docker
 
 ```bash
-docker-compose up -d --build
+make up
 ```
 
-4. Installer les dépendances Composer
+4. Installer les dépendances
 
 ```bash
-docker-compose exec php composer install
+make install
 ```
 
-5. Créer la base de données et exécuter les migrations (si nécessaire)
+## Commandes Make Disponibles
 
-```bash
-docker-compose exec php bin/console doctrine:database:create
-docker-compose exec php bin/console doctrine:migrations:migrate
-```
+- `make up` : Démarre les conteneurs Docker
+- `make down` : Arrête les conteneurs Docker
+- `make install` : Installe toutes les dépendances (Composer + npm)
+- `make build` : Compile les assets avec npm
+- `make watch` : Lance le watcher pour le développement
+- `make tests` : Lance les tests
+- `make bash` : Ouvre un terminal dans le conteneur PHP
 
 ## Accès à l'Application
 
@@ -78,12 +87,23 @@ docker-compose exec php bin/console doctrine:migrations:migrate
 Le projet suit la structure standard d'une application Symfony :
 
 ```
-app/
-├── src/           # Code source de l'application
-├── templates/     # Templates Twig
-├── public/        # Fichiers publics (images, CSS, JS)
-├── tests/         # Tests unitaires et fonctionnels
-└── var/          # Fichiers temporaires (cache, logs)
+├── app/                # Application Symfony
+│   ├── assets/        # Fichiers source JS et CSS
+│   ├── bin/           # Exécutables
+│   ├── config/        # Configuration
+│   ├── public/        # Fichiers publics
+│   ├── src/           # Code source PHP
+│   ├── templates/     # Templates Twig
+│   ├── translations/  # Fichiers de traduction
+│   ├── var/          # Fichiers temporaires
+│   └── vendor/       # Dépendances PHP
+├── docker/           # Configuration Docker
+├── .env             # Variables d'environnement
+├── .env.dev         # Variables pour le développement
+├── .env.test        # Variables pour les tests
+├── docker-compose.yml
+├── Makefile
+└── install-symfony.sh
 ```
 
 ## Contribution

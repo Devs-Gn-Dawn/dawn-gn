@@ -7,7 +7,7 @@ NC='\033[0m'
 
 echo -e "${GREEN}Installation de Symfony...${NC}"
 
-# Vérification et création des fichiers .env
+# Vérification et création des fichiers .env à la racine
 if [ ! -f ".env" ]; then
     echo -e "${YELLOW}Création du fichier .env à partir de .env.dist...${NC}"
     cp .env.dist .env
@@ -30,27 +30,28 @@ if [ ! -f ".env" ]; then
     sed -i "s/db_user:db_password/app_user:$DB_PASSWORD/" .env
 fi
 
-# Création des fichiers d'environnement dans le dossier app
-mkdir -p app
-echo -e "${YELLOW}Création des liens symboliques pour les fichiers d'environnement...${NC}"
-
-# Création des liens symboliques pour tous les fichiers .env*
-for env_file in .env*; do
-    if [ -f "$env_file" ]; then
-        echo "Création du lien pour $env_file"
-        ln -sf "../$env_file" "app/$env_file"
-    fi
-done
+# Création de la structure du projet
+echo -e "${YELLOW}Création de la structure du projet...${NC}"
+mkdir -p app/{assets,bin,config,migrations,public,src,templates,translations,var}
 
 # Installation des dépendances Composer si composer.json existe
 if [ -f "app/composer.json" ]; then
     echo -e "${YELLOW}Installation des dépendances Composer...${NC}"
-    cd app && composer install
+    cd app && composer install && cd ..
 fi
 
-# Création et configuration du dossier var
-mkdir -p app/var
+# Installation des dépendances npm si package.json existe
+if [ -f "app/package.json" ]; then
+    echo -e "${YELLOW}Installation des dépendances npm...${NC}"
+    cd app && npm install && cd ..
+fi
+
+# Configuration des permissions
+echo -e "${YELLOW}Configuration des permissions...${NC}"
 chmod -R 777 app/var
 
 echo -e "${GREEN}Installation terminée !${NC}"
-echo -e "${YELLOW}N'oubliez pas de vérifier et personnaliser les valeurs dans le fichier .env${NC}" 
+echo -e "${YELLOW}Vous pouvez maintenant :"
+echo -e "1. Vérifier et personnaliser les valeurs dans le fichier .env"
+echo -e "2. Lancer 'make install' pour installer toutes les dépendances"
+echo -e "3. Lancer 'make dev' pour démarrer le serveur de développement${NC}" 

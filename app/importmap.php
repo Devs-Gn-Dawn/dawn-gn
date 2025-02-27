@@ -14,6 +14,18 @@
 return [
     'app' => [
         'path' => './assets/app.js',
-        'preload' => true,
+        'entrypoint' => true,
+    ],
+    '@hotwired/stimulus' => [
+        'version' => '3.2.2',
+    ],
+    '@symfony/stimulus-bundle' => [
+        'path' => './vendor/symfony/stimulus-bundle/assets/dist/loader.js',
+    ],
+    '@hotwired/turbo' => [
+        'version' => '7.3.0',
+    ],
+    '@symfony/stimulus-bridge' => [
+        'version' => '4.0.0',
     ],
 ];

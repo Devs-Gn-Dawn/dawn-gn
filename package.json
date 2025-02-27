@@ -1,0 +1,6 @@
+{
+  "devDependencies": {
+    "@hotwired/stimulus": "^3.2.2",
+    "@symfony/stimulus-bridge": "^4.0.0"
+  }
+}

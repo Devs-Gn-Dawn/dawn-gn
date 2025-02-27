@@ -32,3 +32,5 @@ app/.env
 app/.env.*
 ###< environment files ### 
 vendor/*
+app/templates/html.sample/
+node_modules/

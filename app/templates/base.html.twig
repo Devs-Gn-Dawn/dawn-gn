@@ -5,43 +5,25 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>{% block title %}Dawn, le GN{% endblock %}</title>
-        <link rel="icon" type="image/png" href="{{ asset('img/favico32.png') }}">
         
         {% block stylesheets %}
-            {# Fonts and icons #}
-            <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
-            <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
-            
-            {# Nucleo Icons #}
-            <link href="{{ asset('css/nucleo-icons.css') }}" rel="stylesheet" />
-            <link href="{{ asset('css/nucleo-svg.css') }}" rel="stylesheet" />
-            
-            {# Main Styling #}
-            <link href="{{ asset('css/soft-ui-dashboard-tailwind.css') }}" rel="stylesheet" />
-            
-            {# App Styling #}
             {{ encore_entry_link_tags('app') }}
+            {% include 'partials/_styles.html.twig' %}
+            <link rel="stylesheet" href="{{ asset('build/styles/perfect-scrollbar.css') }}">
+            <link rel="stylesheet" href="{{ asset('build/styles/tooltips.css') }}">
         {% endblock %}
     </head>
     <body class="m-0 font-sans antialiased font-normal text-base leading-default bg-gray-50 text-slate-500">
         {% block body %}{% endblock %}
         
         {% block javascripts %}
-            {# Core Scripts #}
             {{ encore_entry_script_tags('app') }}
-            
-            {# Sweet Alert #}
-            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-            
-            {# Plugins Scripts #}
-            <script src="https://unpkg.com/@popperjs/core@2"></script>
-            <script src="{{ asset('js/plugins/perfect-scrollbar.min.js') }}"></script>
-            
-            {# Main Scripts #}
-            <script src="{{ asset('js/soft-ui-dashboard-tailwind.js') }}"></script>
-            
-            {# Additional Scripts #}
-            {% block additional_scripts %}{% endblock %}
+            {{ encore_entry_script_tags('popper') }}
+            {{ encore_entry_script_tags('tooltips') }}
+            {% include 'partials/_scripts.html.twig' %}
+            <script src="{{ asset('build/js/dropdown.js') }}"></script>
+            <script src="{{ asset('build/js/navbar-sticky.js') }}"></script>
+            <script src="{{ asset('build/js/sidenav-burger.js') }}"></script>
         {% endblock %}
     </body>
 </html>

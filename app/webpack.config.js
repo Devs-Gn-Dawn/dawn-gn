@@ -11,8 +11,8 @@ Encore
   .setOutputPath("public/build/")
   // public path used by the web server to access the output path
   .setPublicPath("/build")
-  // only needed for CDN's or subdirectory deploy
-  //.setManifestKeyPrefix('build/')
+  // For Docker environment, we need to make sure the assets are accessible
+  .setManifestKeyPrefix("build/")
 
   /*
    * ENTRY CONFIG
@@ -21,9 +21,38 @@ Encore
    * and one CSS file (e.g. app.css) if your JavaScript imports CSS.
    */
   .addEntry("app", "./assets/app.js")
+  .addEntry(
+    "soft-ui-dashboard-tailwind",
+    "./assets/scripts/soft-ui-dashboard-tailwind.js"
+  )
+  .addEntry("popper", "./assets/scripts/popper-wrapper.js")
+  .addEntry("tooltips", "./assets/scripts/tooltips.js")
+
+  // Copy static files
+  .copyFiles([
+    {
+      from: "./assets/styles",
+      to: "styles/[path][name].[ext]",
+    },
+    {
+      from: "./assets/scripts",
+      to: "js/[path][name].[ext]",
+    },
+    {
+      from: "./assets/fonts",
+      to: "fonts/[path][name].[ext]",
+    },
+    {
+      from: "./assets/img",
+      to: "images/[path][name].[ext]",
+    },
+  ])
 
   // When enabled, Webpack "splits" your files into smaller pieces for greater optimization.
   .splitEntryChunks()
+
+  // enables the Symfony UX Stimulus bridge (used in assets/bootstrap.js)
+  .enableStimulusBridge("./assets/controllers.json")
 
   // will require an extra script tag for runtime.js
   // but, you probably want this, unless you're building a single-page app
@@ -39,7 +68,8 @@ Encore
   .cleanupOutputBeforeBuild()
   .enableBuildNotifications()
   .enableSourceMaps(!Encore.isProduction())
-  // enables hashed filenames (e.g. app.abc123.css)
+
+  // Enable versioning in production
   .enableVersioning(Encore.isProduction())
 
   // configure Babel
@@ -58,22 +88,27 @@ Encore
     options.postcssOptions = {
       config: "./postcss.config.js",
     };
-  });
+  })
 
-// enables Sass/SCSS support
-//.enableSassLoader()
+  // enables Sass/SCSS support
+  .enableSassLoader();
 
-// uncomment if you use TypeScript
-//.enableTypeScriptLoader()
+// Get the full Webpack config
+const config = Encore.getWebpackConfig();
 
-// uncomment if you use React
-//.enableReactPreset()
+// Add optimization configuration
+if (Encore.isProduction()) {
+  config.optimization = {
+    minimize: true,
+    minimizer: [
+      new (require("terser-webpack-plugin"))({
+        terserOptions: {
+          compress: true,
+          mangle: true,
+        },
+      }),
+    ],
+  };
+}
 
-// uncomment to get integrity="..." attributes on your script & link tags
-// requires WebpackEncoreBundle 1.4 or higher
-//.enableIntegrityHashes(Encore.isProduction())
-
-// uncomment if you're having problems with a jQuery plugin
-//.autoProvidejQuery()
-
-module.exports = Encore.getWebpackConfig();
+module.exports = config;

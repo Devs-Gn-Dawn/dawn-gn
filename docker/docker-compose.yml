@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    ports:
+      - "8080:80"
+      - "9003:9003"  # Port pour Xdebug
+    volumes:
+      - ./app:/var/www/app
+      - ./.env:/var/www/.env
+      - ./.env.local:/var/www/.env.local
+      - ./.env.dev:/var/www/.env.dev
+      - ./.env.test:/var/www/.env.test
+      - ./docker/php/docker-entrypoint.sh:/usr/local/bin/docker-entrypoint
+    environment:
+      - APP_ENV=${APP_ENV:-dev}
+      - APP_SECRET=${APP_SECRET}
+      - APP_DEBUG=${APP_DEBUG:-1}
+      - DATABASE_URL=${DATABASE_URL}
+      - PHP_MEMORY_LIMIT=${PHP_MEMORY_LIMIT:-512M}
+      - UPLOAD_MAX_FILESIZE=${UPLOAD_MAX_FILESIZE:-100M}
+      - POST_MAX_SIZE=${POST_MAX_SIZE:-100M}
+      - APP_PATH=/var/www/app
+      - PUBLIC_PATH=/var/www/app/public
+      - VAR_PATH=/var/www/app/var
+      - VENDOR_PATH=/var/www/app/vendor
+      - PHP_IDE_CONFIG=serverName=symfony
+      - XDEBUG_MODE=debug
+      - XDEBUG_CONFIG="client_host=host.docker.internal"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - app-network
+    entrypoint: ["docker-entrypoint"]
+
+  db:
+    image: mysql:8.0
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - app-network
+
+  adminer:
+    image: adminer
+    ports:
+      - "8081:8080"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  mysql_data: 

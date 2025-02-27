@@ -1,3 +1,13 @@
-// assets/bootstrap.js
-// Ce fichier peut être utilisé pour initialiser des fonctionnalités globales
-console.log("Bootstrap file loaded");
+import { startStimulusApp } from "@symfony/stimulus-bridge";
+
+// Register any custom, 3rd party controllers here
+// app.register('some_controller_name', SomeImportedController);
+
+// Registers Stimulus controllers from controllers.json and in the controllers/ directory
+export const app = startStimulusApp(
+  require.context(
+    "@symfony/stimulus-bridge/lazy-controller-loader!./controllers",
+    true,
+    /\.[jt]sx?$/
+  )
+);

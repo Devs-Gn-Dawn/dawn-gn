@@ -1,0 +1,11 @@
+.git
+.gitignore
+.env
+.env.*
+docker-compose*.yml
+app/var/*
+app/vendor/*
+app/node_modules/*
+*.md
+.idea/
+.vscode/ 
