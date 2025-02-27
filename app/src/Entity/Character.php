@@ -35,6 +35,12 @@ class Character
     #[ORM\Column(type: Types::TEXT)]
     private ?string $note_orga = null;
 
+    #[ORM\Column(type: Types::BOOLEAN)]
+    private bool $isMain = false;
+
+    #[ORM\Column(type: Types::BOOLEAN)]
+    private bool $isValidated = false;
+
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'characters')]
     #[ORM\JoinColumn(name: 'fk_user', referencedColumnName: 'id', nullable: false)]
     private ?User $user = null;
@@ -160,5 +166,27 @@ class Character
     public function getSkillsLearned(): Collection
     {
         return $this->skillsLearned;
+    }
+
+    public function isMain(): bool
+    {
+        return $this->isMain;
+    }
+
+    public function setIsMain(bool $isMain): static
+    {
+        $this->isMain = $isMain;
+        return $this;
+    }
+
+    public function isValidated(): bool
+    {
+        return $this->isValidated;
+    }
+
+    public function setIsValidated(bool $isValidated): static
+    {
+        $this->isValidated = $isValidated;
+        return $this;
     }
 }

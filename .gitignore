@@ -34,3 +34,4 @@ app/.env.*
 vendor/*
 app/templates/html.sample/
 node_modules/
+.cursor/

@@ -14,7 +14,15 @@
         {% endblock %}
     </head>
     <body class="m-0 font-sans antialiased font-normal text-base leading-default bg-gray-50 text-slate-500">
-        {% block body %}{% endblock %}
+        {% include 'partials/_sidebar.html.twig' %}
+
+        <main class="ease-soft-in-out xl:ml-68.5 relative h-full max-h-screen rounded-xl transition-all duration-200">
+            {% include 'partials/_navbar.html.twig' %}
+
+            {% block body %}{% endblock %}
+
+            {% include 'partials/_footer.html.twig' %}
+        </main>
         
         {% block javascripts %}
             {{ encore_entry_script_tags('app') }}
