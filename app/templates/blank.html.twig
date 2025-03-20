@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{% block title %}Dawn, le GN{% endblock %}</title>
+        
+        {% block stylesheets %}
+            {{ encore_entry_link_tags('app') }}
+            {% include 'partials/_styles.html.twig' %}
+            <link rel="stylesheet" href="{{ asset('build/styles/perfect-scrollbar.css') }}">
+            <link rel="stylesheet" href="{{ asset('build/styles/tooltips.css') }}">
+        {% endblock %}
+    </head>
+    <body class="m-0 font-sans antialiased font-normal text-base leading-default bg-gray-50 text-slate-500">
+        {% block body %}{% endblock %}
+
+            {% include 'partials/_footer.html.twig' %}
+        
+        {% block javascripts %}
+            {{ encore_entry_script_tags('app') }}
+            {{ encore_entry_script_tags('popper') }}
+            {{ encore_entry_script_tags('tooltips') }}
+            {% include 'partials/_scripts.html.twig' %}
+        {% endblock %}
+    </body>
+</html> 

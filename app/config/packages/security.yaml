@@ -22,6 +22,7 @@ security:
         username_parameter: email
         password_parameter: password
         default_target_path: app_account
+        always_use_default_target_path: true
       logout:
         path: app_logout
         target: app_login

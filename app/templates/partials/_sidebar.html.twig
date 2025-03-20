@@ -26,7 +26,7 @@
     <ul class="flex flex-col pl-0 mb-0">
       <li class="mt-0.5 w-full">
         <a class="py-2.7 text-sm ease-nav-brand my-0 mx-4 flex items-center whitespace-nowrap px-4 transition-colors hover:scale-102 {% if app.request.get('_route') starts with 'app_character_' %}shadow-soft-xl rounded-lg bg-white font-semibold text-slate-700{% endif %}" href="{{ path('app_character_index') }}">
-          <div class="{% if app.request.get('_route') starts with 'app_character_' %}bg-gradient-to-tl from-gray-900 to-slate-800{% endif %} shadow-soft-2xl mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-white bg-center stroke-0 text-center xl:p-2.5">
+          <div class="{% if app.request.get('_route') starts with 'app_character_index' %}bg-gradient-to-tl from-gray-900 to-slate-800{% endif %} shadow-soft-2xl mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-white bg-center stroke-0 text-center xl:p-2.5">
             <svg width="12px" height="12px" viewBox="0 0 46 42" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
               <title>customer-support</title>
               <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -48,10 +48,28 @@
 
       <li class="mt-0.5 w-full">
         <a class="py-2.7 text-sm ease-nav-brand my-0 mx-4 flex items-center whitespace-nowrap px-4 transition-colors hover:scale-102 {% if app.request.get('_route') starts with 'app_account_' or app.request.get('_route') == 'app_account' %}shadow-soft-xl rounded-lg bg-white font-semibold text-slate-700{% endif %}" href="{{ path('app_account') }}">
-          <div class="{% if app.request.get('_route') starts with 'app_account_' or app.request.get('_route') == 'app_account' %}bg-gradient-to-tl from-gray-900 to-slate-800{% endif %} shadow-soft-2xl mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-white bg-center stroke-0 text-center xl:p-2.5">
-            <i class="ni ni-single-02 {% if app.request.get('_route') starts with 'app_account_' or app.request.get('_route') == 'app_account' %}text-white{% endif %}" aria-hidden="true"></i>
+          <div class="{% if app.request.get('_route') starts with 'app_account' %}bg-gradient-to-tl from-gray-900 to-slate-800{% endif %} shadow-soft-2xl mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-white bg-center stroke-0 text-center xl:p-2.5">
+            <i class="ni ni-badge {% if app.request.get('_route') starts with 'app_account' %}text-white{% endif %}" aria-hidden="true"></i>
           </div>
           <span class="ml-1 duration-300 opacity-100 pointer-events-none ease-soft">Mes informations</span>
+        </a>
+      </li>
+
+      <li class="mt-0.5 w-full">
+        <a class="py-2.7 text-sm ease-nav-brand my-0 mx-4 flex items-center whitespace-nowrap px-4 transition-colors hover:scale-102 {% if app.request.get('_route') starts with 'app_character_sheet' %}shadow-soft-xl rounded-lg bg-white font-semibold text-slate-700{% endif %}" href="{{ path('app_character_index') }}">
+          <div class="{% if app.request.get('_route') starts with 'app_character_sheet' %}bg-gradient-to-tl from-gray-900 to-slate-800{% endif %} shadow-soft-2xl mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-white bg-center stroke-0 text-center xl:p-2.5">
+            <i class="ni ni-paper-diploma {% if app.request.get('_route') starts with 'app_character_sheet' %}text-white{% endif %}" aria-hidden="true"></i>
+          </div>
+          <span class="ml-1 duration-300 opacity-100 pointer-events-none ease-soft">Ma fiche personnage</span>
+        </a>
+      </li>
+
+      <li class="mt-0.5 w-full">
+        <a class="py-2.7 text-sm ease-nav-brand my-0 mx-4 flex items-center whitespace-nowrap px-4 transition-colors hover:scale-102" href="#">
+          <div class="shadow-soft-2xl mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-white bg-center stroke-0 text-center xl:p-2.5">
+            <i class="ni ni-email-83" aria-hidden="true"></i>
+          </div>
+          <span class="ml-1 duration-300 opacity-100 pointer-events-none ease-soft">Contacter mon orga</span>
         </a>
       </li>
     </ul>

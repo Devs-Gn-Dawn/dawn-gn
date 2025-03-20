@@ -1,0 +1,49 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Ajouter un équipement{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card mb-4">
+                <div class="card-header pb-0">
+                    <h6>Ajouter un équipement à {{ character.name }}</h6>
+                </div>
+                <div class="card-body px-0 pt-0 pb-2">
+                    <div class="table-responsive p-0">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
+                            {% for item in gear %}
+                            <div class="bg-white rounded-lg shadow-md p-4">
+                                <h3 class="text-lg font-bold mb-2">{{ item.label }}</h3>
+                                <p class="text-sm text-gray-600 mb-2">{{ item.short }}</p>
+                                <p class="text-sm text-gray-800 mb-4">{{ item.description }}</p>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm font-semibold">Coût : {{ item.base_cost }} PA</span>
+                                    <form action="{{ path('character_equipment_add', {'id': character.id}) }}" method="post" class="inline">
+                                        <input type="hidden" name="gear_id" value="{{ item.id }}">
+                                        <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                                            Ajouter
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                            {% else %}
+                            <div class="col-12 text-center">
+                                <p>Aucun équipement disponible.</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="text-center mt-4">
+    <a href="{{ path('app_character_edit', {'id': character.id}) }}" class="text-blue-500 hover:text-blue-700">
+        Retour à la fiche du personnage
+    </a>
+</div>
+{% endblock %} 

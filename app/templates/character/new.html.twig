@@ -1,0 +1,153 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nouveau Personnage{% endblock %}
+
+{% block body %}
+    <div class="w-full px-6 py-6 mx-auto">
+        <div class="flex flex-wrap -mx-3">
+            <div class="flex-none w-full max-w-full px-3">
+                <div class="relative flex flex-col min-w-0 mb-6 break-words bg-white border-0 border-transparent border-solid shadow-soft-xl rounded-2xl bg-clip-border">
+                    <div class="p-6 pb-0 mb-0 border-b-0 border-b-solid rounded-t-2xl border-b-transparent">
+                        <h6>Créer un nouveau personnage</h6>
+                    </div>
+
+                    <div class="flex-auto px-0 pt-0 pb-2">
+                        <div class="p-6">
+                            <form method="post">
+                                <div class="flex flex-wrap -mx-3">
+                                    <!-- Informations de base -->
+                                    <div class="flex-none w-full max-w-full px-3 mb-6">
+                                        <div class="relative flex flex-col min-w-0 break-words bg-white border-0 border-transparent border-solid shadow-soft-xl rounded-2xl bg-clip-border">
+                                            <div class="p-4">
+                                                <div class="flex flex-wrap -mx-3">
+                                                    <div class="w-full max-w-full px-3 mb-6 md:w-6/12 md:flex-none xl:mb-0">
+                                                        <div class="relative flex flex-col min-w-0">
+                                                            <label class="mb-2 ml-1 font-bold text-xs text-slate-700">Nom du personnage</label>
+                                                            <div class="relative">
+                                                                <input type="text" name="character_name" class="focus:shadow-soft-primary-outline text-sm leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding px-3 py-2 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-cyan-300 focus:outline-none" required/>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="w-full max-w-full px-3 md:w-6/12 md:flex-none">
+                                                        <div class="relative flex flex-col min-w-0">
+                                                            <label class="mb-2 ml-1 font-bold text-xs text-slate-700">Faction</label>
+                                                            <div class="relative">
+                                                                <select name="faction" id="faction-select" class="focus:shadow-soft-primary-outline text-sm leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding px-3 py-2 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-cyan-300 focus:outline-none" required>
+                                                                    <option value="">Choisir une faction</option>
+                                                                    {% for label, value in factions %}
+                                                                        <option value="{{ value }}">{{ label }}</option>
+                                                                    {% endfor %}
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="w-full max-w-full px-3 md:w-6/12 md:flex-none">
+                                                        <div class="relative flex flex-col min-w-0">
+                                                            <label id="class-label" class="mb-2 ml-1 font-bold text-xs text-slate-700">Classe</label>
+                                                            <div class="relative">
+                                                                <select name="class" id="class-select" class="focus:shadow-soft-primary-outline text-sm leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding px-3 py-2 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-cyan-300 focus:outline-none" required>
+                                                                    <option value="">Choisir une classe</option>
+                                                                    {% for label, value in classes %}
+                                                                        <option value="{{ value }}">{{ label }}</option>
+                                                                    {% endfor %}
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Background -->
+                                    <div class="flex-none w-full max-w-full px-3 mb-6">
+                                        <div class="relative flex flex-col min-w-0 break-words bg-white border-0 border-transparent border-solid shadow-soft-xl rounded-2xl bg-clip-border">
+                                            <div class="p-4">
+                                                <h6 class="mb-4">Background</h6>
+                                                <div class="relative">
+                                                    <div id="editor" class="bg-white !text-sm">
+                                                        <p>Écrivez votre background ici...</p>
+                                                    </div>
+                                                    <textarea name="background" id="background_hidden" class="hidden"></textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Boutons d'action -->
+                                    <div class="w-full px-3 text-right">
+                                        <button type="submit" class="inline-block px-6 py-3 font-bold text-center text-white uppercase align-middle transition-all rounded-lg cursor-pointer bg-gradient-to-tl from-green-600 to-green-700 leading-pro text-xs ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 hover:scale-102 active:opacity-85 hover:shadow-soft-xs">Créer le personnage</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+
+<script>
+    var quill = new Quill('#editor', {
+        theme: 'snow'
+    });
+    
+    // Synchroniser le contenu de l'éditeur avec le textarea caché avant l'envoi du formulaire
+    document.querySelector('form').onsubmit = function() {
+        document.getElementById('background_hidden').value = quill.root.innerHTML;
+    };
+
+    // Mise à jour dynamique des classes en fonction de la faction
+    const factionSelect = document.getElementById('faction-select');
+    const classSelect = document.getElementById('class-select');
+    const classLabel = document.getElementById('class-label');
+
+    // Désactiver le select des classes au chargement
+    classSelect.disabled = true;
+    classSelect.classList.add('opacity-50', 'cursor-not-allowed');
+    classLabel.classList.add('text-gray-400');
+    classLabel.textContent = 'Classe (Sélectionnez d\'abord une faction)';
+
+    factionSelect.addEventListener('change', async function() {
+        const selectedFaction = this.value;
+        classSelect.innerHTML = '<option value="">Choisir une classe</option>';
+        
+        if (!selectedFaction) {
+            classSelect.disabled = true;
+            classSelect.classList.add('opacity-50', 'cursor-not-allowed');
+            classLabel.classList.add('text-gray-400');
+            classLabel.textContent = 'Classe (Sélectionnez d\'abord une faction)';
+            return;
+        }
+
+        try {
+            const response = await fetch(`/characters/api/classes/${selectedFaction}`);
+            const classes = await response.json();
+            
+            Object.entries(classes).forEach(([label, value]) => {
+                const option = document.createElement('option');
+                option.value = value;
+                option.textContent = label;
+                classSelect.appendChild(option);
+            });
+            
+            // Activer le select des classes une fois les options chargées
+            classSelect.disabled = false;
+            classSelect.classList.remove('opacity-50', 'cursor-not-allowed');
+            classLabel.classList.remove('text-gray-400');
+            classLabel.textContent = 'Classe';
+        } catch (error) {
+            console.error('Erreur lors du chargement des classes:', error);
+            classSelect.disabled = true;
+            classSelect.classList.add('opacity-50', 'cursor-not-allowed');
+            classLabel.classList.add('text-gray-400');
+            classLabel.textContent = 'Classe (Erreur de chargement)';
+        }
+    });
+</script>
+{% endblock %} 

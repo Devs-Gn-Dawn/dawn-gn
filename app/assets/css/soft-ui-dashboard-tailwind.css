@@ -1942,7 +1942,7 @@ h6 {
 .border-red-600 {
   --tw-border-opacity: 1;
   border-color: rgb(234 6 6 / var(--tw-border-opacity));
-}
+} 
 
 .border-slate-100 {
   --tw-border-opacity: 1;
@@ -1963,7 +1963,7 @@ h6 {
   --tw-border-opacity: 1;
   border-color: rgb(52 71 103 / var(--tw-border-opacity));
 }
-
+  
 .border-slate-800 {
   --tw-border-opacity: 1;
   border-color: rgb(58 65 111 / var(--tw-border-opacity));
@@ -2878,6 +2878,11 @@ h6 {
 .text-slate-700 {
   --tw-text-opacity: 1;
   color: rgb(52 71 103 / var(--tw-text-opacity));
+}
+
+.text-slate-800 {
+  --tw-text-opacity: 1;
+  color: rgb(58 65 111 / var(--tw-text-opacity));
 }
 
 .text-transparent {

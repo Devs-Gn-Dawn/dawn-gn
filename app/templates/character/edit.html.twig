@@ -1,32 +1,260 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Modifier {{ character.name }}{% endblock %}
+{% block title %}Modifier le Personnage{% endblock %}
 
 {% block body %}
-    <div class="container mt-4">
-        <h1>Modifier {{ character.name }}</h1>
+    <div class="w-full px-6 py-6 mx-auto">
+        <div class="flex flex-wrap -mx-3">
+            <div class="flex-none w-full max-w-full px-3">
+                <div class="relative flex flex-col min-w-0 mb-6 break-words bg-white border-0 border-transparent border-solid shadow-soft-xl rounded-2xl bg-clip-border">
+                    <div class="p-6 pb-0 mb-0 bg-white border-b-0 border-b-solid rounded-t-2xl border-b-transparent">
+                        <div class="flex flex-wrap -mx-3">
+                            <div class="flex items-center w-full max-w-full px-3 shrink-0 md:w-8/12 md:flex-none">
+                                <h6 class="mb-0">{{ character.name }}</h6>
+                            </div>
+                        </div>
+                    </div>
 
-        {{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
-        <div class="row">
-            <div class="col-md-6">
-                <div class="mb-3">
-                    {{ form_label(form.name) }}
-                    {{ form_widget(form.name, {'attr': {'class': 'form-control'}}) }}
-                    {{ form_errors(form.name) }}
-                </div>
+                    <!-- Tabs -->
+                    <div class="flex flex-wrap px-6 pt-4">
+                        <div class="flex-auto">
+                            <ul class="flex flex-row flex-wrap list-none border-b-0 pl-0" role="tablist">
+                                <li class="flex-auto text-center">
+                                    <a href="{{ path('app_character_edit', {'id': character.id}) }}" 
+                                       class="block px-6 py-3 mb-0 ml-2 font-bold text-center text-slate-700 uppercase align-middle transition-all ease-in border-b-2 border-transparent border-solid cursor-pointer text-xs bg-transparent leading-pro tracking-tight-soft hover:isolate focus:isolate {% if app.request.attributes.get('_route') == 'app_character_edit' %}border-cyan-500{% endif %}"
+                                       role="tab">
+                                        <i class="fas fa-pencil-alt mr-2"></i>Fiche personnage
+                                    </a>
+                                </li>
+                                <li class="flex-auto text-center">
+                                    <a href="{{ path('app_character_background', {'id': character.id}) }}" 
+                                       class="block px-6 py-3 mb-0 ml-2 font-bold text-center text-slate-700 uppercase align-middle transition-all ease-in border-b-2 border-transparent border-solid cursor-pointer text-xs bg-transparent leading-pro tracking-tight-soft hover:isolate focus:isolate {% if app.request.attributes.get('_route') == 'app_character_background' %}border-cyan-500{% endif %}"
+                                       role="tab">
+                                        <i class="fas fa-file-alt mr-2"></i>Background
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
 
-                <div class="mb-3">
-                    {{ form_label(form.description) }}
-                    {{ form_widget(form.description, {'attr': {'class': 'form-control'}}) }}
-                    {{ form_errors(form.description) }}
+                    <div class="flex-auto px-0 pt-0 pb-2">
+                        <div class="p-6">
+                            <!-- Informations de base -->
+                            <div class="flex flex-wrap -mx-3 mb-6">
+                                <div class="w-full max-w-full px-3 shrink-0 md:w-6/12 md:flex-0">
+                                    <div class="mb-4">
+                                        <label for="name" class="inline-block mb-2 ml-1 font-bold text-xs text-slate-700">Nom du personnage</label>
+                                        <input type="text" name="name" value="{{ character.name }}" class="focus:shadow-soft-primary-outline text-sm leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding px-3 py-2 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-cyan-300 focus:outline-none" />
+                                    </div>
+                                </div>
+                                <div class="w-full max-w-full px-3 shrink-0 md:w-6/12 md:flex-0">
+                                    <div class="mb-4">
+                                        <label for="faction" class="inline-block mb-2 ml-1 font-bold text-xs text-slate-700">Faction</label>
+                                        <input type="text" value="{{ character.faction }}" class="focus:shadow-soft-primary-outline text-sm leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding px-3 py-2 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-cyan-300 focus:outline-none" readonly />
+                                    </div>
+                                </div>
+                                <div class="w-full max-w-full px-3 shrink-0 md:w-6/12 md:flex-0">
+                                    <div class="mb-4">
+                                        <label for="class" class="inline-block mb-2 ml-1 font-bold text-xs text-slate-700">Classe</label>
+                                        <input type="text" value="{{ character.class }}" class="focus:shadow-soft-primary-outline text-sm leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding px-3 py-2 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-cyan-300 focus:outline-none" readonly />
+                                    </div>
+                                </div>
+                                <div class="w-full max-w-full px-3 shrink-0 md:w-6/12 md:flex-0">
+                                    <div class="mb-4">
+                                        <label for="xp" class="inline-block mb-2 ml-1 font-bold text-xs text-slate-700">Points d'expérience disponibles</label>
+                                        <input type="text" value="3" class="focus:shadow-soft-primary-outline text-sm leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding px-3 py-2 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-cyan-300 focus:outline-none" readonly />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex flex-wrap -mx-3">
+                                <!-- Compétences -->
+                                <div class="flex-none w-full max-w-full px-3 mb-6">
+                                    <div class="relative flex flex-col min-w-0 pb-2 break-words bg-white border-0 border-transparent border-solid shadow-soft-xl rounded-2xl bg-clip-border">
+                                        <div class="flex flex-wrap mx-3 my-3">
+                                            <div class="flex-none w-auto max-w-full px-3 my-auto">
+                                                <div class="h-full">
+                                                    <h5 class="mb-1">Compétences</h5>
+                                                </div>
+                                            </div>
+                                            <div class="w-full max-w-full px-3 mx-auto mt-4 sm:my-auto sm:mr-0 sm:w-1/5 md:w-1/5 md:flex-none">
+                                                <div class="relative right-0">
+                                                    <div class="h-full text-right">
+                                                        <h6 class="mb-1"><span class="text-slate-400">{{ character.getPaUsed() }}</span>/{{ character.getPaTotal() }} PA <a href="#" id="info" data-target="tooltip_trigger" data-placement="top"><i class="fa fa-plus-circle text-slate-400 hover:text-slate-700 text-sm" aria-hidden="true"></i></a></h6>
+                                                    </div> 
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="flex-auto px-0 pt-0 pb-2">
+                                            <div class="p-0 mx-5">
+                                                <table class="items-center w-full table-fixed border-separate border-spacing-2 mb-0 align-top border-gray-200 text-slate-500">
+                                                    <tbody>
+                                                        {% for skill in character.skills %}
+                                                        <tr>
+                                                            <td class="p-2 align-middle bg-transparent border-b shadow-transparent text-pretty">
+                                                                <div class="flex px-2 py-1">
+                                                                    <div class="flex flex-col justify-center">
+                                                                        <p class="text-sm leading-normal">
+                                                                            <span class="font-extrabold underline text-slate-700">{{ skill.name }}</span> : {{ skill.description }}
+                                                                            <br/>
+                                                                            Coût : <span class="font-extrabold">{{ skill.cost }}PA</span> - <span class="italic">"{{ skill.quote }}"</span>
+                                                                        </p>
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                            <td class="w-20 align-middle bg-slate-50 shadow-transparent p-2 rounded border border-dashed border-slate-200 hover:border-slate-500">
+                                                                <div class="w-full text-center">
+                                                                    <a href="{{ path('character_skill_delete', {'id': character.id, 'skillId': skill.id}) }}" class="text-red-500 hover:text-red-700">
+                                                                        <i class="fa fa-trash cursor-pointer" aria-hidden="true"></i>
+                                                                    </a>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                        {% endfor %}
+                                                        <tr>
+                                                            <td class="mx-8 text-center shadow-transparent" colspan="2">
+                                                                <div class="flex p-3 mt-3 text-center justify-center bg-slate-100 bg-opacity-40 border rounded border-dashed border-slate-300">
+                                                                    <a href="{{ path('character_skill_add', {'id': character.id}) }}" class="text-xs font-semibold leading-tight text-slate-300 cursor-pointer hover:scale-102 hover:text-slate-700 hover:underline">
+                                                                        <strong class="font-extrabold">+ </strong>Ajouter une compétence ({{ character.getPaTotal() - character.getPaUsed() }} PA disponibles)
+                                                                    </a>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Compétences spéciales -->
+                                <div class="flex-none w-full max-w-full px-3 mb-6">
+                                    <div class="relative flex flex-col min-w-0 pb-2 break-words bg-white border-0 border-transparent border-solid shadow-soft-xl rounded-2xl bg-clip-border">
+                                        <div class="flex flex-wrap mx-3 my-3">
+                                            <div class="flex-none w-auto max-w-full px-3 my-auto">
+                                                <div class="h-full">
+                                                    <h5 class="mb-1">Capacités spéciales <a href="#" id="info" data-target="tooltip_trigger" data-placement="top"><i class="fa fa-question-circle hover:text-slate-700 text-sm" aria-hidden="true"></i></a></h5>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="flex-auto px-0 pt-0 pb-2">
+                                            <div class="p-0 mx-5">
+                                                <table class="items-center w-full table-fixed border-separate border-spacing-2 mb-0 align-top border-gray-200 text-slate-500">
+                                                    <tbody>
+                                                        {% for specialSkill in character.specialSkills %}
+                                                        <tr>
+                                                            <td class="p-2 align-middle bg-transparent border-b shadow-transparent text-pretty">
+                                                                <div class="flex px-2 py-1">
+                                                                    <div class="flex flex-col justify-center">
+                                                                        <p class="text-sm leading-normal">
+                                                                            <span class="font-extrabold underline text-slate-700">{{ specialSkill.name }}</span> : {{ specialSkill.description }}
+                                                                        </p>
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                        {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Matériels et ressources -->
+                                <div class="flex-none w-full max-w-full px-3 mb-6">
+                                    <div class="relative flex flex-col min-w-0 pb-2 break-words bg-white border-0 border-transparent border-solid shadow-soft-xl rounded-2xl bg-clip-border">
+                                        <div class="flex flex-wrap mx-3 my-3">
+                                            <div class="flex-none w-auto max-w-full px-3 my-auto">
+                                                <div class="h-full">
+                                                    <h5 class="mb-1">Matériels et ressources</h5>
+                                                </div>
+                                            </div>
+                                            <div class="w-full max-w-full px-3 mx-auto mt-4 sm:my-auto sm:mr-0 sm:w-1/5 md:w-1/5 md:flex-none">
+                                                <div class="relative right-0">
+                                                    <div class="h-full text-right">
+                                                        <h6 class="mb-1"><span class="text-slate-400">{{ character.getEquipmentPaUsed() }}</span>/{{ character.getEquipmentPaTotal() }} PA <a href="#" id="info" data-target="tooltip_trigger" data-placement="top"><i class="fa fa-plus-circle text-slate-400 hover:text-slate-700 text-sm" aria-hidden="true"></i></a></h6>
+                                                    </div> 
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="flex-auto px-0 pt-0 pb-2">
+                                            <div class="p-0 mx-5">
+                                                <div class="flex justify-between items-center mb-4">
+                                                    <h6 class="mb-0">Équipements</h6>
+                                                    <a href="{{ path('character_equipment_add', {'id': character.id}) }}" class="btn btn-primary btn-sm">
+                                                        <i class="ni ni-fat-add"></i> Ajouter un équipement
+                                                    </a>
+                                                </div>
+                                                <table class="items-center w-full table-fixed border-separate border-spacing-2 mb-0 align-top border-gray-200 text-slate-500">
+                                                    <tbody>
+                                                        {% for possession in character.possessions %}
+                                                        <tr>
+                                                            <td class="p-2 align-middle bg-transparent border-b shadow-transparent text-pretty">
+                                                                <div class="flex px-2 py-1">
+                                                                    <div class="flex flex-col justify-center">
+                                                                        <p class="text-sm leading-normal">
+                                                                            <span class="font-extrabold underline text-slate-700">{{ possession.gear.label }}</span> : {{ possession.gear.description }}
+                                                                            <br/>
+                                                                            Coût : <span class="font-extrabold">{{ possession.cost }}PA</span> - <span class="italic">"{{ possession.gear.short }}"</span>
+                                                                        </p>
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                            <td class="p-2 align-middle bg-transparent border-b shadow-transparent text-right">
+                                                                <a href="{{ path('character_equipment_delete', {'id': character.id, 'possessionId': possession.id}) }}" 
+                                                                   class="text-red-500 hover:text-red-700"
+                                                                   onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet équipement ?');">
+                                                                    <i class="ni ni-fat-delete"></i>
+                                                                </a>
+                                                            </td>
+                                                        </tr>
+                                                        {% else %}
+                                                        <tr>
+                                                            <td class="p-2 align-middle bg-transparent border-b shadow-transparent text-center">
+                                                                Aucun équipement
+                                                            </td>
+                                                        </tr>
+                                                        {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Possessions -->
+                                <div class="flex-none w-full max-w-full px-3 mb-6">
+                                    <div class="relative flex flex-col min-w-0 pb-2 break-words bg-white border-0 border-transparent border-solid shadow-soft-xl rounded-2xl bg-clip-border">
+                                        <div class="flex flex-wrap mx-3 my-3">
+                                            <div class="flex-none w-auto max-w-full px-3 my-auto">
+                                                <div class="h-full">
+                                                    <h5 class="mb-1">Mes possessions <a href="#" id="info" data-target="tooltip_trigger" data-placement="top"><i class="fa fa-question-circle hover:text-slate-700 text-sm" aria-hidden="true"></i></a></h5>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="flex-auto px-0 pt-0 pb-2">
+                                            <div class="p-0 mx-5">
+                                                <ul class="list-square list-inside ml-5">
+                                                    {% for possession in character.possessions %}
+                                                    <li>{{ possession }}</li>
+                                                    {% endfor %}
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="w-full p-1 mx-auto text-right">
+                                <a href="{{ path('character_delete', {'id': character.id}) }}" class="inline-block px-6 py-3 font-bold text-center text-red-700 bg-transparent uppercase align-middle transition-all leading-pro text-xs ease-soft-in tracking-tight-soft hover:scale-102 hover:underline active:opacity-85" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce personnage ?')">Supprimer</a>
+                                <a href="{{ path('character_submit', {'id': character.id}) }}" class="inline-block px-6 py-3 font-bold text-center text-white uppercase align-middle transition-all rounded-lg cursor-pointer bg-gradient-to-tl from-cyan-300 to-cyan-600 leading-pro text-xs ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 hover:scale-102 active:opacity-85 hover:shadow-soft-xs hover:text-cyan-100">Soumettre ce personnage aux orgas</a>
+                                <button type="submit" class="inline-block px-6 py-3 font-bold text-center text-white uppercase align-middle transition-all rounded-lg cursor-pointer bg-gradient-to-tl from-green-600 to-green-700 leading-pro text-xs ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 hover:scale-102 active:opacity-85 hover:text-lime-300 hover:shadow-soft-xs">Sauvegarder</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-
-        <div class="mb-3">
-            <button type="submit" class="btn btn-primary">Enregistrer les modifications</button>
-            <a href="{{ path('app_character_index') }}" class="btn btn-secondary">Retour à la liste</a>
-        </div>
-        {{ form_end(form) }}
     </div>
 {% endblock %} 

@@ -189,4 +189,70 @@ class Character
         $this->isValidated = $isValidated;
         return $this;
     }
+
+    public function getPaUsed(): int
+    {
+        $total = 0;
+        foreach ($this->skillsLearned as $skillLearned) {
+            $total += $skillLearned->getCost();
+        }
+        return $total;
+    }
+
+    public function getPaTotal(): int
+    {
+        // TODO: Implémenter la logique pour calculer le total des PA en fonction de la classe et de la faction
+        return 100; // Valeur par défaut
+    }
+
+    public function getEquipmentPaUsed(): int
+    {
+        $total = 0;
+        foreach ($this->possessions as $possession) {
+            $total += $possession->getCost();
+        }
+        return $total;
+    }
+
+    public function getEquipmentPaTotal(): int
+    {
+        // TODO: Implémenter la logique pour calculer le total des PA d'équipement
+        return 50; // Valeur par défaut
+    }
+
+    public function getSkills(): array
+    {
+        $skills = [];
+        foreach ($this->skillsLearned as $skillLearned) {
+            $skills[] = [
+                'id' => $skillLearned->getSkill()->getId(),
+                'name' => $skillLearned->getSkill()->getLabel(),
+                'description' => $skillLearned->getSkill()->getDescription(),
+                'cost' => $skillLearned->getCost(),
+                'quote' => $skillLearned->getNote()
+            ];
+        }
+        return $skills;
+    }
+
+    public function getSpecialSkills(): array
+    {
+        // TODO: Implémenter la logique pour récupérer les compétences spéciales
+        return [];
+    }
+
+    public function getEquipment(): array
+    {
+        $equipment = [];
+        foreach ($this->possessions as $possession) {
+            $equipment[] = [
+                'id' => $possession->getGear()->getId(),
+                'name' => $possession->getGear()->getLabel(),
+                'description' => $possession->getGear()->getDescription(),
+                'cost' => $possession->getCost(),
+                'quote' => $possession->getNote()
+            ];
+        }
+        return $equipment;
+    }
 }

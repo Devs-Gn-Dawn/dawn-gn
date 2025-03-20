@@ -14,7 +14,7 @@ class Gear
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 31)]
+    #[ORM\Column(length: 63)]
     private ?string $label = null;
 
     #[ORM\Column(type: Types::SMALLINT)]

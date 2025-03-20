@@ -1,4 +1,7 @@
-import { startStimulusApp } from "@symfony/stimulus-bridge";
+import "./styles/app.css";
+
+// start the Stimulus application
+import "./bootstrap";
 
 // Register any custom, 3rd party controllers here
 // app.register('some_controller_name', SomeImportedController);

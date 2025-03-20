@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   web:
     build:
@@ -11,7 +9,6 @@ services:
     volumes:
       - ./app:/var/www/app
       - ./.env:/var/www/.env
-      - ./.env.local:/var/www/.env.local
       - ./.env.dev:/var/www/.env.dev
       - ./.env.test:/var/www/.env.test
       - ./docker/php/docker-entrypoint.sh:/usr/local/bin/docker-entrypoint
