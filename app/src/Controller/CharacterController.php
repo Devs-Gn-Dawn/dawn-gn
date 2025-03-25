@@ -31,6 +31,7 @@ class CharacterController extends AbstractController
     {
         return $this->render('character/index.html.twig', [
             'characters' => $characterRepository->findBy(['user' => $this->getUser()]),
+            'breadcrumb' => ['Liste des personnages'],
         ]);
     }
 
@@ -72,6 +73,11 @@ class CharacterController extends AbstractController
 
         return $this->render('character/edit.html.twig', [
             'character' => $character,
+            'navRelative' => false,
+            'breadcrumb' => [
+                $this->generateUrl('app_character_index') => 'Liste des personnages',
+                'Fiche personnage : <b>' . $character->getName() . '</b>'
+            ],
         ]);
     }
 

@@ -190,7 +190,26 @@ class Character
         return $this;
     }
 
+    public function getPaAvailable(): int
+    {
+        return $this->getPaTotal() - $this->getPaUsed();
+    }
+
+
     public function getPaUsed(): int
+    {
+        $total = 0;
+        $total += $this->getSkillsPaUsed();
+        $total += $this->getEquipmentPaUsed();
+        return $total;
+    }
+
+    public function getPaTotal(): int
+    {
+        return 30; // Valeur par défaut
+    }
+
+    public function getSkillsPaUsed(): int
     {
         $total = 0;
         foreach ($this->skillsLearned as $skillLearned) {
@@ -198,13 +217,6 @@ class Character
         }
         return $total;
     }
-
-    public function getPaTotal(): int
-    {
-        // TODO: Implémenter la logique pour calculer le total des PA en fonction de la classe et de la faction
-        return 100; // Valeur par défaut
-    }
-
     public function getEquipmentPaUsed(): int
     {
         $total = 0;
@@ -216,7 +228,6 @@ class Character
 
     public function getEquipmentPaTotal(): int
     {
-        // TODO: Implémenter la logique pour calculer le total des PA d'équipement
         return 50; // Valeur par défaut
     }
 
@@ -228,6 +239,9 @@ class Character
                 'id' => $skillLearned->getSkill()->getId(),
                 'name' => $skillLearned->getSkill()->getLabel(),
                 'description' => $skillLearned->getSkill()->getDescription(),
+                'required' => $skillLearned->getSkill()->getRequired(),
+                'class' => $skillLearned->getSkill()->getClass(),
+                'faction' => $skillLearned->getSkill()->getFaction(),
                 'cost' => $skillLearned->getCost(),
                 'quote' => $skillLearned->getNote()
             ];
@@ -254,5 +268,15 @@ class Character
             ];
         }
         return $equipment;
+    }
+
+    public function getFactionType(): ?FactionType
+    {
+        return FactionType::from($this->faction);
+    }
+
+    public function getBanner(): string
+    {
+        return FactionType::getBanner($this->getFactionType());
     }
 }

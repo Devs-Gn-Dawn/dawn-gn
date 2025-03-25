@@ -3,258 +3,352 @@
 {% block title %}Modifier le Personnage{% endblock %}
 
 {% block body %}
-    <div class="w-full px-6 py-6 mx-auto">
-        <div class="flex flex-wrap -mx-3">
-            <div class="flex-none w-full max-w-full px-3">
-                <div class="relative flex flex-col min-w-0 mb-6 break-words bg-white border-0 border-transparent border-solid shadow-soft-xl rounded-2xl bg-clip-border">
-                    <div class="p-6 pb-0 mb-0 bg-white border-b-0 border-b-solid rounded-t-2xl border-b-transparent">
-                        <div class="flex flex-wrap -mx-3">
-                            <div class="flex items-center w-full max-w-full px-3 shrink-0 md:w-8/12 md:flex-none">
-                                <h6 class="mb-0">{{ character.name }}</h6>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Tabs -->
-                    <div class="flex flex-wrap px-6 pt-4">
-                        <div class="flex-auto">
-                            <ul class="flex flex-row flex-wrap list-none border-b-0 pl-0" role="tablist">
-                                <li class="flex-auto text-center">
-                                    <a href="{{ path('app_character_edit', {'id': character.id}) }}" 
-                                       class="block px-6 py-3 mb-0 ml-2 font-bold text-center text-slate-700 uppercase align-middle transition-all ease-in border-b-2 border-transparent border-solid cursor-pointer text-xs bg-transparent leading-pro tracking-tight-soft hover:isolate focus:isolate {% if app.request.attributes.get('_route') == 'app_character_edit' %}border-cyan-500{% endif %}"
-                                       role="tab">
-                                        <i class="fas fa-pencil-alt mr-2"></i>Fiche personnage
-                                    </a>
-                                </li>
-                                <li class="flex-auto text-center">
-                                    <a href="{{ path('app_character_background', {'id': character.id}) }}" 
-                                       class="block px-6 py-3 mb-0 ml-2 font-bold text-center text-slate-700 uppercase align-middle transition-all ease-in border-b-2 border-transparent border-solid cursor-pointer text-xs bg-transparent leading-pro tracking-tight-soft hover:isolate focus:isolate {% if app.request.attributes.get('_route') == 'app_character_background' %}border-cyan-500{% endif %}"
-                                       role="tab">
-                                        <i class="fas fa-file-alt mr-2"></i>Background
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <div class="flex-auto px-0 pt-0 pb-2">
-                        <div class="p-6">
-                            <!-- Informations de base -->
-                            <div class="flex flex-wrap -mx-3 mb-6">
-                                <div class="w-full max-w-full px-3 shrink-0 md:w-6/12 md:flex-0">
-                                    <div class="mb-4">
-                                        <label for="name" class="inline-block mb-2 ml-1 font-bold text-xs text-slate-700">Nom du personnage</label>
-                                        <input type="text" name="name" value="{{ character.name }}" class="focus:shadow-soft-primary-outline text-sm leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding px-3 py-2 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-cyan-300 focus:outline-none" />
-                                    </div>
-                                </div>
-                                <div class="w-full max-w-full px-3 shrink-0 md:w-6/12 md:flex-0">
-                                    <div class="mb-4">
-                                        <label for="faction" class="inline-block mb-2 ml-1 font-bold text-xs text-slate-700">Faction</label>
-                                        <input type="text" value="{{ character.faction }}" class="focus:shadow-soft-primary-outline text-sm leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding px-3 py-2 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-cyan-300 focus:outline-none" readonly />
-                                    </div>
-                                </div>
-                                <div class="w-full max-w-full px-3 shrink-0 md:w-6/12 md:flex-0">
-                                    <div class="mb-4">
-                                        <label for="class" class="inline-block mb-2 ml-1 font-bold text-xs text-slate-700">Classe</label>
-                                        <input type="text" value="{{ character.class }}" class="focus:shadow-soft-primary-outline text-sm leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding px-3 py-2 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-cyan-300 focus:outline-none" readonly />
-                                    </div>
-                                </div>
-                                <div class="w-full max-w-full px-3 shrink-0 md:w-6/12 md:flex-0">
-                                    <div class="mb-4">
-                                        <label for="xp" class="inline-block mb-2 ml-1 font-bold text-xs text-slate-700">Points d'expérience disponibles</label>
-                                        <input type="text" value="3" class="focus:shadow-soft-primary-outline text-sm leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding px-3 py-2 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-cyan-300 focus:outline-none" readonly />
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="flex flex-wrap -mx-3">
-                                <!-- Compétences -->
-                                <div class="flex-none w-full max-w-full px-3 mb-6">
-                                    <div class="relative flex flex-col min-w-0 pb-2 break-words bg-white border-0 border-transparent border-solid shadow-soft-xl rounded-2xl bg-clip-border">
-                                        <div class="flex flex-wrap mx-3 my-3">
-                                            <div class="flex-none w-auto max-w-full px-3 my-auto">
-                                                <div class="h-full">
-                                                    <h5 class="mb-1">Compétences</h5>
-                                                </div>
-                                            </div>
-                                            <div class="w-full max-w-full px-3 mx-auto mt-4 sm:my-auto sm:mr-0 sm:w-1/5 md:w-1/5 md:flex-none">
-                                                <div class="relative right-0">
-                                                    <div class="h-full text-right">
-                                                        <h6 class="mb-1"><span class="text-slate-400">{{ character.getPaUsed() }}</span>/{{ character.getPaTotal() }} PA <a href="#" id="info" data-target="tooltip_trigger" data-placement="top"><i class="fa fa-plus-circle text-slate-400 hover:text-slate-700 text-sm" aria-hidden="true"></i></a></h6>
-                                                    </div> 
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="flex-auto px-0 pt-0 pb-2">
-                                            <div class="p-0 mx-5">
-                                                <table class="items-center w-full table-fixed border-separate border-spacing-2 mb-0 align-top border-gray-200 text-slate-500">
-                                                    <tbody>
-                                                        {% for skill in character.skills %}
-                                                        <tr>
-                                                            <td class="p-2 align-middle bg-transparent border-b shadow-transparent text-pretty">
-                                                                <div class="flex px-2 py-1">
-                                                                    <div class="flex flex-col justify-center">
-                                                                        <p class="text-sm leading-normal">
-                                                                            <span class="font-extrabold underline text-slate-700">{{ skill.name }}</span> : {{ skill.description }}
-                                                                            <br/>
-                                                                            Coût : <span class="font-extrabold">{{ skill.cost }}PA</span> - <span class="italic">"{{ skill.quote }}"</span>
-                                                                        </p>
-                                                                    </div>
-                                                                </div>
-                                                            </td>
-                                                            <td class="w-20 align-middle bg-slate-50 shadow-transparent p-2 rounded border border-dashed border-slate-200 hover:border-slate-500">
-                                                                <div class="w-full text-center">
-                                                                    <a href="{{ path('character_skill_delete', {'id': character.id, 'skillId': skill.id}) }}" class="text-red-500 hover:text-red-700">
-                                                                        <i class="fa fa-trash cursor-pointer" aria-hidden="true"></i>
-                                                                    </a>
-                                                                </div>
-                                                            </td>
-                                                        </tr>
-                                                        {% endfor %}
-                                                        <tr>
-                                                            <td class="mx-8 text-center shadow-transparent" colspan="2">
-                                                                <div class="flex p-3 mt-3 text-center justify-center bg-slate-100 bg-opacity-40 border rounded border-dashed border-slate-300">
-                                                                    <a href="{{ path('character_skill_add', {'id': character.id}) }}" class="text-xs font-semibold leading-tight text-slate-300 cursor-pointer hover:scale-102 hover:text-slate-700 hover:underline">
-                                                                        <strong class="font-extrabold">+ </strong>Ajouter une compétence ({{ character.getPaTotal() - character.getPaUsed() }} PA disponibles)
-                                                                    </a>
-                                                                </div>
-                                                            </td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Compétences spéciales -->
-                                <div class="flex-none w-full max-w-full px-3 mb-6">
-                                    <div class="relative flex flex-col min-w-0 pb-2 break-words bg-white border-0 border-transparent border-solid shadow-soft-xl rounded-2xl bg-clip-border">
-                                        <div class="flex flex-wrap mx-3 my-3">
-                                            <div class="flex-none w-auto max-w-full px-3 my-auto">
-                                                <div class="h-full">
-                                                    <h5 class="mb-1">Capacités spéciales <a href="#" id="info" data-target="tooltip_trigger" data-placement="top"><i class="fa fa-question-circle hover:text-slate-700 text-sm" aria-hidden="true"></i></a></h5>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="flex-auto px-0 pt-0 pb-2">
-                                            <div class="p-0 mx-5">
-                                                <table class="items-center w-full table-fixed border-separate border-spacing-2 mb-0 align-top border-gray-200 text-slate-500">
-                                                    <tbody>
-                                                        {% for specialSkill in character.specialSkills %}
-                                                        <tr>
-                                                            <td class="p-2 align-middle bg-transparent border-b shadow-transparent text-pretty">
-                                                                <div class="flex px-2 py-1">
-                                                                    <div class="flex flex-col justify-center">
-                                                                        <p class="text-sm leading-normal">
-                                                                            <span class="font-extrabold underline text-slate-700">{{ specialSkill.name }}</span> : {{ specialSkill.description }}
-                                                                        </p>
-                                                                    </div>
-                                                                </div>
-                                                            </td>
-                                                        </tr>
-                                                        {% endfor %}
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Matériels et ressources -->
-                                <div class="flex-none w-full max-w-full px-3 mb-6">
-                                    <div class="relative flex flex-col min-w-0 pb-2 break-words bg-white border-0 border-transparent border-solid shadow-soft-xl rounded-2xl bg-clip-border">
-                                        <div class="flex flex-wrap mx-3 my-3">
-                                            <div class="flex-none w-auto max-w-full px-3 my-auto">
-                                                <div class="h-full">
-                                                    <h5 class="mb-1">Matériels et ressources</h5>
-                                                </div>
-                                            </div>
-                                            <div class="w-full max-w-full px-3 mx-auto mt-4 sm:my-auto sm:mr-0 sm:w-1/5 md:w-1/5 md:flex-none">
-                                                <div class="relative right-0">
-                                                    <div class="h-full text-right">
-                                                        <h6 class="mb-1"><span class="text-slate-400">{{ character.getEquipmentPaUsed() }}</span>/{{ character.getEquipmentPaTotal() }} PA <a href="#" id="info" data-target="tooltip_trigger" data-placement="top"><i class="fa fa-plus-circle text-slate-400 hover:text-slate-700 text-sm" aria-hidden="true"></i></a></h6>
-                                                    </div> 
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="flex-auto px-0 pt-0 pb-2">
-                                            <div class="p-0 mx-5">
-                                                <div class="flex justify-between items-center mb-4">
-                                                    <h6 class="mb-0">Équipements</h6>
-                                                    <a href="{{ path('character_equipment_add', {'id': character.id}) }}" class="btn btn-primary btn-sm">
-                                                        <i class="ni ni-fat-add"></i> Ajouter un équipement
-                                                    </a>
-                                                </div>
-                                                <table class="items-center w-full table-fixed border-separate border-spacing-2 mb-0 align-top border-gray-200 text-slate-500">
-                                                    <tbody>
-                                                        {% for possession in character.possessions %}
-                                                        <tr>
-                                                            <td class="p-2 align-middle bg-transparent border-b shadow-transparent text-pretty">
-                                                                <div class="flex px-2 py-1">
-                                                                    <div class="flex flex-col justify-center">
-                                                                        <p class="text-sm leading-normal">
-                                                                            <span class="font-extrabold underline text-slate-700">{{ possession.gear.label }}</span> : {{ possession.gear.description }}
-                                                                            <br/>
-                                                                            Coût : <span class="font-extrabold">{{ possession.cost }}PA</span> - <span class="italic">"{{ possession.gear.short }}"</span>
-                                                                        </p>
-                                                                    </div>
-                                                                </div>
-                                                            </td>
-                                                            <td class="p-2 align-middle bg-transparent border-b shadow-transparent text-right">
-                                                                <a href="{{ path('character_equipment_delete', {'id': character.id, 'possessionId': possession.id}) }}" 
-                                                                   class="text-red-500 hover:text-red-700"
-                                                                   onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet équipement ?');">
-                                                                    <i class="ni ni-fat-delete"></i>
-                                                                </a>
-                                                            </td>
-                                                        </tr>
-                                                        {% else %}
-                                                        <tr>
-                                                            <td class="p-2 align-middle bg-transparent border-b shadow-transparent text-center">
-                                                                Aucun équipement
-                                                            </td>
-                                                        </tr>
-                                                        {% endfor %}
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Possessions -->
-                                <div class="flex-none w-full max-w-full px-3 mb-6">
-                                    <div class="relative flex flex-col min-w-0 pb-2 break-words bg-white border-0 border-transparent border-solid shadow-soft-xl rounded-2xl bg-clip-border">
-                                        <div class="flex flex-wrap mx-3 my-3">
-                                            <div class="flex-none w-auto max-w-full px-3 my-auto">
-                                                <div class="h-full">
-                                                    <h5 class="mb-1">Mes possessions <a href="#" id="info" data-target="tooltip_trigger" data-placement="top"><i class="fa fa-question-circle hover:text-slate-700 text-sm" aria-hidden="true"></i></a></h5>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="flex-auto px-0 pt-0 pb-2">
-                                            <div class="p-0 mx-5">
-                                                <ul class="list-square list-inside ml-5">
-                                                    {% for possession in character.possessions %}
-                                                    <li>{{ possession }}</li>
-                                                    {% endfor %}
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="w-full p-1 mx-auto text-right">
-                                <a href="{{ path('character_delete', {'id': character.id}) }}" class="inline-block px-6 py-3 font-bold text-center text-red-700 bg-transparent uppercase align-middle transition-all leading-pro text-xs ease-soft-in tracking-tight-soft hover:scale-102 hover:underline active:opacity-85" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce personnage ?')">Supprimer</a>
-                                <a href="{{ path('character_submit', {'id': character.id}) }}" class="inline-block px-6 py-3 font-bold text-center text-white uppercase align-middle transition-all rounded-lg cursor-pointer bg-gradient-to-tl from-cyan-300 to-cyan-600 leading-pro text-xs ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 hover:scale-102 active:opacity-85 hover:shadow-soft-xs hover:text-cyan-100">Soumettre ce personnage aux orgas</a>
-                                <button type="submit" class="inline-block px-6 py-3 font-bold text-center text-white uppercase align-middle transition-all rounded-lg cursor-pointer bg-gradient-to-tl from-green-600 to-green-700 leading-pro text-xs ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 hover:scale-102 active:opacity-85 hover:text-lime-300 hover:shadow-soft-xs">Sauvegarder</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+      <div class="w-full px-6 mx-auto">
+        <div class="relative flex items-center p-0 mt-6 overflow-hidden bg-right bg-cover min-h-75 rounded-2xl" style="background-image: url('{{ asset('build/images/bandeaux/' ~ character.getBanner() ~ '.jpg') }}'); background-position-y: 50%">
+            <!-- <span class="absolute inset-y-0 w-full h-full bg-center bg-cover bg-gradient-to-tl from-red-900 to-red-700 opacity-30"></span> -->
         </div>
-    </div>
+        <div class="relative flex flex-col flex-auto min-w-0 p-4 mx-6 -mt-16 overflow-hidden break-words border-0 shadow-blur rounded-2xl bg-white/80 bg-clip-border backdrop-blur-2xl backdrop-saturate-200">
+          <div class="flex flex-wrap px-6">
+            {# <div class="flex-none w-auto max-w-full px-3">
+              <div class="text-base ease-soft-in-out h-18.5 w-18.5 relative inline-flex items-center justify-center rounded-xl text-white transition-all duration-200">
+                <img src="../assets/img/bruce-mars.jpg" alt="profile_image" class="w-full shadow-soft-sm rounded-xl" />
+              </div>
+            </div> #}
+            <div class="flex-none w-auto max-w-full my-auto">
+              <div class="h-full">
+                <h5 class="mb-1 hover:border hover:border-dashed hover:border-slate-400 hover:bg-white hover:pl-2 hover:rounded-1" data-target="tooltip_trigger" data-placement="top">{{ character.name }}</h5> 
+                <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm" role="tooltip">
+                  Changer le nom du personnage
+                  <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
+                </div>
+                <div class="mb-0 font-semibold leading-normal text-base"><span class="font-extrabold">{{ character.getFactionType().getLabel() }}</span> - {{ character.class }}<a href="#" class="ml-2 mr-1" data-target="tooltip_trigger" data-placement="top"><i class="ml-2 fa fa-pencil hover:scale-102 hover:text-slate-700"></i></a>
+                  <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm" role="tooltip">
+                    Changer de faction / classe
+                    <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
+                  </div>
+                </div>
+                <div class="mb-0 font-semibold leading-normal text-sm"><span class="font-extrabold">{{ character.getPaAvailable() }}</span>/{{ character.getPaTotal() }} PA <a href="#" id="info" data-target="tooltip_trigger" data-placement="top"><i class="fa fa-question-circle hover:text-slate-700 text-sm" aria-hidden="true"></i></a> 
+                  <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm" role="tooltip">
+                    Points d'XP gagnés lors des précédents opus et encore non utilisés
+                    <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="w-full max-w-full px-3 mx-auto mt-4 sm:my-auto sm:mr-0 md:w-1/2 md:flex-none lg:w-4/12">
+              <div class="relative">
+                <ul class="relative flex flex-wrap p-1 list-none bg-transparent rounded-xl" nav-pills role="tablist">
+                  <li class="z-30 flex-auto text-center">
+                    <a class="z-30 block w-full px-0 py-1 mb-0 transition-colors border-0 rounded-lg ease-soft-in-out bg-inherit text-slate-700" nav-link href="javascript:hideBgTab();" role="tab" aria-selected="false">
+                      <svg class="text-slate-700" width="16px" height="16px" viewBox="0 0 40 40" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink">
+                        <title>settings</title>
+                        <g stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
+                          <g transform="translate(-2020.000000, -442.000000)" fill="#FFFFFF" fillRule="nonzero">
+                            <g transform="translate(1716.000000, 291.000000)">
+                              <g transform="translate(304.000000, 151.000000)">
+                                <polygon class="fill-slate-800" opacity="0.596981957" points="18.0883333 15.7316667 11.1783333 8.82166667 13.3333333 6.66666667 6.66666667 0 0 6.66666667 6.66666667 13.3333333 8.82166667 11.1783333 15.315 17.6716667"></polygon>
+                                <path class="fill-slate-800" d="M31.5666667,23.2333333 C31.0516667,23.2933333 30.53,23.3333333 30,23.3333333 C29.4916667,23.3333333 28.9866667,23.3033333 28.48,23.245 L22.4116667,30.7433333 L29.9416667,38.2733333 C32.2433333,40.575 35.9733333,40.575 38.275,38.2733333 L38.275,38.2733333 C40.5766667,35.9716667 40.5766667,32.2416667 38.275,29.94 L31.5666667,23.2333333 Z" opacity="0.596981957"></path>
+                                <path class="fill-slate-800" d="M33.785,11.285 L28.715,6.215 L34.0616667,0.868333333 C32.82,0.315 31.4483333,0 30,0 C24.4766667,0 20,4.47666667 20,10 C20,10.99 20.1483333,11.9433333 20.4166667,12.8466667 L2.435,27.3966667 C0.95,28.7083333 0.0633333333,30.595 0.00333333333,32.5733333 C-0.0583333333,34.5533333 0.71,36.4916667 2.11,37.89 C3.47,39.2516667 5.27833333,40 7.20166667,40 C9.26666667,40 11.2366667,39.1133333 12.6033333,37.565 L27.1533333,19.5833333 C28.0566667,19.8516667 29.01,20 30,20 C35.5233333,20 40,15.5233333 40,10 C40,8.55166667 39.685,7.18 39.1316667,5.93666667 L33.785,11.285 Z"></path>
+                              </g>
+                            </g>
+                          </g>
+                        </g>
+                      </svg>
+                      <span class="ml-1">Fiche personnage</span>
+                    </a>
+                  </li>
+                  <li class="z-30 flex-auto text-center">
+                    <a class="z-30 block w-full px-0 py-1 mb-0 transition-all border-0 rounded-lg ease-soft-in-out bg-inherit text-slate-700" nav-link href="javascript:hideCompTab();" role="tab" aria-selected="false">
+                      <svg class="text-slate-700" width="16px" height="16px" viewBox="0 0 40 44" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink">
+                        <title>document</title>
+                        <g stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
+                          <g transform="translate(-1870.000000, -591.000000)" fill="#FFFFFF" fillRule="nonzero">
+                            <g transform="translate(1716.000000, 291.000000)">
+                              <g transform="translate(154.000000, 300.000000)">
+                                <path class="fill-slate-800" d="M40,40 L36.3636364,40 L36.3636364,3.63636364 L5.45454545,3.63636364 L5.45454545,0 L38.1818182,0 C39.1854545,0 40,0.814545455 40,1.81818182 L40,40 Z" opacity="0.603585379"></path>
+                                <path class="fill-slate-800" d="M30.9090909,7.27272727 L1.81818182,7.27272727 C0.814545455,7.27272727 0,8.08727273 0,9.09090909 L0,41.8181818 C0,42.8218182 0.814545455,43.6363636 1.81818182,43.6363636 L30.9090909,43.6363636 C31.9127273,43.6363636 32.7272727,42.8218182 32.7272727,41.8181818 L32.7272727,9.09090909 C32.7272727,8.08727273 31.9127273,7.27272727 30.9090909,7.27272727 Z M18.1818182,34.5454545 L7.27272727,34.5454545 L7.27272727,30.9090909 L18.1818182,30.9090909 L18.1818182,34.5454545 Z M25.4545455,27.2727273 L7.27272727,27.2727273 L7.27272727,23.6363636 L25.4545455,23.6363636 L25.4545455,27.2727273 Z M25.4545455,20 L7.27272727,20 L7.27272727,16.3636364 L25.4545455,16.3636364 L25.4545455,20 Z"></path>
+                              </g>
+                            </g>
+                          </g>
+                        </g>
+                      </svg>
+                      <span class="ml-1">Background</span>
+                    </a>
+                  </li>                  
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="compTab" class="block p-6 mx-auto" active-tab>
+        <div class="flex flex-wrap -mx-3">
+          <!-- Compétences -->
+          <div class="flex-none w-full max-w-full px-3  mb-6">
+            <div class="relative flex flex-col min-w-0 pb-2 break-words bg-white border-0 border-transparent border-solid shadow-soft-xl rounded-2xl bg-clip-border">
+              <div class="flex flex-wrap mx-3 my-3">
+                <div class="flex-none w-auto max-w-full px-3 my-auto">
+                  <div class="h-full">
+                    <h5 class="mb-1">Compétences</h5>
+                  </div>
+                </div>
+                <div class="w-full max-w-full px-3 mx-auto mt-4 sm:my-auto sm:mr-0 sm:w-1/5 md:w-1/5 md:flex-none">
+                  <div class="relative right-0">
+                    <div class="h-full text-right">
+                      <h6 class="mb-1"><span class="text-slate-400">0</span>/{{ character.getSkillsPaUsed() }} PA <a href="#" id="info" data-target="tooltip_trigger" data-placement="top"><i class="fa fa-plus-circle text-slate-400 hover:text-slate-700 text-sm" aria-hidden="true"></i></a> 
+                        <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm" role="tooltip">
+                          Ajouter XP
+                          <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
+                        </div></h5>
+                    </div> 
+                  </div>
+                </div>
+              </div>
+              <div class="flex-auto px-0 pt-0 pb-2">
+                <div class="p-0 mx-5">
+                  <table class="items-center w-full table-fixed border-separate border-spacing-2 mb-0 align-top border-gray-200 text-slate-500">
+                    <tbody>
+                        {% for skill in character.skills ?? [] %}
+                      <tr>
+                        <td class="p-2 align-middle bg-transparent border-b  shadow-transparent text-pretty">
+                          <div class="flex px-2 py-1">
+                            <div class="flex flex-col justify-center">
+                              <p class="text-sm leading-normal"><span class="font-extrabold underline text-slate-700">Absorption des radiations</span> : après 5 min de méditation avec une cible irradiée tenue par les mains, le shaman peut absorber la moitié des radiations avec un maximum de 5 (arrondi à l’entier supérieur).<br/>
+                                Coût : <span class="font-extrabold">4PA</span> - <span class="italic">"Comme ça on me repère mieux la nuit."</span> 
+                              </p>
+                            </div>
+                          </div>
+                        </td>
+                        <td class="w-20 align-middle bg-slate-50  shadow-transparent p-2 rounded border border-dashed border-slate-200 hover:border-slate-500">
+                          <div class="w-full text-center"><i class="fa fa-trash cursor-pointer hover:text-slate-700" aria-hidden="true"  data-target="tooltip_trigger" data-placement="top"></i>
+                            <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm" role="tooltip">
+                              Supprimer la compétence
+                              <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                      {% else %}
+                      <tr>
+                        <td class="mx-8 text-center shadow-transparent" colspan="2">
+                          Aucune compétence
+                        </td>
+                      </tr>
+                      {% endfor %}
+                      <tr>
+                        <td class="mx-8 text-center shadow-transparent" colspan="2">
+                          <div class="flex p-3 mt-3 text-center justify-center bg-slate-100 bg-opacity-40  border rounded border-dashed border-slate-300">
+                            <span class="text-xs font-semibold leading-tight text-slate-300 cursor-pointer hover:scale-102 hover:text-slate-700 hover:underline"><strong class="font-extrabold">+ </strong>Ajouter une compétence (17 PA disponibles)</span>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Compétences spéciales-->
+          <div class="flex-none w-full max-w-full px-3  mb-6">
+            <div class="relative flex flex-col min-w-0 pb-2 break-words bg-white border-0 border-transparent border-solid shadow-soft-xl rounded-2xl bg-clip-border">
+              <div class="flex flex-wrap mx-3 my-3">
+                <div class="flex-none w-auto max-w-full px-3 my-auto">
+                  <div class="h-full">
+                    <h5 class="mb-1">Capacités spéciales <a href="#" id="info" data-target="tooltip_trigger" data-placement="top"><i class="fa fa-question-circle hover:text-slate-700 text-sm" aria-hidden="true"></i></a> 
+                      <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm" role="tooltip">
+                        Ces compétences sont renseignées et gérées par les orgas
+                        <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
+                      </div></h5>
+                  </div>
+                </div>
+              </div>
+              <div class="flex-auto px-0 pt-0 pb-2">
+                <div class="p-0 mx-5">
+                  <table class="items-center w-full table-fixed border-separate border-spacing-2 mb-0 align-top border-gray-200 text-slate-500">
+                    <tbody>
+                        {% for specialAbility in character.specialAbilities ?? [] %}
+                      <tr>
+                        <td class="p-2 align-middle bg-transparent border-b  shadow-transparent text-pretty">
+                          <div class="flex px-2 py-1">
+                            <div class="flex flex-col justify-center">
+                              <p class="text-sm leading-normal"><span class="font-extrabold underline text-slate-700">{{ specialAbility.label }}</span> : {{ specialAbility.description }}<br/>
+                              </p>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                      {% else %}
+                      <tr>
+                        <td class="p-2 align-middle bg-transparent border-b shadow-transparent text-center">
+                            Aucune capacité spéciale
+                        </td>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Matos -->
+          <div class="flex-none w-full max-w-full px-3 mb-3">
+            <div class="relative flex flex-col min-w-0 pb-2 break-words bg-white border-0 border-transparent border-solid shadow-soft-xl rounded-2xl bg-clip-border">
+              <div class="flex flex-wrap mx-3 my-3">
+                <div class="flex-none w-auto max-w-full px-3 my-auto">
+                  <div class="h-full">
+                    <h5 class="mb-1">Matériels et ressources</h5>
+                  </div>
+                </div>
+                <div class="w-full max-w-full px-3 mx-auto mt-4 sm:my-auto sm:mr-0 sm:w-1/5 md:w-1/5 md:flex-none">
+                  <div class="relative right-0">
+                    <div class="h-full text-right">
+                      <h6 class="mb-1"><span class="text-slate-400">0</span>/{{ character.getEquipmentPaUsed() }} PA <a href="#" id="info" data-target="tooltip_trigger" data-placement="top"><i class="fa fa-plus-circle text-slate-400 hover:text-slate-700 text-sm" aria-hidden="true"></i></a> 
+                        <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm" role="tooltip">
+                          Ajouter XP
+                          <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
+                        </div></h5>
+                    </div> 
+                  </div>
+                </div>
+              </div>
+              <div class="flex-auto px-0 pt-0 pb-2">
+                <div class="p-0 mx-5">
+                  <table class="items-center w-full table-fixed border-separate border-spacing-2 mb-0 align-top border-gray-200 text-slate-500">
+                    <tbody>
+                        {% for possession in character.possessions %}
+                        <tr>
+                            <td class="p-2 align-middle bg-transparent shadow-transparent text-pretty">
+                                <div class="flex px-2 py-1">
+                                    <div class="flex flex-col justify-center pl-6">
+                                        <p class="text-sm leading-normal">
+                                            <span class="font-extrabold underline text-slate-700">{{ possession.gear.label }}</span> : {{ possession.gear.description }}
+                                            <br/>
+                                            Coût : <span class="font-extrabold">{{ possession.cost }}PA</span> <span class="italic">"{{ possession.gear.short }}"</span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="w-20 align-middle bg-slate-50  shadow-transparent p-2 rounded border border-dashed border-slate-200 hover:border-slate-500">
+                            <div class="w-full text-center"><i class="fa fa-trash cursor-pointer hover:text-slate-700" aria-hidden="true"  data-target="tooltip_trigger" data-placement="top"></i>
+                                <a href="{{ path('character_equipment_delete', {'id': character.id, 'possessionId': possession.id}) }}" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet équipement ?');" data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm" role="tooltip">
+                                Supprimer
+                                <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
+                                </div>
+                            </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td class="p-2 align-middle bg-transparent border-b shadow-transparent text-center">
+                                Aucun équipement
+                            </td>
+                        </tr>
+                      {% endfor %}
+                      <tr>
+                        <td class="mx-8 text-center shadow-transparent">
+                          <div class="flex p-3 mt-3 text-center justify-center bg-slate-100 bg-opacity-40  border rounded border-dashed border-slate-300">
+                            <span class="text-xs font-semibold leading-tight text-slate-300 cursor-pointer hover:scale-102 hover:text-slate-700 hover:underline"><strong class="font-extrabold">+ </strong>Ajouter du matériel ou une ressource (1 PA disponibles)</span>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+           <div class="flex-none w-full max-w-full px-3  mb-6">
+            <div class="relative flex flex-col min-w-0 pb-2 break-words bg-white border-0 border-transparent border-solid shadow-soft-xl rounded-2xl bg-clip-border">
+              <div class="flex flex-wrap mx-3 my-3">
+                <div class="flex-none w-auto max-w-full px-3 my-auto">
+                  <div class="h-full">
+                    <h5 class="mb-1">Mes posséssions <a href="#" id="info" data-target="tooltip_trigger" data-placement="top"><i class="fa fa-question-circle hover:text-slate-700 text-sm" aria-hidden="true"></i></a> 
+                      <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm" role="tooltip">
+                        Mes posséssions accumulées lors du précédent opus Dawn principal
+                        <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
+                      </div></h5>
+                  </div>
+                </div>
+              </div>
+              <div class="flex-auto px-0 pt-0 pb-2">
+                <div class="p-0 mx-5">
+                    <ul class="list-square list-inside ml-5">
+                        {% for possession in character.possessions %}
+                        <li>{{ possession }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="bgTab" class="hidden w-full p-6 mx-auto">
+        <div class="flex flex-wrap -mx-3">
+          <!-- Compétences -->
+          <div class="flex-none w-full max-w-full px-3  mb-6">
+            <div class="relative flex flex-col min-w-0 pb-2 break-words bg-white border-0 border-transparent border-solid shadow-soft-xl rounded-2xl bg-clip-border">
+              <div class="flex flex-wrap mx-3 my-3">
+                <div class="flex-none w-full max-w-full px-3 my-auto">
+                  <div class="h-full">
+                    <h5 class="mb-1">Background de {{ character.name }}</h5>
+                  </div>
+                </div>
+                <div class="w-full px-0 pt-5 pb-2 my-auto ">
+                  <div id="editor" class="bg-white !text-sm">
+                    {{ character.background }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+        <div class="w-full px-6 mx-auto text-right mb-4">
+            <a href="{{ path('character_delete', {'id': character.id}) }}" class="inline-block px-6 py-3 font-bold text-center text-red-700 bg-transparent uppercase align-middle transition-all leading-pro text-xs ease-soft-in tracking-tight-soft hover:scale-102 hover:underline active:opacity-85" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce personnage ?')">Supprimer</a>
+            <a href="{{ path('character_submit', {'id': character.id}) }}" class="inline-block px-6 py-3 font-bold text-center text-white uppercase align-middle transition-all rounded-lg cursor-pointer bg-gradient-to-tl from-cyan-300 to-cyan-600 leading-pro text-xs ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 hover:scale-102 active:opacity-85 hover:shadow-soft-xs hover:text-cyan-100">Soumettre ce personnage aux orgas</a>
+            <button type="submit" class="inline-block px-6 py-3 font-bold text-center text-white uppercase align-middle transition-all rounded-lg cursor-pointer bg-gradient-to-tl from-green-600 to-green-700 leading-pro text-xs ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 hover:scale-102 active:opacity-85 hover:text-lime-300 hover:shadow-soft-xs">Sauvegarder</button>
+        </div>
+
+  <script>
+  document.addEventListener('DOMContentLoaded', function() {
+
+    const compTab = document.getElementById("compTab");
+    const bgTab = document.getElementById("bgTab");
+
+
+    const quill = new Quill('#editor', {
+        theme: 'snow'
+    });
+  });
+    function hideCompTab()
+    {
+        if(compTab.classList.contains = 'block')
+        {
+        compTab.classList.remove("block");
+        compTab.classList.add("hidden");
+
+        bgTab.classList.remove("hidden");
+        bgTab.classList.add("block");
+        }
+    } 
+
+    function hideBgTab()
+    {
+        if(bgTab.classList.contains = 'block')
+        {
+        bgTab.classList.remove("block");
+        bgTab.classList.add("hidden");
+
+        compTab.classList.remove("hidden");
+        compTab.classList.add("block");
+        }
+    } 
+
+  </script>
+
 {% endblock %} 

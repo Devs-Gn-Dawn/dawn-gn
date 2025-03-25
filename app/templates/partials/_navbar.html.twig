@@ -1,23 +1,48 @@
-<nav class="relative flex flex-wrap items-center justify-between px-0 py-2 mx-6 transition-all shadow-none duration-250 ease-soft-in rounded-2xl lg:flex-nowrap lg:justify-start" navbar-main navbar-scroll="true">
-  <div class="flex items-center justify-between w-full px-4 py-1 mx-auto flex-wrap-inherit">
-    <nav>
-      <ol class="flex w-full flex-wrap pt-1 mr-12 bg-transparent rounded-lg sm:mr-16">
-        <li class="text-sm leading-normal">
-          <a class="opacity-50 text-slate-700" href="javascript:;">Dawn, Le GN</a>
+<nav class="{% if navRelative %}relative{% else %}absolute z-20{% endif %} rounded-2xl px-6 w-full flex flex-wrap items-center justify-between w-full py-2 transition-all shadow-none duration-250 ease-soft-in lg:flex-nowrap lg:justify-start" navbar-main navbar-scroll="true">
+  <div class="flex items-center justify-between w-full py-1 mx-auto flex-wrap-inherit">
+    <nav data-breadcrumb>
+      <ol class="flex flex-wrap pt-1 pl-2 pr-4 mr-12 bg-transparent rounded-lg sm:mr-16">
+        {# Premier niveau toujours présent #}
+        <li class="text-sm opacity-50 leading-normal {% if navRelative %}text-slate-700{% endif %}">
+          <a href="/">Dawn, Le GN</a>
         </li>
-        <li class="text-sm pl-2 leading-normal text-slate-700 before:float-left before:pr-2 before:text-gray-600 before:content-['/']" aria-current="page">Mes informations</li>
+        
+        {# Reste du breadcrumb dynamique #}
+        {% set breadcrumb = breadcrumb|default([]) %}
+        {% for path, item in breadcrumb %}
+          <li class="text-sm {% if not loop.last %}opacity-50{% endif %} pl-2 leading-normal {% if navRelative %}text-slate-700{% endif %} before:float-left before:pr-2 before:text-gray-600 before:content-['/']" {% if loop.last %}aria-current="page"{% endif %}>
+            {% if path != '#' and not loop.last %}
+              <a href="{{ path }}">{{ item|raw }}</a>
+            {% else %}
+              {{ item|raw }}
+            {% endif %}
+          </li>
+        {% endfor %}
       </ol>
     </nav>
 
     <div class="flex items-center mt-2 grow sm:mt-0 sm:mr-6 md:mr-0 lg:flex lg:basis-auto">
       <div class="flex items-center md:ml-auto md:pr-4"></div>
       <ul class="flex flex-row justify-end pl-0 mb-0 list-none md-max:w-full">
+        <li class="relative flex items-center pr-2">
+          <p class="hidden transform-dropdown-show"></p>
+          <a href="javascript:;" class="block p-0 text-sm transition-all ease-nav-brand {% if not navRelative %} hover:text-slate-50{% else %}text-slate-500{% endif %} hover:scale-102" dropdown-trigger aria-expanded="false">
+            <i class="fa fa-user sm:mr-1" aria-hidden="true"></i>
+          </a>
+          <ul dropdown-menu class="text-sm transform-dropdown before:font-awesome before:leading-default before:duration-350 before:ease-soft lg:shadow-soft-3xl duration-250 min-w-44 pointer-events-none absolute right-0 top-0 z-50 origin-top list-none rounded-lg border-0 border-solid border-transparent bg-white bg-clip-padding px-2 py-2 text-left text-slate-500 opacity-0 transition-all sm:-mr-6 lg:absolute lg:right-0 lg:left-auto lg:block lg:cursor-pointer">
+            <li class="relative">
+              <a class="ease-soft py-1.2 clear-both block w-full whitespace-nowrap rounded-lg bg-transparent px-4 duration-300 hover:bg-gray-200 hover:text-slate-700 lg:transition-colors" href="login.html">
+                Se déconnecter
+              </a>
+            </li>   
+          </ul>
+        </li>
         <li class="flex items-center pl-4 xl:hidden">
-          <a href="javascript:;" class="block p-0 text-sm transition-all ease-nav-brand text-slate-500" sidenav-trigger>
+          <a href="javascript:;" class="block p-0 text-sm transition-all ease-nav-brand {% if navRelative %}}text-slate-500{% endif %}" sidenav-trigger>
             <div class="w-4.5 overflow-hidden">
-              <i class="ease-soft mb-0.75 relative block h-0.5 rounded-sm bg-slate-500 transition-all"></i>
-              <i class="ease-soft mb-0.75 relative block h-0.5 rounded-sm bg-slate-500 transition-all"></i>
-              <i class="ease-soft relative block h-0.5 rounded-sm bg-slate-500 transition-all"></i>
+              <i class="ease-soft mb-0.75 relative block h-0.5 rounded-sm {% if not navRelative %}bg-white{% else %}bg-slate-500{% endif %} transition-all"></i>
+              <i class="ease-soft mb-0.75 relative block h-0.5 rounded-sm {% if not navRelative %}bg-white{% else %}bg-slate-500{% endif %} transition-all"></i>
+              <i class="ease-soft relative block h-0.5 rounded-sm {% if not navRelative %}bg-white{% else %}bg-slate-500{% endif %} transition-all"></i>
             </div>
           </a>
         </li>

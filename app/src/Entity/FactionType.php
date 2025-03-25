@@ -26,4 +26,14 @@ enum FactionType: string
             array_map(fn($case) => $case->value, self::cases())
         );
     }
+
+    public static function getBanner(FactionType $faction): string
+    {
+        return match ($faction) {
+            self::NOMADS => 'bandeau_nomads',
+            self::TECHERS => 'bandeau_techers',
+            self::RODOIR => 'bandeau_rodoir',
+            self::NEOCUBA => 'bandeau_neocuba',
+        };
+    }
 }

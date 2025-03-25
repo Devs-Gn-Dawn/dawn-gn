@@ -15,13 +15,7 @@
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 */
-var page = window.location.pathname.split("/").pop().split(".")[0];
-var aux = window.location.pathname.split("/");
-var to_build = aux.includes("pages") ? "../" : "./";
-var root = window.location.pathname.split("/");
-if (!aux.includes("pages")) {
-  page = "dashboard";
-}
+var to_build = "/";
 
 loadStylesheet(to_build + "build/styles/perfect-scrollbar.css");
 loadJS(to_build + "build/js/perfect-scrollbar.js", true);
@@ -153,21 +147,4 @@ function navbar_fixed_plugin() {
     navbar.classList.add("sticky");
     navbar.classList.add("top-[1%]");
   }
-}
-
-// Tickets function
-function sweetTicket() {
-  Swal.fire({
-    customClass: {
-      text: "!mt-2 sm:!mt-0 !m-0 !text-center sm:!text-left !text-s !text-gray-500 !pl-4 sm:!pl-0 !pr-4 !pb-4 sm:!pr-6 sm:!pb-4 sm:!ml-4 !col-start-1 sm:!col-start-2 !col-end-3",
-      confirmButton:
-        "border-0 inline-flex w-full justify-center rounded-md bg-gradient-to-tl from-gray-900 to-slate-800 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:scale-102 hover:bg-slate-800 sm:ml-3 sm:w-auto",
-    },
-    width: "50%",
-    text: "Vous le trouverez ici, sur le billet HelloAsso reçu par mail.",
-    imageUrl: "/img/billet_info.jpg",
-    imageWidth: "100%",
-    confirmButtonText: "J'ai compris !",
-    animation: false,
-  });
 }

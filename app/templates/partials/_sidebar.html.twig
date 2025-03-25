@@ -25,12 +25,13 @@
   <div class="items-center block w-auto max-h-screen overflow-auto h-sidenav grow basis-full">
     <ul class="flex flex-col pl-0 mb-0">
       <li class="mt-0.5 w-full">
-        <a class="py-2.7 text-sm ease-nav-brand my-0 mx-4 flex items-center whitespace-nowrap px-4 transition-colors hover:scale-102 {% if app.request.get('_route') starts with 'app_character_' %}shadow-soft-xl rounded-lg bg-white font-semibold text-slate-700{% endif %}" href="{{ path('app_character_index') }}">
-          <div class="{% if app.request.get('_route') starts with 'app_character_index' %}bg-gradient-to-tl from-gray-900 to-slate-800{% endif %} shadow-soft-2xl mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-white bg-center stroke-0 text-center xl:p-2.5">
+        {% set active = app.request.get('_route') starts with 'app_character_' %}
+        <a class="py-2.7 text-sm ease-nav-brand my-0 mx-4 flex items-center whitespace-nowrap px-4 transition-colors hover:scale-102 {% if active %}shadow-soft-xl rounded-lg bg-white font-semibold text-slate-700{% endif %}" href="{{ path('app_character_index') }}">
+          <div class="{% if active %}bg-gradient-to-tl from-gray-900 to-slate-800{% endif %} shadow-soft-2xl mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-white bg-center stroke-0 text-center xl:p-2.5">
             <svg width="12px" height="12px" viewBox="0 0 46 42" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
               <title>customer-support</title>
               <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                <g transform="translate(-1717.000000, -291.000000)" fill="{% if app.request.get('_route') starts with 'app_character_' %}#FFFFFF{% else %}#3a416f{% endif %}" fill-rule="nonzero">
+                <g transform="translate(-1717.000000, -291.000000)" fill="{% if active %}#FFFFFF{% else %}#3a416f{% endif %}" fill-rule="nonzero">
                   <g transform="translate(1716.000000, 291.000000)">
                     <g transform="translate(1.000000, 0.000000)">
                       <path class="opacity-60" d="M45,0 L26,0 C25.447,0 25,0.447 25,1 L25,20 C25,20.379 25.214,20.725 25.553,20.895 C25.694,20.965 25.848,21 26,21 C26.212,21 26.424,20.933 26.6,20.8 L34.333,15 L45,15 C45.553,15 46,14.553 46,14 L46,1 C46,0.447 45.553,0 45,0 Z"></path>
@@ -47,27 +48,30 @@
       </li>
 
       <li class="mt-0.5 w-full">
-        <a class="py-2.7 text-sm ease-nav-brand my-0 mx-4 flex items-center whitespace-nowrap px-4 transition-colors hover:scale-102 {% if app.request.get('_route') starts with 'app_account_' or app.request.get('_route') == 'app_account' %}shadow-soft-xl rounded-lg bg-white font-semibold text-slate-700{% endif %}" href="{{ path('app_account') }}">
-          <div class="{% if app.request.get('_route') starts with 'app_account' %}bg-gradient-to-tl from-gray-900 to-slate-800{% endif %} shadow-soft-2xl mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-white bg-center stroke-0 text-center xl:p-2.5">
-            <i class="ni ni-badge {% if app.request.get('_route') starts with 'app_account' %}text-white{% endif %}" aria-hidden="true"></i>
+        {% set active = app.request.get('_route') starts with 'app_account_' or app.request.get('_route') == 'app_account' %}
+        <a class="py-2.7 text-sm ease-nav-brand my-0 mx-4 flex items-center whitespace-nowrap px-4 transition-colors hover:scale-102 {% if active %}shadow-soft-xl rounded-lg bg-white font-semibold text-slate-700{% endif %}" href="{{ path('app_account') }}">
+          <div class="{% if active %}bg-gradient-to-tl from-gray-900 to-slate-800{% endif %} shadow-soft-2xl mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-white bg-center stroke-0 text-center xl:p-2.5">
+            <i class="ni ni-badge {% if active %}text-white{% endif %}" aria-hidden="true"></i>
           </div>
           <span class="ml-1 duration-300 opacity-100 pointer-events-none ease-soft">Mes informations</span>
         </a>
       </li>
 
       <li class="mt-0.5 w-full">
-        <a class="py-2.7 text-sm ease-nav-brand my-0 mx-4 flex items-center whitespace-nowrap px-4 transition-colors hover:scale-102 {% if app.request.get('_route') starts with 'app_character_sheet' %}shadow-soft-xl rounded-lg bg-white font-semibold text-slate-700{% endif %}" href="{{ path('app_character_index') }}">
-          <div class="{% if app.request.get('_route') starts with 'app_character_sheet' %}bg-gradient-to-tl from-gray-900 to-slate-800{% endif %} shadow-soft-2xl mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-white bg-center stroke-0 text-center xl:p-2.5">
-            <i class="ni ni-paper-diploma {% if app.request.get('_route') starts with 'app_character_sheet' %}text-white{% endif %}" aria-hidden="true"></i>
+        {% set active = app.request.get('_route') starts with 'app_character_sheet' %}
+        <a class="py-2.7 text-sm ease-nav-brand my-0 mx-4 flex items-center whitespace-nowrap px-4 transition-colors hover:scale-102 {% if active %}shadow-soft-xl rounded-lg bg-white font-semibold text-slate-700{% endif %}" href="{{ path('app_character_index') }}">
+          <div class="{% if active %}bg-gradient-to-tl from-gray-900 to-slate-800{% endif %} shadow-soft-2xl mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-white bg-center stroke-0 text-center xl:p-2.5">
+            <i class="ni ni-paper-diploma {% if active %}text-white{% endif %}" aria-hidden="true"></i>
           </div>
           <span class="ml-1 duration-300 opacity-100 pointer-events-none ease-soft">Ma fiche personnage</span>
         </a>
       </li>
 
       <li class="mt-0.5 w-full">
-        <a class="py-2.7 text-sm ease-nav-brand my-0 mx-4 flex items-center whitespace-nowrap px-4 transition-colors hover:scale-102" href="#">
-          <div class="shadow-soft-2xl mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-white bg-center stroke-0 text-center xl:p-2.5">
-            <i class="ni ni-email-83" aria-hidden="true"></i>
+        {% set active = app.request.get('_route') == 'app_contact' %}
+        <a onclick="showContactForm()" class="py-2.7 text-sm ease-nav-brand my-0 mx-4 flex items-center whitespace-nowrap px-4 transition-colors hover:scale-102 cursor-pointer {% if active %}shadow-soft-xl rounded-lg bg-white font-semibold text-slate-700{% endif %}">
+          <div class="{% if active %}bg-gradient-to-tl from-gray-900 to-slate-800{% endif %} shadow-soft-2xl mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-white bg-center stroke-0 text-center xl:p-2.5">
+            <i class="ni ni-email-83 {% if active %}text-white{% endif %}" aria-hidden="true"></i>
           </div>
           <span class="ml-1 duration-300 opacity-100 pointer-events-none ease-soft">Contacter mon orga</span>
         </a>
