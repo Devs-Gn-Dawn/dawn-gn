@@ -36,4 +36,14 @@ enum FactionType: string
             self::NEOCUBA => 'bandeau_neocuba',
         };
     }
+
+    public static function getAvatar(FactionType $faction): string
+    {
+        return match ($faction) {
+            self::NOMADS => 'avatar_nomads',
+            self::TECHERS => 'avatar_techers',
+            self::RODOIR => 'avatar_rodoir',
+            self::NEOCUBA => 'avatar_neocuba',
+        };
+    }
 }
