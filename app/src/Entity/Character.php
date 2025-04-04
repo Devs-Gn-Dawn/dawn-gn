@@ -35,6 +35,12 @@ class Character
     #[ORM\Column(type: Types::TEXT)]
     private ?string $note_orga = null;
 
+    #[ORM\Column(type: Types::INTEGER)]
+    private int $xp_skill = 0;
+
+    #[ORM\Column(type: Types::INTEGER)]
+    private int $xp_gear = 0;
+
     #[ORM\Column(type: Types::BOOLEAN)]
     private bool $isMain = false;
 
@@ -190,26 +196,44 @@ class Character
         return $this;
     }
 
-    public function getPaAvailable(): int
+    public function getGainedXp(): int
     {
-        return $this->getPaTotal() - $this->getPaUsed();
-    }
-
-
-    public function getPaUsed(): int
-    {
+        $user = $this->getUser();
         $total = 0;
-        $total += $this->getSkillsPaUsed();
-        $total += $this->getEquipmentPaUsed();
+        foreach ($user->getRegistrations() as $registration) {
+            if ($registration->getEventType()->getStatus() == EventType::STATUS_CLOSED) {
+                $total++;
+            }
+        }
         return $total;
     }
 
-    public function getPaTotal(): int
+    public function getAvailableXp(): int
     {
-        return 30; // Valeur par défaut
+        return $this->getGainedXp() - $this->getSkillsXp() - $this->getGearXp() + 30;
     }
 
-    public function getSkillsPaUsed(): int
+    public function getSkillsXp(): int
+    {
+        return $this->xp_skill;
+    }
+
+    public function getAvailableSkillsXp(): int
+    {
+        return $this->getSkillsXp() - $this->getSkillsXpUsed();
+    }
+
+    public function getGearXp(): int
+    {
+        return $this->xp_gear;
+    }
+
+    public function getAvailableGearXp(): int
+    {
+        return $this->getGearXp() - $this->getGearXpUsed();
+    }
+
+    public function getSkillsXpUsed(): int
     {
         $total = 0;
         foreach ($this->skillsLearned as $skillLearned) {
@@ -217,18 +241,13 @@ class Character
         }
         return $total;
     }
-    public function getEquipmentPaUsed(): int
+    public function getGearXpUsed(): int
     {
         $total = 0;
         foreach ($this->possessions as $possession) {
             $total += $possession->getCost();
         }
         return $total;
-    }
-
-    public function getEquipmentPaTotal(): int
-    {
-        return 50; // Valeur par défaut
     }
 
     public function getSkills(): array
@@ -278,5 +297,33 @@ class Character
     public function getBanner(): string
     {
         return FactionType::getBanner($this->getFactionType());
+    }
+
+    public function getAvatar(): string
+    {
+        return FactionType::getAvatar($this->getFactionType());
+    }
+
+    public function addSkill(Skill $skill, ?int $cost = null, ?string $note = null): static
+    {
+        foreach ($this->skillsLearned as $skillLearned) {
+            if ($skillLearned->getSkill() === $skill) {
+                throw new \Exception("Compétence déjà apprise");
+            }
+        }
+
+        if ($this->getPaAvailable() < ($cost ?? $skill->getBaseCost())) {
+            throw new \Exception("Points insuffisants");
+        }
+
+        $skillLearned = new SkillLearned();
+        $skillLearned->setSkill($skill);
+        $skillLearned->setCost($cost ?? $skill->getBaseCost());
+        $skillLearned->setNote($note);
+        $skillLearned->setCharacter($this);
+
+        $this->skillsLearned->add($skillLearned);
+
+        return $this;
     }
 }

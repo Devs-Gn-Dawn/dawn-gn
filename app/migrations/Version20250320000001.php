@@ -16,16 +16,7 @@ final class Version20250320000001 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
-        // Création de la table gear
-        $this->addSql('CREATE TABLE gear (
-            id INT AUTO_INCREMENT NOT NULL,
-            label VARCHAR(63) NOT NULL,
-            base_cost SMALLINT NOT NULL,
-            description LONGTEXT NOT NULL,
-            short LONGTEXT NOT NULL,
-            visibility BOOLEAN NOT NULL DEFAULT true,
-            PRIMARY KEY(id)
-        ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+
 
         // Insertion des armes de corps à corps
         $this->addSql("INSERT INTO gear (label, base_cost, description, short, visibility) VALUES

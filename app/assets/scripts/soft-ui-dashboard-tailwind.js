@@ -118,33 +118,33 @@ if (document.querySelector(".fixed-plugin")) {
 }
 
 // Sidenav
-var sidenav = document.querySelector("aside");
-var sidenav_trigger = document.querySelector("[sidenav-trigger]");
-var sidenav_close_button = document.querySelector("[sidenav-close]");
+// var sidenav = document.querySelector("aside");
+// var sidenav_trigger = document.querySelector("[sidenav-trigger]");
+// var sidenav_close_button = document.querySelector("[sidenav-close]");
 
-if (sidenav_trigger) {
-  sidenav_trigger.addEventListener("click", function () {
-    sidenav.classList.toggle("-translate-x-full");
-  });
-}
+// if (sidenav_trigger) {
+//   sidenav_trigger.addEventListener("click", function () {
+//     sidenav.classList.toggle("-translate-x-full");
+//   });
+// }
 
-if (sidenav_close_button) {
-  sidenav_close_button.addEventListener("click", function () {
-    sidenav.classList.add("-translate-x-full");
-  });
-}
+// if (sidenav_close_button) {
+//   sidenav_close_button.addEventListener("click", function () {
+//     sidenav.classList.add("-translate-x-full");
+//   });
+// }
 
-// Function for the fixed navbar
-function navbar_fixed_plugin() {
-  if (buttonNavbarFixed.getAttribute("checked") === "true") {
-    buttonNavbarFixed.setAttribute("checked", "false");
-    navbar.classList.remove("sticky");
-    navbar.classList.remove("top-[1%]");
-    navbar.classList.add("relative");
-  } else {
-    buttonNavbarFixed.setAttribute("checked", "true");
-    navbar.classList.remove("relative");
-    navbar.classList.add("sticky");
-    navbar.classList.add("top-[1%]");
-  }
-}
+// // Function for the fixed navbar
+// function navbar_fixed_plugin() {
+//   if (buttonNavbarFixed.getAttribute("checked") === "true") {
+//     buttonNavbarFixed.setAttribute("checked", "false");
+//     navbar.classList.remove("sticky");
+//     navbar.classList.remove("top-[1%]");
+//     navbar.classList.add("relative");
+//   } else {
+//     buttonNavbarFixed.setAttribute("checked", "true");
+//     navbar.classList.remove("relative");
+//     navbar.classList.add("sticky");
+//     navbar.classList.add("top-[1%]");
+//   }
+// }

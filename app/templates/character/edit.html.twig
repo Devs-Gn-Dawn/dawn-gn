@@ -27,7 +27,7 @@
                     <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
                   </div>
                 </div>
-                <div class="mb-0 font-semibold leading-normal text-sm"><span class="font-extrabold">{{ character.getPaAvailable() }}</span>/{{ character.getPaTotal() }} PA <a href="#" id="info" data-target="tooltip_trigger" data-placement="top"><i class="fa fa-question-circle hover:text-slate-700 text-sm" aria-hidden="true"></i></a> 
+                <div class="mb-0 font-semibold leading-normal text-sm"><span class="font-extrabold">{{ character.getAvailableXp() }}</span>/{{ character.getGainedXp() }} XP <a href="#" id="info" data-target="tooltip_trigger" data-placement="top"><i class="fa fa-question-circle hover:text-slate-700 text-sm" aria-hidden="true"></i></a> 
                   <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm" role="tooltip">
                     Points d'XP gagnés lors des précédents opus et encore non utilisés
                     <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
@@ -96,7 +96,7 @@
                 <div class="w-full max-w-full px-3 mx-auto mt-4 sm:my-auto sm:mr-0 sm:w-1/5 md:w-1/5 md:flex-none">
                   <div class="relative right-0">
                     <div class="h-full text-right">
-                      <h6 class="mb-1"><span class="text-slate-400">0</span>/{{ character.getSkillsPaUsed() }} PA <a href="#" id="info" data-target="tooltip_trigger" data-placement="top"><i class="fa fa-plus-circle text-slate-400 hover:text-slate-700 text-sm" aria-hidden="true"></i></a> 
+                      <h6 class="mb-1"><span class="text-slate-400">{{ character.getSkillsXp() - character.getSkillsXpUsed() }}</span>/{{ character.getSkillsXp() }} XP <a href="#" id="info" data-target="tooltip_trigger" data-placement="top"><i class="fa fa-plus-circle text-slate-400 hover:text-slate-700 text-sm" aria-hidden="true"></i></a> 
                         <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm" role="tooltip">
                           Ajouter XP
                           <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
@@ -114,7 +114,7 @@
                         <td class="p-2 align-middle bg-transparent border-b  shadow-transparent text-pretty">
                           <div class="flex px-2 py-1">
                             <div class="flex flex-col justify-center">
-                              <p class="text-sm leading-normal"><span class="font-extrabold underline text-slate-700">Absorption des radiations</span> : après 5 min de méditation avec une cible irradiée tenue par les mains, le shaman peut absorber la moitié des radiations avec un maximum de 5 (arrondi à l’entier supérieur).<br/>
+                              <p class="text-sm leading-normal"><span class="font-extrabold underline text-slate-700">Absorption des radiations</span> : après 5 min de méditation avec une cible irradiée tenue par les mains, le shaman peut absorber la moitié des radiations avec un maximum de 5 (arrondi à l'entier supérieur).<br/>
                                 Coût : <span class="font-extrabold">4PA</span> - <span class="italic">"Comme ça on me repère mieux la nuit."</span> 
                               </p>
                             </div>
@@ -139,7 +139,7 @@
                       <tr>
                         <td class="mx-8 text-center shadow-transparent" colspan="2">
                           <div class="flex p-3 mt-3 text-center justify-center bg-slate-100 bg-opacity-40  border rounded border-dashed border-slate-300">
-                            <span class="text-xs font-semibold leading-tight text-slate-300 cursor-pointer hover:scale-102 hover:text-slate-700 hover:underline"><strong class="font-extrabold">+ </strong>Ajouter une compétence (17 PA disponibles)</span>
+                            <span onclick="showAddSkillModal()" class="text-xs font-semibold leading-tight text-slate-300 cursor-pointer hover:scale-102 hover:text-slate-700 hover:underline"><strong class="font-extrabold">+ </strong>Ajouter une compétence (<span data-target="skillsPaAvailable">{{ character.getSkillsXp() - character.getSkillsXpUsed()}}</span> XP disponibles)</span>
                           </div>
                         </td>
                       </tr>
@@ -203,7 +203,7 @@
                 <div class="w-full max-w-full px-3 mx-auto mt-4 sm:my-auto sm:mr-0 sm:w-1/5 md:w-1/5 md:flex-none">
                   <div class="relative right-0">
                     <div class="h-full text-right">
-                      <h6 class="mb-1"><span class="text-slate-400">0</span>/{{ character.getEquipmentPaUsed() }} PA <a href="#" id="info" data-target="tooltip_trigger" data-placement="top"><i class="fa fa-plus-circle text-slate-400 hover:text-slate-700 text-sm" aria-hidden="true"></i></a> 
+                      <h6 class="mb-1"><span class="text-slate-400">{{ character.getGearXp() - character.getGearXpUsed() }}</span>/{{ character.getGearXp() }} XP <a href="#" id="info" data-target="tooltip_trigger" data-placement="top"><i class="fa fa-plus-circle text-slate-400 hover:text-slate-700 text-sm" aria-hidden="true"></i></a> 
                         <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm" role="tooltip">
                           Ajouter XP
                           <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
@@ -230,8 +230,12 @@
                                 </div>
                             </td>
                             <td class="w-20 align-middle bg-slate-50  shadow-transparent p-2 rounded border border-dashed border-slate-200 hover:border-slate-500">
-                            <div class="w-full text-center"><i class="fa fa-trash cursor-pointer hover:text-slate-700" aria-hidden="true"  data-target="tooltip_trigger" data-placement="top"></i>
-                                <a href="{{ path('character_equipment_delete', {'id': character.id, 'possessionId': possession.id}) }}" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet équipement ?');" data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm" role="tooltip">
+                            <div class="w-full text-center">
+                                <i class="fa fa-trash cursor-pointer hover:text-slate-700" 
+                                   onclick="confirmDelete('{{ path('character_equipment_delete', {'id': character.id, 'possessionId': possession.id}) }}')" 
+                                   data-target="tooltip_trigger" 
+                                   data-placement="top"></i>
+                                <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm" role="tooltip">
                                 Supprimer
                                 <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
                                 </div>
@@ -248,7 +252,7 @@
                       <tr>
                         <td class="mx-8 text-center shadow-transparent">
                           <div class="flex p-3 mt-3 text-center justify-center bg-slate-100 bg-opacity-40  border rounded border-dashed border-slate-300">
-                            <span class="text-xs font-semibold leading-tight text-slate-300 cursor-pointer hover:scale-102 hover:text-slate-700 hover:underline"><strong class="font-extrabold">+ </strong>Ajouter du matériel ou une ressource (1 PA disponibles)</span>
+                            <span class="text-xs font-semibold leading-tight text-slate-300 cursor-pointer hover:scale-102 hover:text-slate-700 hover:underline"><strong class="font-extrabold">+ </strong>Ajouter du matériel ou une ressource ({{ character.getGearXp() - character.getGearXpUsed() }} XP disponibles)</span>
                           </div>
                         </td>
                       </tr>
@@ -309,17 +313,17 @@
       </div>
 
         <div class="w-full px-6 mx-auto text-right mb-4">
-            <a href="{{ path('character_delete', {'id': character.id}) }}" class="inline-block px-6 py-3 font-bold text-center text-red-700 bg-transparent uppercase align-middle transition-all leading-pro text-xs ease-soft-in tracking-tight-soft hover:scale-102 hover:underline active:opacity-85" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce personnage ?')">Supprimer</a>
+            <a href="#" 
+               onclick="confirmDelete('{{ path('character_delete', {'id': character.id}) }}')" 
+               class="inline-block px-6 py-3 font-bold text-center text-red-700 bg-transparent uppercase align-middle transition-all leading-pro text-xs ease-soft-in tracking-tight-soft hover:scale-102 hover:underline active:opacity-85">Supprimer</a>
             <a href="{{ path('character_submit', {'id': character.id}) }}" class="inline-block px-6 py-3 font-bold text-center text-white uppercase align-middle transition-all rounded-lg cursor-pointer bg-gradient-to-tl from-cyan-300 to-cyan-600 leading-pro text-xs ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 hover:scale-102 active:opacity-85 hover:shadow-soft-xs hover:text-cyan-100">Soumettre ce personnage aux orgas</a>
             <button type="submit" class="inline-block px-6 py-3 font-bold text-center text-white uppercase align-middle transition-all rounded-lg cursor-pointer bg-gradient-to-tl from-green-600 to-green-700 leading-pro text-xs ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 hover:scale-102 active:opacity-85 hover:text-lime-300 hover:shadow-soft-xs">Sauvegarder</button>
         </div>
 
   <script>
   document.addEventListener('DOMContentLoaded', function() {
-
     const compTab = document.getElementById("compTab");
     const bgTab = document.getElementById("bgTab");
-
 
     const quill = new Quill('#editor', {
         theme: 'snow'
@@ -349,6 +353,74 @@
         }
     } 
 
+    function showAddSkillModal() {
+        fetch('{{ path('api_character_available_skills', {'id': character.id}) }}')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erreur lors du chargement des compétences disponibles.');
+                }
+                return response.json();
+            })
+            .then(skills => {
+                if (skills.error) {
+                    showErrorAlert({ message: skills.error });
+                    return;
+                }
+
+                createModal({
+                    title: "Ajouter une compétence",
+                    html: `
+                        <form id="skillForm" class="text-left">
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-700">Compétence</label>
+                                <select id="skill" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-slate-500 focus:ring-slate-500">
+                                    <option value="">-- Sélectionnez une compétence --</option>
+                                    ${skills.map(skill => `
+                                        <option value="${skill.id}" data-cost="${skill.baseCost}" data-description="${skill.description}" data-short="${skill.short}" data-label="${skill.label}">
+                                            ${skill.label} - ${skill.baseCost}XP
+                                        </option>
+                                    `).join('')}
+                                </select>
+                            </div>
+                            <div id="skillDescription" class="mb-4 text-sm leading-normal hidden">
+                                <p class="text-sm leading-normal">
+                                    <span class="font-extrabold text-slate-700"></span> : <span class="description"></span><br/>
+                                    Coût : <span class="font-extrabold text-red-700 cost"></span>
+                                </p>
+                            </div>
+                        </form>
+                    `,
+                    getData: () => ({
+                        skillId: document.getElementById("skill").value,
+                    }),
+                    validate: (data) => data.skillId,
+                    url: "{{ path('api_character_skill_add', {'id': character.id}) }}",
+                    confirmButtonText: "Ajouter",
+                    successTitle: "Compétence ajoutée !",
+                    successMessage: "La compétence a été ajoutée avec succès.",
+                    didOpen: () => {
+                        const skillSelect = document.getElementById("skill");
+                        const skillDescription = document.getElementById("skillDescription");
+                        
+                        skillSelect.addEventListener("change", function() {
+                            const selectedOption = this.options[this.selectedIndex];
+                            
+                            if (this.value) {
+                                skillDescription.classList.remove("hidden");
+                                skillDescription.querySelector(".font-extrabold").textContent = selectedOption.dataset.label;
+                                skillDescription.querySelector(".description").textContent = selectedOption.dataset.description;
+                                skillDescription.querySelector(".cost").textContent = selectedOption.dataset.cost + "XP";
+                            } else {
+                                skillDescription.classList.add("hidden");
+                            }
+                        });
+                    }
+                });
+            })
+            .catch(error => {
+                showErrorAlert({ message: error.message });
+            });
+    }
   </script>
 
-{% endblock %} 
+{% endblock %}

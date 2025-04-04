@@ -108,30 +108,6 @@ class Skill
         return $this;
     }
 
-    public function getRequiredClasses(): array
-    {
-        return $this->required_classes;
-    }
-
-    public function setRequiredClasses(array $required_classes): static
-    {
-        $this->required_classes = $required_classes;
-
-        return $this;
-    }
-
-    public function getRequiredFactions(): array
-    {
-        return $this->required_factions;
-    }
-
-    public function setRequiredFactions(array $required_factions): static
-    {
-        $this->required_factions = $required_factions;
-
-        return $this;
-    }
-
     public function isVisibility(): ?bool
     {
         return $this->visibility;
@@ -142,6 +118,32 @@ class Skill
         $this->visibility = $visibility;
 
         return $this;
+    }
+
+    public function getRequiredClasses(): array
+    {
+        if (empty($this->required_classes)) {
+            return [];
+        }
+
+        if (is_string($this->required_classes)) {
+            return array_filter(explode(',', $this->required_classes));
+        }
+
+        return $this->required_classes;
+    }
+
+    public function getRequiredFactions(): array
+    {
+        if (empty($this->required_factions)) {
+            return [];
+        }
+
+        if (is_string($this->required_factions)) {
+            return array_filter(explode(',', $this->required_factions));
+        }
+
+        return $this->required_factions;
     }
 
     /**

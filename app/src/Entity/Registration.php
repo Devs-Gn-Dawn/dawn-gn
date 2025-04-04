@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\RegistrationRepository;
 use Doctrine\ORM\Mapping as ORM;
+use App\Entity\EventType;
 
 #[ORM\Entity(repositoryClass: RegistrationRepository::class)]
 class Registration
@@ -43,6 +44,22 @@ class Registration
     public function setEvent(string $event): static
     {
         $this->event = $event;
+
+        return $this;
+    }
+
+    public function getEventType(): ?EventType
+    {
+        try {
+            return EventType::from($this->event);
+        } catch (\ValueError $e) {
+            return null;
+        }
+    }
+
+    public function setEventType(EventType $eventType): static
+    {
+        $this->event = $eventType->value;
 
         return $this;
     }

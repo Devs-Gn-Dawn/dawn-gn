@@ -12,10 +12,17 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Entity\Allergy;
 use App\Entity\Note;
+use App\Entity\Registration;
+use App\Entity\EventType;
+use App\Repository\RegistrationRepository;
 
 #[IsGranted('ROLE_USER')]
 class AccountController extends AbstractController
 {
+    public function __construct(
+        private RegistrationRepository $registrationRepository
+    ) {}
+
     #[Route('/account', name: 'app_account')]
     public function index(): Response
     {
@@ -26,6 +33,7 @@ class AccountController extends AbstractController
             'breadcrumb' => [
                 '/account' => 'Mes informations',
             ],
+            'eventTypes' => EventType::getChoices(),
         ]);
     }
 
@@ -179,5 +187,66 @@ class AccountController extends AbstractController
         $entityManager->flush();
 
         return new JsonResponse(['message' => 'Note supprimée avec succès']);
+    }
+
+    #[Route('/account/registration/add', name: 'app_account_registration_add', methods: ['POST'])]
+    public function addRegistration(Request $request, EntityManagerInterface $entityManager): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+
+        if (!$data || !isset($data['event']) || !isset($data['ticket'])) {
+            return new JsonResponse(['error' => 'Données invalides'], 400);
+        }
+
+        try {
+            // check if the event is valid
+            if (!in_array($data['event'], EventType::getChoices())) {
+                return new JsonResponse(['error' => 'Événement invalide'], 400);
+            }
+            // check if the ticket is valid
+            // TODO helloasso api
+
+            // check if the event is already registered
+            $existingRegistration = $this->registrationRepository->findOneBy([
+                'user' => $this->getUser(),
+                'event' => $data['event']
+            ]);
+
+            if ($existingRegistration) {
+                return new JsonResponse(['error' => 'Événement déjà enregistré'], 400);
+            }
+
+            $registration = new Registration();
+            $registration->setUser($this->getUser());
+            $registration->setEvent($data['event']);
+            $registration->setHelloassoTicket($data['ticket']);
+
+            $entityManager->persist($registration);
+            $entityManager->flush();
+
+            return new JsonResponse(['success' => true]);
+        } catch (\Exception $e) {
+            return new JsonResponse(['error' => 'Une erreur est survenue lors de la création de l\'inscription'], 500);
+        }
+    }
+
+    #[Route('/account/registration/{id}/edit', name: 'app_account_registration_edit', methods: ['POST'])]
+    public function editRegistration(Request $request, Registration $registration, EntityManagerInterface $entityManager): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+
+        if (!$data || !isset($data['event']) || !isset($data['ticket'])) {
+            return new JsonResponse(['error' => 'Données invalides'], 400);
+        }
+
+        try {
+            $registration->setEvent($data['event']);
+            $registration->setHelloassoTicket($data['ticket']);
+            $entityManager->flush();
+
+            return new JsonResponse(['success' => true]);
+        } catch (\Exception $e) {
+            return new JsonResponse(['error' => 'Une erreur est survenue lors de la modification de l\'inscription'], 500);
+        }
     }
 }

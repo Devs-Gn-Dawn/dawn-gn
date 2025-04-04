@@ -123,9 +123,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @return Collection<int, Registration>
      */
-    public function getRegistrations(): Collection
+    public function getRegistrations($includeHidden = false): Collection
     {
-        return $this->registrations;
+        if ($includeHidden) {
+            return $this->registrations;
+        }
+        return $this->registrations->filter(function (Registration $registration) {
+            return $registration->getEventType()->getStatus() !== EventType::STATUS_HIDDEN;
+        });
     }
 
     /**

@@ -6,62 +6,8 @@
     {{ parent() }}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Fonction générique pour afficher une alerte de succès
-            function showSuccessAlert(title, text) {
-                return Swal.fire({
-                    title: title,
-                    text: text,
-                    icon: 'success',
-                    customClass: {
-                        confirmButton: "border-0 inline-flex justify-center rounded-md bg-gradient-to-tl from-gray-900 to-slate-800 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:scale-102 hover:bg-slate-800 w-30"
-                    }
-                }).then(() => {
-                    window.location.reload();
-                });
-            }
-
-            // Fonction générique pour afficher une alerte d'erreur
-            function showErrorAlert(error) {
-                return Swal.fire({
-                    title: 'Erreur !',
-                    text: error.message,
-                    icon: 'error',
-                    customClass: {
-                        confirmButton: "border-0 inline-flex justify-center rounded-md bg-gradient-to-tl from-gray-900 to-slate-800 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:scale-102 hover:bg-slate-800 w-30"
-                    }
-                });
-            }
-
-            // Fonction générique pour la confirmation de suppression
-            function showDeleteConfirmation(deleteCallback) {
-                return Swal.fire({
-                    title: 'Êtes-vous sûr ?',
-                    text: 'Cette action est irréversible',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'Oui, supprimer',
-                    cancelButtonText: 'Annuler',
-                    customClass: {
-                        confirmButton: "border-0 inline-flex justify-center rounded-md bg-gradient-to-tl from-red-600 to-rose-400 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:scale-102 hover:opacity-75 w-40",
-                        cancelButton: "border-0 inline-flex justify-center rounded-md bg-gradient-to-tl from-slate-600 to-slate-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:scale-102 hover:opacity-75 w-40",
-                        actions: 'flex gap-4 justify-center mt-4',
-                        popup: 'w-96'
-                    }
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        deleteCallback();
-                    }
-                });
-            }
-
-            // Mettre à jour les classes des boutons dans tous les modals
-            const modalClasses = {
-                confirmButton: "border-0 inline-flex justify-center rounded-md bg-gradient-to-tl from-gray-900 to-slate-800 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:scale-102 hover:bg-slate-800 w-30",
-                cancelButton: "border-0 inline-flex justify-center rounded-md bg-gradient-to-tl from-slate-600 to-slate-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:scale-102 hover:opacity-75 w-30",
-                actions: 'flex gap-4 justify-center mt-4',
-                popup: 'w-96'
-            };
-
+            // Les fonctions showSuccessAlert et showErrorAlert ont été déplacées dans app.js
+            
             // Fonction pour tronquer le texte
             function truncateText(text, maxLength = 100) {
                 if (text.length <= maxLength) return text;
@@ -78,7 +24,7 @@
                     html: `<div class="text-left break-words p-4 text-sm">${formattedContent}</div>`,
                     confirmButtonText: 'Fermer',
                     customClass: {
-                        confirmButton: "border-0 inline-flex justify-center rounded-md bg-gradient-to-tl from-gray-900 to-slate-800 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:scale-102 hover:bg-slate-800 w-30",
+                        confirmButton: window.BUTTON_CLASSES.primary,
                         htmlContainer: 'max-h-[60vh] overflow-y-auto',
                         popup: 'w-[32rem]'
                     },
@@ -91,9 +37,9 @@
                 });
             };
 
-            // Contacts d'urgence
+            // Exemple d'utilisation pour les contacts d'urgence
             window.openEmergencyContactModal = function() {
-                Swal.fire({
+                createModal({
                     title: 'Ajouter un contact d\'urgence',
                     html: `
                         <div class="mb-4">
@@ -103,43 +49,14 @@
                             <input type="tel" id="emergency-contact-phone" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow" placeholder="Numéro de téléphone" required>
                         </div>
                     `,
-                    showCancelButton: true,
-                    confirmButtonText: 'Ajouter',
-                    cancelButtonText: 'Annuler',
-                    customClass: modalClasses,
-                    preConfirm: () => {
-                        const name = document.getElementById('emergency-contact-name').value;
-                        const phone = document.getElementById('emergency-contact-phone').value;
-                        
-                        if (!name || !phone) {
-                            Swal.showValidationMessage('Veuillez remplir tous les champs');
-                            return false;
-                        }
-                        
-                        return fetch('{{ path('app_account_emergency_contact_add') }}', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({
-                                name: name,
-                                phone: phone
-                            })
-                        })
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error('Une erreur est survenue');
-                            }
-                            return response.json();
-                        })
-                        .catch(error => {
-                            Swal.showValidationMessage(error.message);
-                        });
-                    }
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        showSuccessAlert('Contact ajouté !', 'Le contact d\'urgence a été ajouté avec succès.');
-                    }
+                    getData: () => ({
+                        name: document.getElementById('emergency-contact-name').value,
+                        phone: document.getElementById('emergency-contact-phone').value
+                    }),
+                    validate: (data) => data.name && data.phone,
+                    url: '{{ path('app_account_emergency_contact_add') }}',
+                    successTitle: 'Contact ajouté !',
+                    successMessage: 'Le contact d\'urgence a été ajouté avec succès.'
                 });
             };
 
@@ -157,7 +74,7 @@
                     showCancelButton: true,
                     confirmButtonText: 'Modifier',
                     cancelButtonText: 'Annuler',
-                    customClass: modalClasses,
+                    customClass: window.modalClasses,
                     didOpen: () => {
                         document.getElementById('emergency-contact-name').value = name;
                         document.getElementById('emergency-contact-phone').value = phone;
@@ -199,260 +116,137 @@
             };
 
             window.deleteEmergencyContact = function(id) {
-                showDeleteConfirmation(() => {
-                    fetch(`{{ path('app_account_emergency_contact_delete', {'id': 'CONTACT_ID'}) }}`.replace('CONTACT_ID', id), {
-                        method: 'DELETE'
-                    })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Une erreur est survenue');
-                        }
-                        showSuccessAlert('Contact supprimé !', 'Le contact d\'urgence a été supprimé avec succès.');
-                    })
-                    .catch(error => {
-                        showErrorAlert(error);
-                    });
-                });
+                confirmDelete(`{{ path('app_account_emergency_contact_delete', {'id': 'CONTACT_ID'}) }}`.replace('CONTACT_ID', id));
             };
 
             // Allergies
             window.openAllergyModal = function() {
-                Swal.fire({
+                createModal({
                     title: 'Ajouter une allergie',
                     html: `
                         <div class="mb-4">
                             <input type="text" id="allergy-name" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow" placeholder="Nom de l'allergie" required>
                         </div>
                     `,
-                    showCancelButton: true,
-                    confirmButtonText: 'Ajouter',
-                    cancelButtonText: 'Annuler',
-                    customClass: modalClasses,
-                    preConfirm: () => {
-                        const name = document.getElementById('allergy-name').value;
-                        
-                        if (!name) {
-                            Swal.showValidationMessage('Veuillez remplir le champ');
-                            return false;
-                        }
-                        
-                        return fetch('{{ path('app_account_allergy_add') }}', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({
-                                name: name
-                            })
-                        })
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error('Une erreur est survenue');
-                            }
-                            return response.json();
-                        })
-                        .catch(error => {
-                            Swal.showValidationMessage(error.message);
-                        });
-                    }
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        showSuccessAlert('Allergie ajoutée !', 'L\'allergie a été ajoutée avec succès.');
-                    }
+                    getData: () => ({
+                        name: document.getElementById('allergy-name').value
+                    }),
+                    validate: (data) => data.name,
+                    url: '{{ path('app_account_allergy_add') }}',
+                    successTitle: 'Allergie ajoutée !',
+                    successMessage: 'L\'allergie a été ajoutée avec succès.'
                 });
             };
 
             window.editAllergy = function(id, name) {
-                Swal.fire({
+                createModal({
                     title: 'Modifier l\'allergie',
                     html: `
                         <div class="mb-4">
                             <input type="text" id="allergy-name" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow" placeholder="Nom de l'allergie" required>
                         </div>
                     `,
-                    showCancelButton: true,
                     confirmButtonText: 'Modifier',
-                    cancelButtonText: 'Annuler',
-                    customClass: modalClasses,
+                    getData: () => ({
+                        name: document.getElementById('allergy-name').value
+                    }),
+                    validate: (data) => data.name,
+                    url: `{{ path('app_account_allergy_edit', {'id': 'ALLERGY_ID'}) }}`.replace('ALLERGY_ID', id),
                     didOpen: () => {
                         document.getElementById('allergy-name').value = name;
                     },
-                    preConfirm: () => {
-                        const name = document.getElementById('allergy-name').value;
-                        
-                        if (!name) {
-                            Swal.showValidationMessage('Veuillez remplir le champ');
-                            return false;
-                        }
-                        
-                        return fetch(`{{ path('app_account_allergy_edit', {'id': 'ALLERGY_ID'}) }}`.replace('ALLERGY_ID', id), {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({
-                                name: name
-                            })
-                        })
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error('Une erreur est survenue');
-                            }
-                            return response.json();
-                        })
-                        .catch(error => {
-                            Swal.showValidationMessage(error.message);
-                        });
-                    }
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        showSuccessAlert('Allergie modifiée !', 'L\'allergie a été modifiée avec succès.');
-                    }
+                    successTitle: 'Allergie modifiée !',
+                    successMessage: 'L\'allergie a été modifiée avec succès.'
                 });
             };
 
             window.deleteAllergy = function(id) {
-                showDeleteConfirmation(() => {
-                    fetch(`{{ path('app_account_allergy_delete', {'id': 'ALLERGY_ID'}) }}`.replace('ALLERGY_ID', id), {
-                        method: 'DELETE'
-                    })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Une erreur est survenue');
-                        }
-                        showSuccessAlert('Allergie supprimée !', 'L\'allergie a été supprimée avec succès.');
-                    })
-                    .catch(error => {
-                        showErrorAlert(error);
-                    });
-                });
+                confirmDelete(`{{ path('app_account_allergy_delete', {'id': 'ALLERGY_ID'}) }}`.replace('ALLERGY_ID', id));
             };
 
             // Notes
             window.openNoteModal = function() {
-                Swal.fire({
+                createModal({
                     title: 'Ajouter une note',
                     html: `
                         <div class="mb-4">
                             <textarea id="note-content" rows="4" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow" placeholder="Contenu de la note" required></textarea>
                         </div>
                     `,
-                    showCancelButton: true,
-                    confirmButtonText: 'Ajouter',
-                    cancelButtonText: 'Annuler',
-                    customClass: modalClasses,
-                    preConfirm: () => {
-                        const content = document.getElementById('note-content').value;
-                        
-                        if (!content) {
-                            Swal.showValidationMessage('Veuillez remplir le champ');
-                            return false;
-                        }
-                        
-                        return fetch('{{ path('app_account_note_add') }}', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({
-                                content: content
-                            })
-                        })
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error('Une erreur est survenue');
-                            }
-                            return response.json();
-                        })
-                        .catch(error => {
-                            Swal.showValidationMessage(error.message);
-                        });
-                    }
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        showSuccessAlert('Note ajoutée !', 'La note a été ajoutée avec succès.');
-                    }
+                    getData: () => ({
+                        content: document.getElementById('note-content').value
+                    }),
+                    validate: (data) => data.content,
+                    url: '{{ path('app_account_note_add') }}',
+                    successTitle: 'Note ajoutée !',
+                    successMessage: 'La note a été ajoutée avec succès.'
                 });
             };
 
             window.editNote = function(id, content) {
-                Swal.fire({
+                createModal({
                     title: 'Modifier la note',
                     html: `
                         <div class="mb-4">
                             <textarea id="note-content" rows="4" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow" placeholder="Contenu de la note" required></textarea>
                         </div>
                     `,
-                    showCancelButton: true,
                     confirmButtonText: 'Modifier',
-                    cancelButtonText: 'Annuler',
-                    customClass: modalClasses,
+                    getData: () => ({
+                        content: document.getElementById('note-content').value
+                    }),
+                    validate: (data) => data.content,
+                    url: `{{ path('app_account_note_edit', {'id': 'NOTE_ID'}) }}`.replace('NOTE_ID', id),
                     didOpen: () => {
                         document.getElementById('note-content').value = content;
                     },
-                    preConfirm: () => {
-                        const content = document.getElementById('note-content').value;
-                        
-                        if (!content) {
-                            Swal.showValidationMessage('Veuillez remplir le champ');
-                            return false;
-                        }
-                        
-                        return fetch(`{{ path('app_account_note_edit', {'id': 'NOTE_ID'}) }}`.replace('NOTE_ID', id), {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({
-                                content: content
-                            })
-                        })
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error('Une erreur est survenue');
-                            }
-                            return response.json();
-                        })
-                        .catch(error => {
-                            Swal.showValidationMessage(error.message);
-                        });
-                    }
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        showSuccessAlert('Note modifiée !', 'La note a été modifiée avec succès.');
-                    }
+                    successTitle: 'Note modifiée !',
+                    successMessage: 'La note a été modifiée avec succès.'
                 });
             };
 
             window.deleteNote = function(id) {
-                showDeleteConfirmation(() => {
-                    fetch(`{{ path('app_account_note_delete', {'id': 'NOTE_ID'}) }}`.replace('NOTE_ID', id), {
-                        method: 'DELETE'
-                    })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Une erreur est survenue');
-                        }
-                        showSuccessAlert('Note supprimée !', 'La note a été supprimée avec succès.');
-                    })
-                    .catch(error => {
-                        showErrorAlert(error);
-                    });
-                });
+                confirmDelete(`{{ path('app_account_note_delete', {'id': 'NOTE_ID'}) }}`.replace('NOTE_ID', id));
             };
 
-            window.sweetTicket = function() {
-                Swal.fire({
-                    customClass: {
-                        text: "!mt-2 sm:!mt-0 !m-0 !text-center sm:!text-left !text-s !text-gray-500 !pl-4 sm:!pl-0 !pr-4 !pb-4 sm:!pr-6 sm:!pb-4 sm:!ml-4 !col-start-1 sm:!col-start-2 !col-end-3",
-                        confirmButton: "border-0 inline-flex justify-center rounded-md bg-gradient-to-tl from-gray-900 to-slate-800 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:scale-102 hover:bg-slate-800 w-30"
-                    },    
-                    width:"50%",
-                    text: "Vous le trouverez ici, sur le billet HelloAsso reçu par mail.",
-                    imageUrl: "{{ asset('img/billet_info.jpg') }}",
-                    imageWidth: "100%",
-                    confirmButtonText: "J'ai compris !",
-                    animation: false
+            // Fonction pour gérer les inscriptions
+            window.manageRegistration = function(id = null, ticket = null, currentEvent = null) {
+                createModal({
+                    title: id ? 'Modifier mon inscription' : 'Nouvelle inscription',
+                    html: `
+                        <div class="mb-4">
+                            <label for="registration-event" class="block text-sm font-medium text-gray-700 mb-1">Type d'événement</label>
+                            <select id="registration-event" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow" required>
+                                <option value="">Sélectionnez un type d'événement</option>
+                                {% for label, value in eventTypes %}
+                                    <option value="{{ value }}">{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label for="registration-ticket" class="block text-sm font-medium text-gray-700 mb-1">Numéro de billet HelloAsso</label>
+                            <input type="text" id="registration-ticket" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow" placeholder="Numéro du billet" required>
+                        </div>
+                    `,
+                    getData: () => ({
+                        event: document.getElementById('registration-event').value,
+                        ticket: document.getElementById('registration-ticket').value
+                    }),
+                    validate: (data) => data.event && data.ticket,
+                    url: id 
+                        ? `{{ path('app_account_registration_edit', {'id': 'REG_ID'}) }}`.replace('REG_ID', id)
+                        : '{{ path('app_account_registration_add') }}',
+                    didOpen: () => {
+                        if (id) {
+                            document.getElementById('registration-event').value = currentEvent || '';
+                            document.getElementById('registration-ticket').value = ticket || '';
+                        }
+                    },
+                    confirmButtonText: id ? 'Modifier' : 'Ajouter',
+                    successTitle: id ? 'Inscription modifiée !' : 'Inscription ajoutée !',
+                    successMessage: id 
+                        ? 'L\'inscription a été mise à jour avec succès.'
+                        : 'La nouvelle inscription a été ajoutée avec succès.'
                 });
             };
         });
@@ -462,16 +256,16 @@
 {% block body %}
 <div class="w-full px-6 mx-auto">
     <div class="relative flex flex-col flex-auto min-w-0 p-4 mt-12 overflow-hidden break-words border-0 shadow-blur rounded-2xl bg-white/80 bg-clip-border backdrop-blur-2xl backdrop-saturate-200">
-        <div class="flex flex-wrap -mx-3">
-            <div class="flex-none w-auto max-w-full px-3">
+        <div class="flex flex-wrap mx-3">
+            {# <div class="flex-none w-auto max-w-full px-3">
                 <div class="text-base ease-soft-in-out h-18.5 w-18.5 relative inline-flex items-center justify-center rounded-xl text-white transition-all duration-200">
                     <img src="{{ asset('img/bruce-mars.jpg') }}" alt="profile_image" class="w-full shadow-soft-sm rounded-xl" />
                 </div>
-            </div>
+            </div> #}
             <div class="flex-none w-auto max-w-full px-3 my-auto">
                 <div class="h-full">
                     <h5 class="mb-1">{{ user.name }}</h5>
-                    <p class="mb-0 font-semibold leading-normal text-sm"><span class="font-extrabold text-slate-700">{{ user.registrations|length }}</span> participations</p>
+                    <p class="mb-0 font-semibold leading-normal text-sm"><span class="font-extrabold text-slate-700">{{ user.registrations|filter(r => r.getEventType().status == constant('App\\Entity\\EventType::STATUS_CLOSED'))|length }}</span> participations</p>
                 </div>
             </div>
             <div class="w-full max-w-full px-3 mx-auto mt-4 sm:my-auto sm:mr-0 md:w-1/5 md:flex-none">
@@ -481,12 +275,23 @@
                         Plus d'informations
                         <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
                     </div>
-                    : <span class="font-extrabold text-slate-700">{% if user.registrations.empty == false and user.registrations.first %}{{ user.registrations.first.helloasso_ticket }}{% else %}Non renseigné{% endif %}</span>
-                    <a href="#" data-target="tooltip_trigger" data-placement="top"><i class="ml-2 fa fa-pencil hover:scale-102 hover:text-slate-700"></i></a>
+                    : <span class="font-extrabold text-slate-700">{% if user.registrations.empty == false and user.registrations.last %}{{ user.registrations.last.helloassoTicket }}{% else %}Non renseigné{% endif %}</span>
+                    {% if user.registrations.empty == false and user.registrations.last %}
+                    <a href="#" onclick="manageRegistration('{{ user.registrations.last ? user.registrations.last.id : '' }}',
+                    '{{ user.registrations.last ? user.registrations.last.helloassoTicket : '' }}',
+                    '{{ user.registrations.last ? user.registrations.last.event : '' }}')" data-target="tooltip_trigger" data-placement="top"><i class="ml-2 fa fa-pencil hover:scale-102 hover:text-slate-700"></i></a>
                     <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm" role="tooltip">
                         Editer le numéro du billet
                         <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
                     </div>
+                    {% endif %}
+                    {% if not user.registrations.last or user.registrations.last.getEventType().status != constant('App\\Entity\\EventType::STATUS_OPEN') %}
+                    <a href="#" onclick="manageRegistration()" data-target="tooltip_trigger" data-placement="top"><i class="ml-2 fa fa-plus hover:scale-102 hover:text-slate-700"></i></a>
+                    <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm" role="tooltip">
+                        Ajouter un numéro de billet
+                        <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -647,4 +452,8 @@
 </div>
 {% endblock %}
 
-{% block additional_scripts %}{% endblock %} 
+{% block additional_scripts %}{% endblock %}
+
+{% set input_classes = "text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow" %}
+{% set action_button_classes = "inline-block pl-0 pr-4 mb-0 ml-auto font-bold text-center align-middle transition-all bg-transparent border-0 rounded-lg shadow-none cursor-pointer leading-pro text-xs ease-soft-in text-slate-400 hover:text-slate-700 hover:underline" %}
+{% set delete_button_classes = "inline-block pl-4 mb-0 ml-0 font-bold text-center align-middle transition-all bg-transparent border-0 shadow-none cursor-pointer leading-pro text-xs ease-soft-in text-slate-400 hover:text-red-600 hover:underline" %} 

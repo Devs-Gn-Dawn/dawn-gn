@@ -17,6 +17,7 @@ use App\Entity\Skill;
 use App\Entity\SkillLearned;
 use App\Entity\Gear;
 use App\Entity\Possession;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 #[Route('/characters')]
 #[IsGranted('ROLE_USER')]
@@ -32,6 +33,7 @@ class CharacterController extends AbstractController
         return $this->render('character/index.html.twig', [
             'characters' => $characterRepository->findBy(['user' => $this->getUser()]),
             'breadcrumb' => ['Liste des personnages'],
+            'factions' => FactionType::getChoices(),
         ]);
     }
 
@@ -39,12 +41,19 @@ class CharacterController extends AbstractController
     public function new(Request $request): Response
     {
         if ($request->isMethod('POST')) {
+            // Récupérer les données soit du formulaire, soit du JSON
+            $data = $request->getContent() ? json_decode($request->getContent(), true) : $request->request->all();
+
+            if (empty($data['character_name']) || empty($data['faction']) || empty($data['class'])) {
+                return $this->json(['error' => 'Tous les champs sont obligatoires'], 400);
+            }
+
             $character = new Character();
             $character->setUser($this->getUser());
-            $character->setName($request->request->get('character_name'));
-            $character->setFaction($request->request->get('faction'));
-            $character->setClass($request->request->get('class'));
-            $character->setBackground($request->request->get('background'));
+            $character->setName($data['character_name']);
+            $character->setFaction($data['faction']);
+            $character->setClass($data['class']);
+            $character->setBackground($data['background'] ?? '');
             $character->setDescription(''); // Description vide par défaut
             $character->setNoteOrga(''); // Note orga vide par défaut
             $character->setIsMain(false);
@@ -52,6 +61,10 @@ class CharacterController extends AbstractController
 
             $this->entityManager->persist($character);
             $this->entityManager->flush();
+
+            if ($request->getContent()) {
+                return $this->json(['success' => true]);
+            }
 
             $this->addFlash('success', 'Votre personnage a été créé avec succès.');
             return $this->redirectToRoute('app_character_index');
@@ -122,14 +135,24 @@ class CharacterController extends AbstractController
                 }
             }
 
+            // Vérifier si la compétence est disponible pour le personnage
+            if (!$this->entityManager->getRepository(Skill::class)->isSkillAvailableForCharacter($character, $skill)) {
+                $this->addFlash('error', 'Cette compétence n\'est pas disponible pour ce personnage.');
+                return $this->redirectToRoute('character_skill_add', ['id' => $character->getId()]);
+            }
+
+            // Vérifier si le personnage a suffisamment de points d'action
+            if ($character->getPaAvailable() < $skill->getBaseCost()) {
+                $this->addFlash('error', 'Vous n\'avez pas assez de points d\'action pour apprendre cette compétence.');
+                return $this->redirectToRoute('character_skill_add', ['id' => $character->getId()]);
+            }
+
             // Créer la nouvelle compétence apprise
             $skillLearned = new SkillLearned();
-            $skillLearned->setCharacter($character);
             $skillLearned->setSkill($skill);
             $skillLearned->setCost($skill->getBaseCost());
-            $skillLearned->setNote('');
-            $skillLearned->setNoteOrga('');
-
+            $skillLearned->setNote($request->request->get('note', ''));
+            $skillLearned->setCharacter($character);
             $this->entityManager->persist($skillLearned);
             $this->entityManager->flush();
 
@@ -138,45 +161,11 @@ class CharacterController extends AbstractController
         }
 
         // Récupérer toutes les compétences disponibles
-        $availableSkills = $this->entityManager->getRepository(Skill::class)->findBy(['visibility' => true]);
-
-        // Filtrer les compétences en fonction des prérequis
-        $filteredSkills = [];
-        foreach ($availableSkills as $skill) {
-            // Vérifier les prérequis de classe
-            if (!empty($skill->getRequiredClasses()) && !in_array($character->getClass(), $skill->getRequiredClasses())) {
-                continue;
-            }
-
-            // Vérifier les prérequis de faction
-            if (!empty($skill->getRequiredFactions()) && !in_array($character->getFaction(), $skill->getRequiredFactions())) {
-                continue;
-            }
-
-            // Vérifier les prérequis de compétences
-            $hasRequiredSkills = true;
-            foreach ($skill->getRequiredSkills() as $requiredSkill) {
-                $hasLearned = false;
-                foreach ($character->getSkillsLearned() as $learnedSkill) {
-                    if ($learnedSkill->getSkill()->getId() === $requiredSkill->getId()) {
-                        $hasLearned = true;
-                        break;
-                    }
-                }
-                if (!$hasLearned) {
-                    $hasRequiredSkills = false;
-                    break;
-                }
-            }
-
-            if ($hasRequiredSkills) {
-                $filteredSkills[] = $skill;
-            }
-        }
+        $availableSkills = $this->entityManager->getRepository(Skill::class)->findAvailableSkillsForCharacter($character);
 
         return $this->render('character/skill_add.html.twig', [
             'character' => $character,
-            'skills' => $filteredSkills,
+            'skills' => $availableSkills,
         ]);
     }
 
@@ -373,5 +362,41 @@ class CharacterController extends AbstractController
         return $this->render('character/background.html.twig', [
             'character' => $character,
         ]);
+    }
+
+    #[Route('/api/character/{id}/available-skills', name: 'api_character_available_skills', methods: ['GET'])]
+    public function getAvailableSkills(Character $character): JsonResponse
+    {
+        try {
+            $skills = $this->entityManager->getRepository(Skill::class)->findAvailableSkillsForCharacter($character);
+
+            if (!$skills) {
+                return $this->json(['error' => 'Aucune compétence disponible pour ce personnage.'], 404);
+            }
+
+            return $this->json($skills);
+        } catch (\Exception $e) {
+            return $this->json(['error' => 'Erreur lors du chargement des compétences disponibles.', 'message' => $e->getMessage()], 500);
+        }
+    }
+
+    #[Route('/api/character/{id}/skill/add', name: 'api_character_skill_add', methods: ['POST'])]
+    public function addSkillApi(Character $character, Request $request): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        $skill = $this->entityManager->getRepository(Skill::class)->find($data['skillId']);
+
+        try {
+            if ($this->entityManager->getRepository(Skill::class)->isSkillAvailableForCharacter($skill, $character)) {
+                $character->addSkill($skill);
+                $this->entityManager->flush();
+            } else {
+                throw new \Exception('Cette compétence n\'est pas disponible pour ce personnage');
+            }
+        } catch (\Exception $e) {
+            return $this->json(['error' => $e->getMessage()], 400);
+        }
+
+        return $this->json(['success' => true]);
     }
 }

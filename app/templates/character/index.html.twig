@@ -29,7 +29,7 @@
                                             <td class="p-2 align-middle bg-transparent border-b whitespace-nowrap shadow-transparent">
                                                 <div class="flex px-2 py-1">
                                                     <div>
-                                                        <img src="{{ asset('assets/img/team-2.jpg') }}" class="inline-flex items-center justify-center mr-4 text-sm text-white transition-all duration-200 ease-soft-in-out h-9 w-9 rounded-xl" alt="{{ character.name }}" />
+                                                        <img src="{{ asset('build/images/avatars/' ~ character.getAvatar() ~ '.jpg') }}" class="inline-flex items-center justify-center mr-4 text-sm text-white transition-all duration-200 ease-soft-in-out h-9 w-9 rounded-xl" alt="{{ character.name }}" />
                                                     </div>
                                                     <div class="flex flex-col justify-center">
                                                         <h6 class="mb-0 text-sm leading-normal">{{ character.name }}</h6>
@@ -70,11 +70,11 @@
                                 </tbody>
                             </table>
                             <div class="p-4">
-                                <a href="{{ path('app_character_new') }}" class="block w-full">
-                                    <div class="flex mx-2 p-3 text-center justify-center bg-slate-100 bg-opacity-40 border rounded border-dashed border-slate-300 hover:bg-slate-200 transition-all duration-200">
-                                        <span class="text-xs font-semibold leading-tight text-slate-500 cursor-pointer hover:text-slate-700"><strong class="font-extrabold">+ </strong>Créer un nouveau personnage</span>
+                                <div onclick="showNewCharacterModal()" class="block w-full">
+                                    <div class="flex mx-2 p-3 text-center justify-center bg-slate-100 bg-opacity-40 border rounded border-dashed border-slate-300 hover:bg-slate-200 transition-all duration-200 cursor-pointer">
+                                        <span class="text-xs font-semibold leading-tight text-slate-500 hover:text-slate-700"><strong class="font-extrabold">+ </strong>Créer un nouveau personnage</span>
                                     </div>
-                                </a>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -82,4 +82,82 @@
             </div>
         </div>
     </div>
+    <script>
+        window.factions = {{ factions|json_encode|raw }};
+        
+        window.showNewCharacterModal = function () {
+            createModal({
+                title: "Créer un nouveau personnage",
+                html: `
+                    <form id="newCharacterForm" class="text-left">
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700">Nom du personnage</label>
+                            <input type="text" id="character_name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-slate-500 focus:ring-slate-500" required>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700">Faction</label>
+                            <select id="faction-select" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-slate-500 focus:ring-slate-500" required>
+                                <option value="">Choisir une faction</option>
+                                ${Object.entries(window.factions).map(([label, value]) => 
+                                    `<option value="${value}">${label}</option>`
+                                ).join('')}
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label id="class-label" class="block text-sm font-medium text-gray-700">Classe</label>
+                            <select id="class-select" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-slate-500 focus:ring-slate-500" required disabled>
+                                <option value="">Choisir une classe</option>
+                            </select>
+                        </div>
+                    </form>
+                `,
+                didOpen: () => {
+                    const factionSelect = document.getElementById('faction-select');
+                    const classSelect = document.getElementById('class-select');
+                    const classLabel = document.getElementById('class-label');
+
+                    factionSelect.addEventListener('change', async function() {
+                        const selectedFaction = this.value;
+                        classSelect.innerHTML = '<option value="">Choisir une classe</option>';
+                        
+                        if (!selectedFaction) {
+                            classSelect.disabled = true;
+                            classLabel.textContent = 'Classe (Sélectionnez d\'abord une faction)';
+                            return;
+                        }
+
+                        try {
+                            const response = await fetch(`/characters/api/classes/${selectedFaction}`);
+                            const classes = await response.json();
+                            
+                            Object.entries(classes).forEach(([label, value]) => {
+                                const option = document.createElement('option');
+                                option.value = value;
+                                option.textContent = label;
+                                classSelect.appendChild(option);
+                            });
+                            
+                            classSelect.disabled = false;
+                            classLabel.textContent = 'Classe';
+                        } catch (error) {
+                            console.error('Erreur lors du chargement des classes:', error);
+                            classSelect.disabled = true;
+                            classLabel.textContent = 'Classe (Erreur de chargement)';
+                        }
+                    });
+                    factionSelect.dispatchEvent(new Event('change'));
+                },
+                getData: () => ({
+                    character_name: document.getElementById('character_name').value,
+                    faction: document.getElementById('faction-select').value,
+                    class: document.getElementById('class-select').value
+                }),
+                validate: (data) => data.character_name && data.faction && data.class,
+                url: '/characters/new',
+                confirmButtonText: 'Créer',
+                successTitle: 'Personnage créé !',
+                successMessage: 'Votre personnage a été créé avec succès.'
+            });
+        };
+    </script>
 {% endblock %} 
