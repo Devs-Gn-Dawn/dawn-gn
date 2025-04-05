@@ -54,7 +54,7 @@ class Character
     #[ORM\OneToMany(mappedBy: 'character', targetEntity: Possession::class)]
     private Collection $possessions;
 
-    #[ORM\OneToMany(mappedBy: 'character', targetEntity: SkillLearned::class)]
+    #[ORM\OneToMany(mappedBy: 'character', targetEntity: SkillLearned::class, cascade: ['persist'])]
     private Collection $skillsLearned;
 
     public function __construct()
@@ -158,6 +158,28 @@ class Character
         return $this;
     }
 
+    public function setXpSkill(int $xp_skill): static
+    {
+        $this->xp_skill = $xp_skill;
+        return $this;
+    }
+
+    public function setXpGear(int $xp_gear): static
+    {
+        $this->xp_gear = $xp_gear;
+        return $this;
+    }
+
+    public function getXpSkill(): int
+    {
+        return $this->xp_skill;
+    }
+
+    public function getXpGear(): int
+    {
+        return $this->xp_gear;
+    }
+
     /**
      * @return Collection<int, Possession>
      */
@@ -210,27 +232,17 @@ class Character
 
     public function getAvailableXp(): int
     {
-        return $this->getGainedXp() - $this->getSkillsXp() - $this->getGearXp() + 30;
-    }
-
-    public function getSkillsXp(): int
-    {
-        return $this->xp_skill;
+        return $this->getGainedXp() - $this->getXpSkill() - $this->getXpGear() + 30;
     }
 
     public function getAvailableSkillsXp(): int
     {
-        return $this->getSkillsXp() - $this->getSkillsXpUsed();
-    }
-
-    public function getGearXp(): int
-    {
-        return $this->xp_gear;
+        return $this->getXpSkill() - $this->getSkillsXpUsed();
     }
 
     public function getAvailableGearXp(): int
     {
-        return $this->getGearXp() - $this->getGearXpUsed();
+        return $this->getXpGear() - $this->getGearXpUsed();
     }
 
     public function getSkillsXpUsed(): int
@@ -254,13 +266,14 @@ class Character
     {
         $skills = [];
         foreach ($this->skillsLearned as $skillLearned) {
+            $skill = $skillLearned->getSkill();
             $skills[] = [
-                'id' => $skillLearned->getSkill()->getId(),
-                'name' => $skillLearned->getSkill()->getLabel(),
-                'description' => $skillLearned->getSkill()->getDescription(),
-                'required' => $skillLearned->getSkill()->getRequired(),
-                'class' => $skillLearned->getSkill()->getClass(),
-                'faction' => $skillLearned->getSkill()->getFaction(),
+                'id' => $skill->getId(),
+                'name' => $skill->getLabel(),
+                'description' => $skill->getDescription(),
+                'required_classes' => $skill->getRequiredClasses(),
+                'required_factions' => $skill->getRequiredFactions(),
+                'required_skills' => $skill->getRequiredSkills()->toArray(),
                 'cost' => $skillLearned->getCost(),
                 'quote' => $skillLearned->getNote()
             ];
@@ -304,7 +317,7 @@ class Character
         return FactionType::getAvatar($this->getFactionType());
     }
 
-    public function addSkill(Skill $skill, ?int $cost = null, ?string $note = null): static
+    public function addSkill(Skill $skill, ?int $cost = null, ?string $note = null, ?string $noteOrga = null): static
     {
         foreach ($this->skillsLearned as $skillLearned) {
             if ($skillLearned->getSkill() === $skill) {
@@ -312,14 +325,15 @@ class Character
             }
         }
 
-        if ($this->getPaAvailable() < ($cost ?? $skill->getBaseCost())) {
+        if ($this->getAvailableSkillsXp() < ($cost ?? $skill->getBaseCost())) {
             throw new \Exception("Points insuffisants");
         }
 
         $skillLearned = new SkillLearned();
         $skillLearned->setSkill($skill);
         $skillLearned->setCost($cost ?? $skill->getBaseCost());
-        $skillLearned->setNote($note);
+        $skillLearned->setNote($note ?? '');
+        $skillLearned->setNoteOrga($noteOrga ?? '');
         $skillLearned->setCharacter($this);
 
         $this->skillsLearned->add($skillLearned);

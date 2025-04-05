@@ -21,10 +21,10 @@ class SkillLearned
     private ?string $note = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    private ?string $note_orga = null;
+    private ?string $note_orga = '';
 
-    #[ORM\ManyToOne(targetEntity: Character::class, inversedBy: 'skillsLearned')]
-    #[ORM\JoinColumn(name: 'fk_character', referencedColumnName: 'id', nullable: false)]
+    #[ORM\ManyToOne(inversedBy: 'skillsLearned', cascade: ['persist'])]
+    #[ORM\JoinColumn(name: 'fk_character', referencedColumnName: 'id')]
     private ?Character $character = null;
 
     #[ORM\ManyToOne(targetEntity: Skill::class)]

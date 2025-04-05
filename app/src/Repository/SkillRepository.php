@@ -30,7 +30,7 @@ class SkillRepository extends ServiceEntityRepository
             throw new \Exception('XP insufisant');
         }
 
-        if (!empty($requiredClasses) && in_array($character->getClass(), $requiredClasses) === false) {
+        if (!empty($requiredClasses) && !in_array($character->getClass(), $requiredClasses)) {
             throw new \Exception('Classe invalide ' . $character->getClass() . ' ' . json_encode($requiredClasses));
         }
 
@@ -41,7 +41,10 @@ class SkillRepository extends ServiceEntityRepository
         // check required skills
         $requiredSkills = $skill->getRequiredSkills();
         foreach ($requiredSkills as $requiredSkill) {
-            if ($character->getSkillsLearned()->contains($requiredSkill) === false) {
+            $skillLearned = $character->getSkillsLearned()->filter(
+                fn($skillLearned) => $skillLearned->getSkill()->getId() === $requiredSkill->getId()
+            )->first();
+            if ($skillLearned === null) {
                 throw new \Exception('Compétence requise manquante');
             }
         }

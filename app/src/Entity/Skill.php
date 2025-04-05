@@ -122,28 +122,22 @@ class Skill
 
     public function getRequiredClasses(): array
     {
-        if (empty($this->required_classes)) {
-            return [];
-        }
 
-        if (is_string($this->required_classes)) {
-            return array_filter(explode(',', $this->required_classes));
-        }
+        $classes = array_filter($this->required_classes, function ($value) {
+            return trim($value) !== '';
+        });
 
-        return $this->required_classes;
+        return array_values($classes);
     }
 
     public function getRequiredFactions(): array
     {
-        if (empty($this->required_factions)) {
-            return [];
-        }
 
-        if (is_string($this->required_factions)) {
-            return array_filter(explode(',', $this->required_factions));
-        }
+        $factions = array_filter($this->required_factions, function ($value) {
+            return trim($value) !== '';
+        });
 
-        return $this->required_factions;
+        return array_values($factions);
     }
 
     /**

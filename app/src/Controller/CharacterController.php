@@ -18,14 +18,19 @@ use App\Entity\SkillLearned;
 use App\Entity\Gear;
 use App\Entity\Possession;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Psr\Log\LoggerInterface;
 
 #[Route('/characters')]
 #[IsGranted('ROLE_USER')]
 class CharacterController extends AbstractController
 {
+    private LoggerInterface $logger;
     public function __construct(
-        private EntityManagerInterface $entityManager
-    ) {}
+        private EntityManagerInterface $entityManager,
+        LoggerInterface $logger
+    ) {
+        $this->logger = $logger;
+    }
 
     #[Route('/', name: 'app_character_index', methods: ['GET'])]
     public function index(CharacterRepository $characterRepository): Response
@@ -56,6 +61,8 @@ class CharacterController extends AbstractController
             $character->setBackground($data['background'] ?? '');
             $character->setDescription(''); // Description vide par défaut
             $character->setNoteOrga(''); // Note orga vide par défaut
+            $character->setXpSkill(20);
+            $character->setXpGear(10);
             $character->setIsMain(false);
             $character->setIsValidated(false);
 
@@ -396,6 +403,30 @@ class CharacterController extends AbstractController
         } catch (\Exception $e) {
             return $this->json(['error' => $e->getMessage()], 400);
         }
+
+        return $this->json(['success' => true]);
+    }
+
+    #[Route('/api/character/{id}/skill/delete', name: 'api_character_skill_delete', methods: ['POST'])]
+    public function deleteSkillApi(Character $character, Request $request): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        $skillId = $data['skillId'] ?? null;
+
+        if (!$skillId) {
+            return $this->json(['error' => 'Paramètre skillId manquant'], 400);
+        }
+
+        $skillLearned = $character->getSkillsLearned()->filter(
+            fn($skillLearned) => $skillLearned->getSkill()->getId() === $skillId
+        )->first();
+
+        if (!$skillLearned) {
+            return $this->json(['error' => 'Cette compétence n\'est pas apprise par ce personnage'], 404);
+        }
+
+        $this->entityManager->remove($skillLearned);
+        $this->entityManager->flush();
 
         return $this->json(['success' => true]);
     }

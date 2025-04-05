@@ -78,13 +78,13 @@ window.showContactForm = function () {
 };
 
 // Fonction globale de confirmation de suppression
-window.confirmDelete = function (url) {
+window.confirmDelete = function (url, data = {}) {
   createModal({
     title: "Êtes-vous sûr ?",
     html: "Cette action ne peut pas être annulée !",
     confirmButtonText: "Oui, supprimer !",
     customClass: window.modalDeleteClasses,
-    getData: () => ({}),
+    getData: () => data,
     validate: () => true,
     url: url,
     successTitle: "Supprimé !",
