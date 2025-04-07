@@ -7,6 +7,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use App\Entity\CharacterType;
 
 #[ORM\Entity(repositoryClass: CharacterRepository::class)]
 #[ORM\Table(name: '`character`')]
@@ -41,8 +42,8 @@ class Character
     #[ORM\Column(type: Types::INTEGER)]
     private int $xp_gear = 0;
 
-    #[ORM\Column(type: Types::BOOLEAN)]
-    private bool $isMain = false;
+    #[ORM\Column(type: Types::STRING, enumType: CharacterType::class)]
+    private CharacterType $type = CharacterType::MAIN;
 
     #[ORM\Column(type: Types::BOOLEAN)]
     private bool $isValidated = false;
@@ -198,13 +199,33 @@ class Character
 
     public function isMain(): bool
     {
-        return $this->isMain;
+        return $this->type === CharacterType::MAIN;
     }
 
-    public function setIsMain(bool $isMain): static
+    public function isSecondary(): bool
     {
-        $this->isMain = $isMain;
+        return $this->type === CharacterType::SECONDARY;
+    }
+
+    public function isDraft(): bool
+    {
+        return $this->type === CharacterType::DRAFT;
+    }
+
+    public function getType(): CharacterType
+    {
+        return $this->type;
+    }
+
+    public function setType(CharacterType $type): static
+    {
+        $this->type = $type;
         return $this;
+    }
+
+    public function getTypeIcon(): string
+    {
+        return CharacterType::getIcon($this->getType());
     }
 
     public function isValidated(): bool
@@ -224,7 +245,7 @@ class Character
         $total = 0;
         foreach ($user->getRegistrations() as $registration) {
             if ($registration->getEventType()->getStatus() == EventType::STATUS_CLOSED) {
-                $total++;
+                $total += 3;
             }
         }
         return $total;

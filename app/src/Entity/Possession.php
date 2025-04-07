@@ -100,4 +100,13 @@ class Possession
         $this->gear = $gear;
         return $this;
     }
+
+    public function toString($showCost = false): string
+    {
+        if ($showCost) {
+            return sprintf('%s (%d XP)', $this->gear?->getLabel() ?? 'Inconnu', $this->cost);
+        } else {
+            return $this->gear?->getLabel() ?? 'Inconnu';
+        }
+    }
 }

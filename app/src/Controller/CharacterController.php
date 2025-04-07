@@ -19,6 +19,7 @@ use App\Entity\Gear;
 use App\Entity\Possession;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Psr\Log\LoggerInterface;
+use App\Entity\CharacterType;
 
 #[Route('/characters')]
 #[IsGranted('ROLE_USER')]
@@ -149,7 +150,7 @@ class CharacterController extends AbstractController
             }
 
             // Vérifier si le personnage a suffisamment de points d'action
-            if ($character->getPaAvailable() < $skill->getBaseCost()) {
+            if ($character->getAvailableSkillsXp() < $skill->getBaseCost()) {
                 $this->addFlash('error', 'Vous n\'avez pas assez de points d\'action pour apprendre cette compétence.');
                 return $this->redirectToRoute('character_skill_add', ['id' => $character->getId()]);
             }
@@ -242,9 +243,13 @@ class CharacterController extends AbstractController
             // Vérifier si le personnage a déjà cet équipement
             foreach ($character->getPossessions() as $possession) {
                 if ($possession->getGear()->getId() === $gear->getId()) {
-                    $this->addFlash('error', 'Vous avez déjà cet équipement.');
-                    return $this->redirectToRoute('character_equipment_add', ['id' => $character->getId()]);
+                    return $this->json(['error' => 'Vous avez déjà cet équipement.'], 400);
                 }
+            }
+
+            // Vérifier si le personnage a assez d'XP
+            if ($gear->getBaseCost() > ($character->getXpGear() - $character->getGearXpUsed())) {
+                return $this->json(['error' => 'Points d\'XP insuffisants.'], 400);
             }
 
             // Créer la nouvelle possession
@@ -357,6 +362,18 @@ class CharacterController extends AbstractController
         }
 
         if ($request->isMethod('POST')) {
+            // Si la requête est en JSON
+            if ($request->headers->get('Content-Type') === 'application/json') {
+                $data = json_decode($request->getContent(), true);
+                $background = $data['background'] ?? '';
+
+                $character->setBackground($background);
+                $this->entityManager->flush();
+
+                return $this->json(['success' => true]);
+            }
+
+            // Sinon, traitement du formulaire classique
             $character->setDescription($request->request->get('description', ''));
             $character->setBackground($request->request->get('background', ''));
 
@@ -426,6 +443,229 @@ class CharacterController extends AbstractController
         }
 
         $this->entityManager->remove($skillLearned);
+        $this->entityManager->flush();
+
+        return $this->json(['success' => true]);
+    }
+
+    #[Route('/api/character/{id}/skill/xp/add', name: 'api_character_skill_xp_add', methods: ['POST'])]
+    public function addSkillXpApi(Character $character, Request $request): JsonResponse
+    {
+        // Vérifier que l'utilisateur est propriétaire du personnage
+        if ($character->getUser() !== $this->getUser()) {
+            return $this->json(['error' => 'Vous n\'êtes pas autorisé à modifier ce personnage.'], 403);
+        }
+
+        // Vérifier que le personnage n'est pas déjà validé
+        if ($character->isValidated()) {
+            return $this->json(['error' => 'Ce personnage est déjà validé.'], 400);
+        }
+
+        $data = json_decode($request->getContent(), true);
+        $xp = $data['xp'] ?? null;
+
+        if (!$xp || !is_numeric($xp) || $xp <= 0) {
+            return $this->json(['error' => 'Valeur d\'XP invalide'], 400);
+        }
+
+        $availableXp = $character->getAvailableXp();
+        if ($xp > $availableXp) {
+            return $this->json(['error' => 'Points d\'XP insuffisants'], 400);
+        }
+
+        try {
+            $character->setXpSkill($character->getXpSkill() + $xp);
+            $this->entityManager->flush();
+            return $this->json(['success' => true]);
+        } catch (\Exception $e) {
+            return $this->json(['error' => 'Erreur lors de l\'ajout des points d\'XP'], 500);
+        }
+    }
+
+    #[Route('/api/character/{id}/gear/delete', name: 'api_character_gear_delete', methods: ['POST'])]
+    public function deleteGearApi(Character $character, Request $request): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        $possessionId = $data['possessionId'] ?? null;
+
+        if (!$possessionId) {
+            return $this->json(['error' => 'Aucun équipement sélectionné.'], 400);
+        }
+
+        $possession = $this->entityManager->getRepository(Possession::class)->find($possessionId);
+        if (!$possession) {
+            return $this->json(['error' => 'Équipement non trouvé.'], 404);
+        }
+
+        $this->entityManager->remove($possession);
+        $this->entityManager->flush();
+
+        return $this->json(['success' => true]);
+    }
+
+    #[Route('/api/character/{id}/gear/xp/add', name: 'api_character_gear_xp_add', methods: ['POST'])]
+    public function addGearXpApi(Character $character, Request $request): JsonResponse
+    {
+        // Vérifier que l'utilisateur est propriétaire du personnage
+        if ($character->getUser() !== $this->getUser()) {
+            return $this->json(['error' => 'Vous n\'êtes pas autorisé à modifier ce personnage.'], 403);
+        }
+
+        // Vérifier que le personnage n'est pas déjà validé
+        if ($character->isValidated()) {
+            return $this->json(['error' => 'Ce personnage est déjà validé.'], 400);
+        }
+
+        $data = json_decode($request->getContent(), true);
+        $xp = $data['xp'] ?? null;
+
+        if (!$xp || !is_numeric($xp) || $xp <= 0) {
+            return $this->json(['error' => 'Valeur d\'XP invalide'], 400);
+        }
+
+        $availableXp = $character->getAvailableXp();
+        if ($xp > $availableXp) {
+            return $this->json(['error' => 'Points d\'XP insuffisants'], 400);
+        }
+
+        try {
+            $character->setXpGear($character->getXpGear() + $xp);
+            $this->entityManager->flush();
+            return $this->json(['success' => true]);
+        } catch (\Exception $e) {
+            return $this->json(['error' => 'Erreur lors de l\'ajout des points d\'XP'], 500);
+        }
+    }
+
+    #[Route('/api/character/{id}/name/update', name: 'api_character_name_update', methods: ['POST'])]
+    public function updateNameApi(Character $character, Request $request): JsonResponse
+    {
+        // Vérifier que l'utilisateur est propriétaire du personnage
+        if ($character->getUser() !== $this->getUser()) {
+            return $this->json(['error' => 'Vous n\'êtes pas autorisé à modifier ce personnage.'], 403);
+        }
+
+        // Vérifier que le personnage n'est pas déjà validé
+        if ($character->isValidated()) {
+            return $this->json(['error' => 'Ce personnage est déjà validé.'], 400);
+        }
+
+        $data = json_decode($request->getContent(), true);
+        $name = $data['name'] ?? null;
+
+        if (!$name || empty(trim($name))) {
+            return $this->json(['error' => 'Le nom ne peut pas être vide'], 400);
+        }
+
+        try {
+            $character->setName(trim($name));
+            $this->entityManager->flush();
+            return $this->json(['success' => true]);
+        } catch (\Exception $e) {
+            return $this->json(['error' => 'Erreur lors de la mise à jour du nom'], 500);
+        }
+    }
+
+    #[Route('/api/character/{id}/available-gear', name: 'api_character_available_gear', methods: ['GET'])]
+    public function getAvailableGear(Character $character): JsonResponse
+    {
+        try {
+            $gear = $this->entityManager->getRepository(Gear::class)->findBy(['visibility' => true]);
+
+            if (!$gear) {
+                return $this->json(['error' => 'Aucun équipement disponible.'], 404);
+            }
+
+            return $this->json($gear);
+        } catch (\Exception $e) {
+            return $this->json(['error' => 'Erreur lors du chargement des équipements disponibles.', 'message' => $e->getMessage()], 500);
+        }
+    }
+
+    #[Route('/api/character/{id}/gear/add', name: 'api_character_gear_add', methods: ['POST'])]
+    public function addGearApi(Character $character, Request $request): JsonResponse
+    {
+        // Vérifier que l'utilisateur est propriétaire du personnage
+        if ($character->getUser() !== $this->getUser()) {
+            return $this->json(['error' => 'Vous n\'êtes pas autorisé à modifier ce personnage.'], 403);
+        }
+
+        // Vérifier que le personnage n'est pas déjà validé
+        if ($character->isValidated()) {
+            return $this->json(['error' => 'Ce personnage est déjà validé.'], 400);
+        }
+
+        $data = json_decode($request->getContent(), true);
+        $gearId = $data['gearId'] ?? null;
+
+        if (!$gearId) {
+            return $this->json(['error' => 'Aucun équipement sélectionné.'], 400);
+        }
+
+        $gear = $this->entityManager->getRepository(Gear::class)->find($gearId);
+        if (!$gear) {
+            return $this->json(['error' => 'Équipement non trouvé.'], 404);
+        }
+
+        // Vérifier si le personnage a déjà cet équipement
+        foreach ($character->getPossessions() as $possession) {
+            if ($possession->getGear()->getId() === $gear->getId()) {
+                return $this->json(['error' => 'Vous avez déjà cet équipement.'], 400);
+            }
+        }
+
+        // Vérifier si le personnage a assez d'XP
+        if ($gear->getBaseCost() > ($character->getXpGear() - $character->getGearXpUsed())) {
+            return $this->json(['error' => 'Points d\'XP insuffisants.'], 400);
+        }
+
+        try {
+            // Créer la nouvelle possession
+            $possession = new Possession();
+            $possession->setCharacter($character);
+            $possession->setGear($gear);
+            $possession->setCost($gear->getBaseCost());
+            $possession->setNote('');
+            $possession->setNoteOrga('');
+
+            $this->entityManager->persist($possession);
+            $this->entityManager->flush();
+
+            return $this->json(['success' => true]);
+        } catch (\Exception $e) {
+            return $this->json(['error' => 'Erreur lors de l\'ajout de l\'équipement.', 'message' => $e->getMessage()], 500);
+        }
+    }
+
+    #[Route('/{id}/set-type/{type}', name: 'character_set_type', methods: ['POST'])]
+    public function setType(Character $character, string $type): JsonResponse
+    {
+        // Vérifier que l'utilisateur est propriétaire du personnage
+        if ($character->getUser() !== $this->getUser()) {
+            return $this->json(['error' => 'Vous n\'êtes pas autorisé à modifier ce personnage.'], 403);
+        }
+
+        // Vérifier que le personnage n'est pas déjà validé
+        if ($character->isValidated()) {
+            return $this->json(['error' => 'Ce personnage est déjà validé.'], 400);
+        }
+
+        // Vérifier que le type est valide
+        if (!in_array($type, ['main', 'secondary'])) {
+            return $this->json(['error' => 'Type de personnage invalide.'], 400);
+        }
+
+        // Vérifier que l'utilisateur n'a pas déjà un personnage du type demandé
+        if ($type === 'main' && $this->getUser()->hasMainCharacter()) {
+            return $this->json(['error' => 'Vous avez déjà un personnage principal.'], 400);
+        }
+
+        if ($type === 'secondary' && $this->getUser()->hasSecondaryCharacter()) {
+            return $this->json(['error' => 'Vous avez déjà un personnage secondaire.'], 400);
+        }
+
+        // Définir le type du personnage
+        $character->setType($type === 'main' ? CharacterType::MAIN : CharacterType::SECONDARY);
         $this->entityManager->flush();
 
         return $this->json(['success' => true]);

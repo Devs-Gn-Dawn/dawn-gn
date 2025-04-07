@@ -120,6 +120,34 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->characters;
     }
 
+    public function hasMainCharacter(): bool
+    {
+        return $this->characters->filter(function (Character $character) {
+            return $character->isMain();
+        })->count() > 0;
+    }
+
+    public function getMainCharacter(): ?Character
+    {
+        return $this->characters->filter(function (Character $character) {
+            return $character->isMain();
+        })->first();
+    }
+
+    public function hasSecondaryCharacter(): bool
+    {
+        return $this->characters->filter(function (Character $character) {
+            return $character->isSecondary();
+        })->count() > 0;
+    }
+
+    public function getSecondaryCharacter(): ?Character
+    {
+        return $this->characters->filter(function (Character $character) {
+            return !$character->isSecondary();
+        })->first();
+    }
+
     /**
      * @return Collection<int, Registration>
      */

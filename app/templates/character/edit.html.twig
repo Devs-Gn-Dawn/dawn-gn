@@ -16,16 +16,32 @@
             </div> #}
             <div class="flex-none w-auto max-w-full my-auto">
               <div class="h-full">
-                <h5 class="mb-1 hover:border hover:border-dashed hover:border-slate-400 hover:bg-white hover:pl-2 hover:rounded-1" data-target="tooltip_trigger" data-placement="top">{{ character.name }}</h5> 
+                <div class="h-full flex items-center gap-2">
+                  <input type="text" 
+                         id="characterName"
+                         class="mb-1 px-2 py-1 text-xl font-semibold bg-transparent border border-transparent hover:border-dashed hover:border-slate-300 rounded hover:border-slate-400 focus:border focus:border-slate-500 focus:outline-none" 
+                         value="{{ character.name }}" 
+                         name="character[name]" 
+                         data-target="tooltip_trigger" 
+                         data-placement="top">
                 <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm" role="tooltip">
                   Changer le nom du personnage
                   <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
                 </div>
-                <div class="mb-0 font-semibold leading-normal text-base"><span class="font-extrabold">{{ character.getFactionType().getLabel() }}</span> - {{ character.class }}<a href="#" class="ml-2 mr-1" data-target="tooltip_trigger" data-placement="top"><i class="ml-2 fa fa-pencil hover:scale-102 hover:text-slate-700"></i></a>
+                  <button type="button" 
+                          id="saveNameBtn"
+                          class="hidden text-slate-400 transition-colors"
+                          onclick="saveCharacterName()">
+                    <i class="fa fa-save"></i>
+                  </button>
+                </div>
+                <div class="mb-0 font-semibold leading-normal text-base"><span class="font-extrabold">{{ character.getFactionType().getLabel() }}</span> - {{ character.class }}
+                
+                {# <a href="#" class="ml-2 mr-1" data-target="tooltip_trigger" data-placement="top"><i class="ml-2 fa fa-pencil hover:scale-102 hover:text-slate-700"></i></a>
                   <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm" role="tooltip">
                     Changer de faction / classe
                     <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
-                  </div>
+                  </div> #}
                 </div>
                 <div class="mb-0 font-semibold leading-normal text-sm"><span class="font-extrabold">{{ character.getAvailableXp() }}</span>/{{ character.getGainedXp() }} XP <a href="#" id="info" data-target="tooltip_trigger" data-placement="top"><i class="fa fa-question-circle hover:text-slate-700 text-sm" aria-hidden="true"></i></a> 
                   <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm" role="tooltip">
@@ -96,11 +112,17 @@
                 <div class="w-full max-w-full px-3 mx-auto mt-4 sm:my-auto sm:mr-0 sm:w-1/5 md:w-1/5 md:flex-none">
                   <div class="relative right-0">
                     <div class="h-full text-right">
-                      <h6 class="mb-1"><span class="text-slate-400">{{ character.getXpSkill() - character.getSkillsXpUsed() }}</span>/{{ character.getXpSkill() }} XP <a href="#" id="info" data-target="tooltip_trigger" data-placement="top"><i class="fa fa-plus-circle text-slate-400 hover:text-slate-700 text-sm" aria-hidden="true"></i></a> 
-                        <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm" role="tooltip">
-                          Ajouter XP
-                          <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
-                        </div></h5>
+                      <h6 class="mb-1"><span class="text-slate-400">{{ character.getXpSkill() - character.getSkillsXpUsed() }}</span>/{{ character.getXpSkill() }} XP 
+                        {% if character.getAvailableXp() > 0 %}
+                          <button onclick="showAddSkillXpModal()" data-target="tooltip_trigger" data-placement="top" class="text-xs font-semibold leading-tight text-slate-300 cursor-pointer hover:scale-102 hover:text-slate-700 hover:underline">
+                            <i class="fa fa-plus-circle text-slate-400 hover:text-slate-700 text-sm" aria-hidden="true"></i>
+                          </button> 
+                          <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm" role="tooltip">
+                            Ajouter XP
+                            <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
+                          </div>
+                        {% endif %}
+                      </h5>
                     </div> 
                   </div>
                 </div>
@@ -203,11 +225,17 @@
                 <div class="w-full max-w-full px-3 mx-auto mt-4 sm:my-auto sm:mr-0 sm:w-1/5 md:w-1/5 md:flex-none">
                   <div class="relative right-0">
                     <div class="h-full text-right">
-                      <h6 class="mb-1"><span class="text-slate-400">{{ character.getXpGear() - character.getGearXpUsed() }}</span>/{{ character.getXpGear() }} XP <a href="#" id="info" data-target="tooltip_trigger" data-placement="top"><i class="fa fa-plus-circle text-slate-400 hover:text-slate-700 text-sm" aria-hidden="true"></i></a> 
-                        <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm" role="tooltip">
+                      <h6 class="mb-1"><span class="text-slate-400">{{ character.getXpGear() - character.getGearXpUsed() }}</span>/{{ character.getXpGear() }} XP 
+                        {% if character.getAvailableXp() > 0 %}
+                          <button onclick="showAddGearXpModal()" data-target="tooltip_trigger" data-placement="top" class="text-xs font-semibold leading-tight text-slate-300 cursor-pointer hover:scale-102 hover:text-slate-700 hover:underline">
+                            <i class="fa fa-plus-circle text-slate-400 hover:text-slate-700 text-sm" aria-hidden="true"></i>
+                          </button> 
+                          <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm" role="tooltip">
                           Ajouter XP
                           <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
-                        </div></h5>
+                        </div>
+                        {% endif %}
+                      </h5>
                     </div> 
                   </div>
                 </div>
@@ -224,7 +252,8 @@
                                         <p class="text-sm leading-normal">
                                             <span class="font-extrabold underline text-slate-700">{{ possession.gear.label }}</span> : {{ possession.gear.description }}
                                             <br/>
-                                            Coût : <span class="font-extrabold">{{ possession.cost }}PA</span> <span class="italic">"{{ possession.gear.short }}"</span>
+                                            Coût : <span class="font-extrabold">{{ possession.cost }}PA</span> 
+                                            {# <span class="italic">"{{ possession.gear.short }}"</span> #}
                                         </p>
                                     </div>
                                 </div>
@@ -232,7 +261,7 @@
                             <td class="w-20 align-middle bg-slate-50  shadow-transparent p-2 rounded border border-dashed border-slate-200 hover:border-slate-500">
                             <div class="w-full text-center">
                                 <i class="fa fa-trash cursor-pointer hover:text-slate-700" 
-                                   onclick="confirmDelete('{{ path('character_equipment_delete', {'id': character.id, 'possessionId': possession.id}) }}')" 
+                                   onclick="confirmDelete('{{ path('api_character_gear_delete', {'id': character.id}) }}', { possessionId: {{ possession.id }} })" 
                                    data-target="tooltip_trigger" 
                                    data-placement="top"></i>
                                 <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm" role="tooltip">
@@ -252,7 +281,7 @@
                       <tr>
                         <td class="mx-8 text-center shadow-transparent">
                           <div class="flex p-3 mt-3 text-center justify-center bg-slate-100 bg-opacity-40  border rounded border-dashed border-slate-300">
-                            <span class="text-xs font-semibold leading-tight text-slate-300 cursor-pointer hover:scale-102 hover:text-slate-700 hover:underline"><strong class="font-extrabold">+ </strong>Ajouter du matériel ou une ressource ({{ character.getXpGear() - character.getGearXpUsed() }} XP disponibles)</span>
+                            <span onclick="showAddGearModal()" class="text-xs font-semibold leading-tight text-slate-300 cursor-pointer hover:scale-102 hover:text-slate-700 hover:underline"><strong class="font-extrabold">+ </strong>Ajouter du matériel ou une ressource ({{ character.getXpGear() - character.getGearXpUsed() }} XP disponibles)</span>
                           </div>
                         </td>
                       </tr>
@@ -280,7 +309,7 @@
                 <div class="p-0 mx-5">
                     <ul class="list-square list-inside ml-5">
                         {% for possession in character.possessions %}
-                        <li>{{ possession }}</li>
+                        <li>{{ possession.toString() }}</li>
                         {% endfor %}
                     </ul>
                 </div>
@@ -306,6 +335,9 @@
                     {{ character.background }}
                   </div>
                 </div>
+                <div class="w-full px-0 pb-2 my-auto text-right">
+                  <button onclick="saveBackground()" class="inline-block px-6 py-3 font-bold text-center text-white uppercase align-middle transition-all rounded-lg cursor-pointer bg-gradient-to-tl from-green-600 to-green-700 leading-pro text-xs ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 hover:scale-102 active:opacity-85 hover:text-lime-300 hover:shadow-soft-xs">Sauvegarder</button>
+                </div>
               </div>
             </div>
           </div>
@@ -316,17 +348,39 @@
             <a href="#" 
                onclick="confirmDelete('{{ path('character_delete', {'id': character.id}) }}')" 
                class="inline-block px-6 py-3 font-bold text-center text-red-700 bg-transparent uppercase align-middle transition-all leading-pro text-xs ease-soft-in tracking-tight-soft hover:scale-102 hover:underline active:opacity-85">Supprimer</a>
-            <a href="{{ path('character_submit', {'id': character.id}) }}" class="inline-block px-6 py-3 font-bold text-center text-white uppercase align-middle transition-all rounded-lg cursor-pointer bg-gradient-to-tl from-cyan-300 to-cyan-600 leading-pro text-xs ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 hover:scale-102 active:opacity-85 hover:shadow-soft-xs hover:text-cyan-100">Soumettre ce personnage aux orgas</a>
-            <button type="submit" class="inline-block px-6 py-3 font-bold text-center text-white uppercase align-middle transition-all rounded-lg cursor-pointer bg-gradient-to-tl from-green-600 to-green-700 leading-pro text-xs ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 hover:scale-102 active:opacity-85 hover:text-lime-300 hover:shadow-soft-xs">Sauvegarder</button>
+            
+            {% if character.isMain() or character.isSecondary() %}
+                <a href="{{ path('character_submit', {'id': character.id}) }}" class="inline-block px-6 py-3 font-bold text-center text-white uppercase align-middle transition-all rounded-lg cursor-pointer bg-gradient-to-tl from-cyan-300 to-cyan-600 leading-pro text-xs ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 hover:scale-102 active:opacity-85 hover:shadow-soft-xs hover:text-cyan-100">Soumettre ce personnage aux orgas</a>
+            {% elseif not character.getUser().hasMainCharacter() %}
+                <a href="#" onclick="confirmSetType('{{ path('character_set_type', {'id': character.id, 'type': 'main'}) }}', 'principal')" class="inline-block px-6 py-3 font-bold text-center text-white uppercase align-middle transition-all rounded-lg cursor-pointer bg-gradient-to-tl from-cyan-300 to-cyan-600 leading-pro text-xs ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 hover:scale-102 active:opacity-85 hover:shadow-soft-xs hover:text-cyan-100">Faire de ce personnage le personnage principal</a>
+            {% elseif not character.getUser().hasSecondaryCharacter() %}
+                <a href="#" onclick="confirmSetType('{{ path('character_set_type', {'id': character.id, 'type': 'secondary'}) }}', 'reroll')" class="inline-block px-6 py-3 font-bold text-center text-white uppercase align-middle transition-all rounded-lg cursor-pointer bg-gradient-to-tl from-cyan-300 to-cyan-600 leading-pro text-xs ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 hover:scale-102 active:opacity-85 hover:shadow-soft-xs hover:text-cyan-100">Faire de ce personnage un reroll</a>
+            {% endif %}
+            
         </div>
 
   <script>
+  let quill; // Déclarer quill comme variable globale
+  
   document.addEventListener('DOMContentLoaded', function() {
     const compTab = document.getElementById("compTab");
     const bgTab = document.getElementById("bgTab");
 
-    const quill = new Quill('#editor', {
+    quill = new Quill('#editor', {
         theme: 'snow'
+    });
+
+    const nameInput = document.getElementById('characterName');
+    const saveNameBtn = document.getElementById('saveNameBtn');
+    const originalName = nameInput.value;
+
+    nameInput.addEventListener('input', function() {
+      console.log(this.value);
+        if (this.value !== originalName) {
+            saveNameBtn.classList.remove('hidden');
+        } else {
+            saveNameBtn.classList.add('hidden');
+        }
     });
   });
     function hideCompTab()
@@ -352,6 +406,19 @@
         compTab.classList.add("block");
         }
     } 
+
+    function confirmSetType(url, type) {
+        createModal({
+            title: "Confirmation",
+            html: `Êtes-vous sûr de vouloir faire de ce personnage un personnage ${type} ?<br/><br/><span class="text-red-700">Cette action est irréversible.</span>`,
+            confirmButtonText: "Confirmer",
+            getData: () => ({}),
+            validate: () => true,
+            url: url,
+            successTitle: "Type modifié !",
+            successMessage: "Le type du personnage a été modifié avec succès."
+        });
+    }
 
     function showAddSkillModal() {
         fetch('{{ path('api_character_available_skills', {'id': character.id}) }}')
@@ -420,6 +487,215 @@
             .catch(error => {
                 showErrorAlert({ message: error.message });
             });
+    }
+
+    function showAddSkillXpModal() {
+        const availableXp = {{ character.getAvailableXp() }};
+        const currentSkillXp = {{ character.getXpSkill() }};
+        const usedSkillXp = {{ character.getSkillsXpUsed() }};
+
+        createModal({
+            title: "Ajouter des points d'XP aux compétences",
+            html: `
+                <form id="skillXpForm" class="text-left">
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700">Points d'XP à ajouter</label>
+                        <input type="number" id="skillXp" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-slate-500 focus:ring-slate-500" 
+                               min="1" max="${availableXp}" value="1">
+                        <p class="mt-2 text-sm text-gray-500">
+                            Points d'XP disponibles : ${availableXp}<br>
+                            Points d'XP actuels : ${currentSkillXp - usedSkillXp}
+                        </p>
+                    </div>
+                </form>
+            `,
+            getData: () => ({
+                xp: document.getElementById("skillXp").value,
+            }),
+            validate: (data) => {
+                const xp = parseInt(data.xp);
+                return xp > 0 && xp <= availableXp;
+            },
+            url: "{{ path('api_character_skill_xp_add', {'id': character.id}) }}",
+            confirmButtonText: "Ajouter",
+            successTitle: "Points d'XP ajoutés !",
+            successMessage: "Les points d'XP ont été ajoutés avec succès.",
+            didOpen: () => {
+                const xpInput = document.getElementById("skillXp");
+                xpInput.addEventListener("input", function() {
+                    const value = parseInt(this.value);
+                    if (value > availableXp) {
+                        this.value = availableXp;
+                    } else if (value < 1) {
+                        this.value = 1;
+                    }
+                });
+            }
+        });
+    }
+
+    function showAddGearXpModal() {
+        const availableXp = {{ character.getAvailableXp() }};
+        const currentGearXp = {{ character.getXpGear() }};
+        const usedGearXp = {{ character.getGearXpUsed() }};
+
+        createModal({
+            title: "Ajouter des points d'XP aux équipements",
+            html: `
+                <form id="gearXpForm" class="text-left">
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700">Points d'XP à ajouter</label>
+                        <input type="number" id="gearXp" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-slate-500 focus:ring-slate-500" 
+                               min="1" max="${availableXp}" value="1">
+                        <p class="mt-2 text-sm text-gray-500">
+                            Points d'XP disponibles : ${availableXp}<br>
+                            Points d'XP actuels : ${currentGearXp - usedGearXp}
+                        </p>
+                    </div>
+                </form>
+            `,
+            getData: () => ({
+                xp: document.getElementById("gearXp").value,
+            }),
+            validate: (data) => {
+                const xp = parseInt(data.xp);
+                return xp > 0 && xp <= availableXp;
+            },
+            url: "{{ path('api_character_gear_xp_add', {'id': character.id}) }}",
+            confirmButtonText: "Ajouter",
+            successTitle: "Points d'XP ajoutés !",
+            successMessage: "Les points d'XP ont été ajoutés avec succès.",
+            didOpen: () => {
+                const xpInput = document.getElementById("gearXp");
+                xpInput.addEventListener("input", function() {
+                    const value = parseInt(this.value);
+                    if (value > availableXp) {
+                        this.value = availableXp;
+                    } else if (value < 1) {
+                        this.value = 1;
+                    }
+                });
+            }
+        });
+    }
+
+    function showAddGearModal() {
+        fetch('{{ path('api_character_available_gear', {'id': character.id}) }}')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erreur lors du chargement des équipements disponibles.');
+                }
+                return response.json();
+            })
+            .then(gear => {
+                if (gear.error) {
+                    showErrorAlert({ message: gear.error });
+                    return;
+                }
+
+                createModal({
+                    title: "Ajouter un équipement",
+                    html: `
+                        <form id="gearForm" class="text-left">
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-700">Équipement</label>
+                                <select id="gear" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-slate-500 focus:ring-slate-500">
+                                    <option value="">-- Sélectionnez un équipement --</option>
+                                    ${gear.map(item => `
+                                        <option value="${item.id}" data-cost="${item.baseCost}" data-description="${item.description}" data-short="${item.short}" data-label="${item.label}">
+                                            ${item.label} - ${item.baseCost}XP
+                                        </option>
+                                    `).join('')}
+                                </select>
+                            </div>
+                            <div id="gearDescription" class="mb-4 text-sm leading-normal hidden">
+                                <p class="text-sm leading-normal">
+                                    <span class="font-extrabold text-slate-700"></span> : <span class="description"></span><br/>
+                                    Coût : <span class="font-extrabold text-red-700 cost"></span>
+                                </p>
+                            </div>
+                        </form>
+                    `,
+                    getData: () => ({
+                        gearId: document.getElementById("gear").value,
+                    }),
+                    validate: (data) => data.gearId,
+                    url: "{{ path('api_character_gear_add', {'id': character.id}) }}",
+                    confirmButtonText: "Ajouter",
+                    successTitle: "Équipement ajouté !",
+                    successMessage: "L'équipement a été ajouté avec succès.",
+                    didOpen: () => {
+                        const gearSelect = document.getElementById("gear");
+                        const gearDescription = document.getElementById("gearDescription");
+                        
+                        gearSelect.addEventListener("change", function() {
+                            const selectedOption = this.options[this.selectedIndex];
+                            
+                            if (this.value) {
+                                gearDescription.classList.remove("hidden");
+                                gearDescription.querySelector(".font-extrabold").textContent = selectedOption.dataset.label;
+                                gearDescription.querySelector(".description").textContent = selectedOption.dataset.description;
+                                gearDescription.querySelector(".cost").textContent = selectedOption.dataset.cost + "XP";
+                            } else {
+                                gearDescription.classList.add("hidden");
+                            }
+                        });
+                    }
+                });
+            })
+            .catch(error => {
+                showErrorAlert({ message: error.message });
+            });
+    }
+
+    function saveCharacterName() {
+        const nameInput = document.getElementById('characterName');
+        const saveNameBtn = document.getElementById('saveNameBtn');
+        const newName = nameInput.value;
+
+        fetch('{{ path('api_character_name_update', {'id': character.id}) }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ name: newName })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                originalName = newName;
+                saveNameBtn.classList.add('hidden');
+                showSuccessAlert("Nom mis à jour !", "Le nom du personnage a été mis à jour avec succès.");
+            } else {
+                showErrorAlert({ message: data.error || "Une erreur est survenue lors de la mise à jour du nom." });
+            }
+        })
+        .catch(error => {
+            showErrorAlert({ message: "Une erreur est survenue lors de la mise à jour du nom." });
+        });
+    }
+
+    function saveBackground() {
+        const background = quill.root.innerHTML;
+        
+        fetch('{{ path('app_character_background', {'id': character.id}) }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ background: background })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showSuccessAlert("Background sauvegardé !", "Le background du personnage a été sauvegardé avec succès.");
+            } else {
+                showErrorAlert({ message: data.error || "Une erreur est survenue lors de la sauvegarde du background." });
+            }
+        })
+        .catch(error => {
+            showErrorAlert({ message: "Une erreur est survenue lors de la sauvegarde du background." });
+        });
     }
   </script>
 
