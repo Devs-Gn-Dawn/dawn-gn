@@ -64,7 +64,7 @@ class CharacterController extends AbstractController
             $character->setNoteOrga(''); // Note orga vide par défaut
             $character->setXpSkill(20);
             $character->setXpGear(10);
-            $character->setIsMain(false);
+            $character->setType(CharacterType::DRAFT);
             $character->setIsValidated(false);
 
             $this->entityManager->persist($character);
