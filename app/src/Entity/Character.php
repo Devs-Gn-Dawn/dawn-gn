@@ -308,17 +308,18 @@ class Character
         return [];
     }
 
-    public function getEquipment(): array
+    public function getEquipment($withPossession = true): array
     {
         $equipment = [];
-        foreach ($this->possessions as $possession) {
-            $equipment[] = [
-                'id' => $possession->getGear()->getId(),
-                'name' => $possession->getGear()->getLabel(),
-                'description' => $possession->getGear()->getDescription(),
-                'cost' => $possession->getCost(),
-                'quote' => $possession->getNote()
-            ];
+        if ($withPossession) {
+            foreach ($this->possessions as $possession) {
+                $equipment[] = [
+                    'possession' => $possession,
+                    'cost' => $possession->getCost(),
+                    'quote' => $possession->getNote(),
+                    'type' => 'possession'
+                ];
+            }
         }
         return $equipment;
     }

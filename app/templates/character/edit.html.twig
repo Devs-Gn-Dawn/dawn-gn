@@ -172,6 +172,7 @@
             </div>
           </div>
           <!-- Compétences spéciales-->
+          {% if character.specialAbilities ?? [] is not empty %}
           <div class="flex-none w-full max-w-full px-3  mb-6">
             <div class="relative flex flex-col min-w-0 pb-2 break-words bg-white border-0 border-transparent border-solid shadow-soft-xl rounded-2xl bg-clip-border">
               <div class="flex flex-wrap mx-3 my-3">
@@ -213,6 +214,7 @@
               </div>
             </div>
           </div>
+          {% endif %}
           <!-- Matos -->
           <div class="flex-none w-full max-w-full px-3 mb-3">
             <div class="relative flex flex-col min-w-0 pb-2 break-words bg-white border-0 border-transparent border-solid shadow-soft-xl rounded-2xl bg-clip-border">
@@ -292,6 +294,7 @@
             </div>
           </div>
 
+          {% if character.getEquipment(false) ?? [] is not empty %}
            <div class="flex-none w-full max-w-full px-3  mb-6">
             <div class="relative flex flex-col min-w-0 pb-2 break-words bg-white border-0 border-transparent border-solid shadow-soft-xl rounded-2xl bg-clip-border">
               <div class="flex flex-wrap mx-3 my-3">
@@ -308,14 +311,15 @@
               <div class="flex-auto px-0 pt-0 pb-2">
                 <div class="p-0 mx-5">
                     <ul class="list-square list-inside ml-5">
-                        {% for possession in character.possessions %}
-                        <li>{{ possession.toString() }}</li>
+                        {% for equipment in character.getEquipment(false) %}
+                        <li>{{ equipment['possession'].toString() }}</li>
                         {% endfor %}
                     </ul>
                 </div>
               </div>
             </div>
           </div>
+          {% endif %}
         </div>
       </div>
 

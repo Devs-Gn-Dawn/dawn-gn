@@ -84,6 +84,18 @@ class CharacterController extends AbstractController
         ]);
     }
 
+    #[Route('/main', name: 'app_character_main', methods: ['GET'])]
+    public function main(CharacterRepository $characterRepository): Response
+    {
+        // check if user has a main character
+        $mainCharacter = $characterRepository->findOneBy(['user' => $this->getUser(), 'type' => CharacterType::MAIN]);
+        if (!$mainCharacter) {
+            return $this->redirectToRoute('app_character_index');
+        }
+
+        return $this->redirectToRoute('app_character_edit', ['id' => $mainCharacter->getId()]);
+    }
+
     #[Route('/{id}/edit', name: 'app_character_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Character $character): Response
     {
@@ -238,13 +250,6 @@ class CharacterController extends AbstractController
             if (!$gear) {
                 $this->addFlash('error', 'Équipement non trouvé.');
                 return $this->redirectToRoute('character_equipment_add', ['id' => $character->getId()]);
-            }
-
-            // Vérifier si le personnage a déjà cet équipement
-            foreach ($character->getPossessions() as $possession) {
-                if ($possession->getGear()->getId() === $gear->getId()) {
-                    return $this->json(['error' => 'Vous avez déjà cet équipement.'], 400);
-                }
             }
 
             // Vérifier si le personnage a assez d'XP
@@ -605,13 +610,6 @@ class CharacterController extends AbstractController
         $gear = $this->entityManager->getRepository(Gear::class)->find($gearId);
         if (!$gear) {
             return $this->json(['error' => 'Équipement non trouvé.'], 404);
-        }
-
-        // Vérifier si le personnage a déjà cet équipement
-        foreach ($character->getPossessions() as $possession) {
-            if ($possession->getGear()->getId() === $gear->getId()) {
-                return $this->json(['error' => 'Vous avez déjà cet équipement.'], 400);
-            }
         }
 
         // Vérifier si le personnage a assez d'XP
