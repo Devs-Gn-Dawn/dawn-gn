@@ -96,6 +96,13 @@ class CharacterController extends AbstractController
         return $this->redirectToRoute('app_character_edit', ['id' => $mainCharacter->getId()]);
     }
 
+    #[Route('/{id}/check', name: 'app_character_check', methods: ['GET'])]
+    public function check(Character $character): Response
+    {
+        // redirect to edit page
+        return $this->redirectToRoute('app_character_edit', ['id' => $character->getId()]);
+    }
+
     #[Route('/{id}/edit', name: 'app_character_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Character $character): Response
     {

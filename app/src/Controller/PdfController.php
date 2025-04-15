@@ -41,6 +41,7 @@ class PdfController extends AbstractController
     public function generatePdf(int $id): Response
     {
         $user = $this->getUser();
+        /** @var User $user */
         if (!$user) {
             throw $this->createNotFoundException('Utilisateur non trouvé');
         }
@@ -56,7 +57,7 @@ class PdfController extends AbstractController
         }
 
         // Création du QR code
-        $qrCode = new QrCode($this->generateUrl('app_pdf', ['id' => $id], UrlGeneratorInterface::ABSOLUTE_URL));
+        $qrCode = new QrCode($this->generateUrl('app_character_check', ['id' => $id], UrlGeneratorInterface::ABSOLUTE_URL));
         $writer = new PngWriter();
         $result = $writer->write($qrCode);
 
