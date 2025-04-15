@@ -46,4 +46,14 @@ enum FactionType: string
             self::NEOCUBA => 'avatar_neocuba',
         };
     }
+
+    public static function getCharcaterSheetBackground(FactionType $faction): string
+    {
+        return match ($faction) {
+            self::NOMADS => 'fiche_personnage_template-nomads',
+            self::TECHERS => 'fiche_personnage_template-techers',
+            self::RODOIR => 'fiche_personnage_template-rodoir',
+            self::NEOCUBA => 'fiche_personnage_template-neocuba',
+        };
+    }
 }

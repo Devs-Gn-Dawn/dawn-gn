@@ -362,4 +362,37 @@ class Character
 
         return $this;
     }
+
+    public function getPvMax(): int
+    {
+        $pvMax = 3;
+        foreach ($this->skillsLearned as $skillLearned) {
+            if (str_contains($skillLearned->getSkill()->getLabel(), 'Constitution')) {
+                $pvMax += 1;
+            }
+        }
+        return $pvMax;
+    }
+
+    public function getArmor(): int
+    {
+        $armor = 0;
+        foreach ($this->possessions as $possession) {
+            if (str_contains($possession->getGear()->getLabel(), 'Kit d\'armure')) {
+                $armor = max($armor, $possession->getGear()->getBaseCost() / 2);
+            }
+        }
+        return $armor;
+    }
+
+    public function getRadiationsOffset(): int
+    {
+        $offset = 0;
+        foreach ($this->skillsLearned as $skillLearned) {
+            if (str_contains($skillLearned->getSkill()->getLabel(), 'Adapté à la radiation')) {
+                $offset += 2;
+            }
+        }
+        return $offset;
+    }
 }
