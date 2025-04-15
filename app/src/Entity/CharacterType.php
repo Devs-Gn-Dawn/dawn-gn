@@ -6,7 +6,7 @@ enum CharacterType: string
 {
     case MAIN = 'Main';
     case SECONDARY = 'Secondary';
-    case DRAFT = 'draft';
+    case DRAFT = 'Draft';
 
     public function getLabel(): string
     {
