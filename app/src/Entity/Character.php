@@ -46,7 +46,7 @@ class Character
     #[ORM\Column(type: Types::STRING, enumType: CharacterType::class)]
     private CharacterType $type = CharacterType::MAIN;
 
-    #[ORM\Column(type: Types::STRING, enumType: ValidationType::class)]
+    #[ORM\Column(type: Types::INTEGER, enumType: ValidationType::class)]
     private ValidationType $validationType = ValidationType::NON_VALIDE;
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'characters')]

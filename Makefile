@@ -1,4 +1,4 @@
-.PHONY: install build dev watch clean
+.PHONY: up down migrate migration-status install build dev watch clean
 
 # Démarrer les conteneurs Docker
 up:
@@ -10,11 +10,11 @@ down:
 
 # Exécuter les migrations Doctrine
 migrate:
-	docker compose exec php bin/console doctrine:migrations:migrate
+	docker compose exec web bin/console doctrine:migrations:migrate
 
 # Afficher le statut des migrations
 migration-status:
-	docker compose exec php bin/console doctrine:migrations:status
+	docker compose exec web bin/console doctrine:migrations:status
 
 # Installation des dépendances
 install:

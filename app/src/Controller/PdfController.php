@@ -94,7 +94,8 @@ class PdfController extends AbstractController
         // user name
         $pdf->SetFont('Arial', 'B', 14);
         $pdf->SetTextColor(180, 180, 180);
-        $this->mbCell($pdf, 17, 63, $user->getName(), 14, 45);
+        $this->mbCell($pdf, 17, 63, $user->getFirstname(), 14, 45);
+        $this->mbCell($pdf, 17, 70, $user->getName(), 14, 45);
 
         // user class
         $pdf->SetFont('Arial', '', 12);

@@ -15,12 +15,12 @@
             }
 
             // Fonction pour afficher la note complète
-            window.viewFullNote = function(content) {
+            window.viewFullNote = function(title, content) {
                 // Convertir les retours à la ligne en <br>
                 const formattedContent = content.replace(/\n/g, '<br>');
                 
                 Swal.fire({
-                    title: 'Note',
+                    title: title,
                     html: `<div class="text-left break-words p-4 text-sm">${formattedContent}</div>`,
                     confirmButtonText: 'Fermer',
                     customClass: {
@@ -170,34 +170,43 @@
                     title: 'Ajouter une note',
                     html: `
                         <div class="mb-4">
+                            <input type="text" id="note-title" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow" placeholder="Titre de la note" required>
+                        </div>
+                        <div class="mb-4">
                             <textarea id="note-content" rows="4" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow" placeholder="Contenu de la note" required></textarea>
                         </div>
                     `,
                     getData: () => ({
+                        title: document.getElementById('note-title').value,
                         content: document.getElementById('note-content').value
                     }),
-                    validate: (data) => data.content,
+                    validate: (data) => data.title && data.content,
                     url: '{{ path('app_account_note_add') }}',
                     successTitle: 'Note ajoutée !',
                     successMessage: 'La note a été ajoutée avec succès.'
                 });
             };
 
-            window.editNote = function(id, content) {
+            window.editNote = function(id, title, content) {
                 createModal({
                     title: 'Modifier la note',
                     html: `
+                        <div class="mb-4">
+                            <input type="text" id="note-title" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow" placeholder="Titre de la note" required>
+                        </div>
                         <div class="mb-4">
                             <textarea id="note-content" rows="4" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow" placeholder="Contenu de la note" required></textarea>
                         </div>
                     `,
                     confirmButtonText: 'Modifier',
                     getData: () => ({
+                        title: document.getElementById('note-title').value,
                         content: document.getElementById('note-content').value
                     }),
-                    validate: (data) => data.content,
+                    validate: (data) => data.title && data.content,
                     url: `{{ path('app_account_note_edit', {'id': 'NOTE_ID'}) }}`.replace('NOTE_ID', id),
                     didOpen: () => {
+                        document.getElementById('note-title').value = title;
                         document.getElementById('note-content').value = content;
                     },
                     successTitle: 'Note modifiée !',
@@ -249,6 +258,80 @@
                         : 'La nouvelle inscription a été ajoutée avec succès.'
                 });
             };
+
+            window.editProfile = function() {
+                createModal({
+                    title: 'Modifier mon profil',
+                    html: `
+                        <div class="mb-4">
+                            <input type="text" id="profile-name" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow" placeholder="Nom" required>
+                        </div>
+                        <div class="mb-4">
+                            <input type="text" id="profile-firstname" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow" placeholder="Prénom" required>
+                        </div>
+                        <div class="mb-4">
+                            <input type="tel" id="profile-phone" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow" placeholder="Téléphone" required>
+                        </div>
+                        <div class="mb-4">
+                            <input type="text" id="profile-social" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow" placeholder="Réseaux sociaux">
+                        </div>
+                    `,
+                    confirmButtonText: 'Modifier',
+                    getData: () => ({
+                        name: document.getElementById('profile-name').value,
+                        firstname: document.getElementById('profile-firstname').value,
+                        phone: document.getElementById('profile-phone').value,
+                        social: document.getElementById('profile-social').value
+                    }),
+                    validate: (data) => data.name && data.firstname && data.phone,
+                    url: '{{ path('app_account_profile_edit') }}',
+                    didOpen: () => {
+                        document.getElementById('profile-name').value = '{{ user.name }}';
+                        document.getElementById('profile-firstname').value = '{{ user.firstname }}';
+                        document.getElementById('profile-phone').value = '{{ user.phone }}';
+                        document.getElementById('profile-social').value = '{{ user.social }}';
+                    },
+                    successTitle: 'Profil modifié !',
+                    successMessage: 'Votre profil a été modifié avec succès.'
+                });
+            };
+
+            window.editLoginInfo = function() {
+                createModal({
+                    title: 'Modifier mes informations de connexion',
+                    html: `
+                        <div class="mb-4">
+                            <input type="email" id="login-email" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow" placeholder="Email" required>
+                        </div>
+                        <div class="mb-4">
+                            <input type="password" id="login-password" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow" placeholder="Nouveau mot de passe">
+                        </div>
+                        <div class="mb-4">
+                            <input type="password" id="login-password-confirm" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow" placeholder="Confirmer le mot de passe">
+                        </div>
+                    `,
+                    confirmButtonText: 'Modifier',
+                    getData: () => ({
+                        email: document.getElementById('login-email').value,
+                        password: document.getElementById('login-password').value,
+                        password_confirm: document.getElementById('login-password-confirm').value
+                    }),
+                    validate: (data) => {
+                        if (!data.email) return false;
+                        if (data.password && data.password !== data.password_confirm) {
+                            Swal.showValidationMessage('Les mots de passe ne correspondent pas');
+                            return false;
+                        }
+                        return true;
+                    },
+                    url: '{{ path('app_account_login_edit') }}',
+                    didOpen: () => {
+                        document.getElementById('login-email').value = '{{ user.email }}';
+                    },
+                    successTitle: 'Informations modifiées !',
+                    successMessage: 'Vos informations de connexion ont été modifiées avec succès.'
+                });
+            };
         });
     </script>
 {% endblock %}
@@ -256,15 +339,17 @@
 {% block body %}
 <div class="w-full px-6 mx-auto">
     <div class="relative flex flex-col flex-auto min-w-0 p-4 mt-12 overflow-hidden break-words border-0 shadow-blur rounded-2xl bg-white/80 bg-clip-border backdrop-blur-2xl backdrop-saturate-200">
-        <div class="flex flex-wrap mx-3">
-            {# <div class="flex-none w-auto max-w-full px-3">
+        <div class="flex flex-wrap -mx-3">
+            {% if user.hasMainCharacter() %}
+            <div class="flex-none w-auto max-w-full px-3">
                 <div class="text-base ease-soft-in-out h-18.5 w-18.5 relative inline-flex items-center justify-center rounded-xl text-white transition-all duration-200">
-                    <img src="{{ asset('img/bruce-mars.jpg') }}" alt="profile_image" class="w-full shadow-soft-sm rounded-xl" />
+                    <img src="{{ asset('build/images/avatars/' ~ user.getMainCharacter().getAvatar() ~ '.jpg') }}" alt="profile_image" class="w-full shadow-soft-sm rounded-xl" />
                 </div>
-            </div> #}
+            </div>
+            {% endif %}
             <div class="flex-none w-auto max-w-full px-3 my-auto">
                 <div class="h-full">
-                    <h5 class="mb-1">{{ user.name }}</h5>
+                    <h5 class="mb-1">{{ user.getFullName() }}</h5>
                     <p class="mb-0 font-semibold leading-normal text-sm"><span class="font-extrabold text-slate-700">{{ user.registrations|filter(r => r.getEventType().status == constant('App\\Entity\\EventType::STATUS_CLOSED'))|length }}</span> participations</p>
                 </div>
             </div>
@@ -275,17 +360,18 @@
                         Plus d'informations
                         <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
                     </div>
-                    : <span class="font-extrabold text-slate-700">{% if user.registrations.empty == false and user.registrations.last %}{{ user.registrations.last.helloassoTicket }}{% else %}Non renseigné{% endif %}</span>
-                    {% if user.registrations.empty == false and user.registrations.last %}
-                    <a href="#" onclick="manageRegistration('{{ user.registrations.last ? user.registrations.last.id : '' }}',
-                    '{{ user.registrations.last ? user.registrations.last.helloassoTicket : '' }}',
-                    '{{ user.registrations.last ? user.registrations.last.event : '' }}')" data-target="tooltip_trigger" data-placement="top"><i class="ml-2 fa fa-pencil hover:scale-102 hover:text-slate-700"></i></a>
+                    : <span class="font-extrabold text-slate-700">{% if user.lastRegistrationWithState(constant('App\\Entity\\EventType::STATUS_OPEN')) %}{{ user.lastRegistrationWithState(constant('App\\Entity\\EventType::STATUS_OPEN')).helloassoTicket }}{% else %}Non renseigné{% endif %}</span>
+                    {% if user.lastRegistrationWithState(constant('App\\Entity\\EventType::STATUS_OPEN')) %}
+                    {% set lastRegistration = user.lastRegistrationWithState(constant('App\\Entity\\EventType::STATUS_OPEN')) %}
+                    <a href="#" onclick="manageRegistration('{{ lastRegistration ? lastRegistration.id : '' }}',
+                    '{{ lastRegistration ? lastRegistration.helloassoTicket : '' }}',
+                    '{{ lastRegistration ? lastRegistration.event : '' }}')" data-target="tooltip_trigger" data-placement="top"><i class="ml-2 fa fa-pencil hover:scale-102 hover:text-slate-700"></i></a>
                     <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm" role="tooltip">
                         Editer le numéro du billet
                         <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
                     </div>
                     {% endif %}
-                    {% if not user.registrations.last or user.registrations.last.getEventType().status != constant('App\\Entity\\EventType::STATUS_OPEN') %}
+                    {% if not user.lastRegistrationWithState(constant('App\\Entity\\EventType::STATUS_OPEN')) %}
                     <a href="#" onclick="manageRegistration()" data-target="tooltip_trigger" data-placement="top"><i class="ml-2 fa fa-plus hover:scale-102 hover:text-slate-700"></i></a>
                     <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm" role="tooltip">
                         Ajouter un numéro de billet
@@ -380,7 +466,7 @@
                             <h6 class="mb-0">Mon profil</h6>
                         </div>
                         <div class="w-full max-w-full px-3 text-right shrink-0 md:w-4/12 md:flex-none">
-                            <a href="#" data-target="tooltip_trigger" data-placement="top">
+                            <a onclick="editProfile()" href="#" data-target="tooltip_trigger" data-placement="top">
                                 <i class="leading-normal fas fa-user-edit text-sm text-slate-400 hover:text-slate-700"></i>
                             </a>
                             <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm" role="tooltip">
@@ -391,10 +477,43 @@
                     </div>
                 </div>
                 <div class="flex-auto p-4">
+                <p class="leading-normal text-sm "><span class="font-normal italic">Loin des oeufs, loin du coeur. -Une poule-</span></p>
                     <hr class="h-px my-2 bg-transparent bg-gradient-to-r from-transparent via-white to-transparent" />
                     <ul class="flex flex-col pl-0 mb-0 rounded-lg">
-                        <li class="relative block px-4 py-2 pt-0 pl-0 leading-normal bg-white border-0 rounded-t-lg text-sm text-inherit"><strong class="text-slate-700">Nom :</strong> &nbsp; {{ user.name }}</li>
-                        <li class="relative block px-4 py-2 pl-0 leading-normal bg-white border-0 border-t-0 text-sm text-inherit"><strong class="text-slate-700">Email :</strong> &nbsp; {{ user.email }}</li>
+                  <li class="relative block px-4 py-2 pt-0 pl-0 leading-normal bg-white border-0 rounded-t-lg text-sm text-inherit"><strong class="text-slate-700">Nom :</strong> &nbsp; {{ user.name }}</li>
+                  <li class="relative block px-4 py-2 pl-0 leading-normal bg-white border-0 rounded-t-lg text-sm text-inherit"><strong class="text-slate-700">Prénom :</strong> &nbsp; {{ user.firstname }}</li>
+                  <li class="relative block px-4 py-2 pl-0 leading-normal bg-white border-0 border-t-0 text-sm text-inherit"><strong class="text-slate-700">Téléphone :</strong> &nbsp; {{ user.phone }}</li>
+                  <li class="relative block px-4 py-2 pb-0 pl-0 bg-white border-0 border-t-0 rounded-b-lg text-inherit">
+                    <strong class="leading-normal text-sm text-slate-700">Social:</strong> &nbsp;
+                    {% if user.social %}
+                    <a class="inline-block py-0 pl-1 pr-2 mb-0 font-bold text-center text-blue-800 align-middle transition-all bg-transparent border-0 rounded-lg shadow-none cursor-pointer leading-pro text-xs ease-soft-in bg-none" href="javascript:;">
+                      <i class="fab fa-facebook fa-lg"></i>
+                    </a>
+                    {% endif %}
+                  </li>
+                </ul>
+              </div>
+              <div class="p-4 pb-0 mb-0 bg-white border-b-0 rounded-t-2xl">
+                <div class="flex flex-wrap -mx-3">
+                  <div class="flex items-center w-full max-w-full px-3 shrink-0 md:w-8/12 md:flex-none">
+                    <h6 class="mb-0">Mes informations de connexion</h6>
+                  </div>
+                  <div class="w-full max-w-full px-3 text-right shrink-0 md:w-4/12 md:flex-none">
+                    <a onclick="editLoginInfo()" href="javascript:;" data-target="tooltip_trigger" data-placement="top">
+                      <i class="leading-normal fas fa-user-edit text-sm text-slate-400 hover:text-slate-700"></i>
+                    </a>
+                    <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm z-10" role="tooltip">
+                      Modifier le login et/ou le mot de passe
+                      <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-[''] z-10" data-popper-arrow></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="flex-auto p-4">
+                <hr class="h-px my-2 bg-transparent bg-gradient-to-r from-transparent via-white to-transparent" />
+                <ul class="flex flex-col pl-0 mb-0 rounded-lg">
+                  <li class="relative block px-4 py-2 pl-0 leading-normal bg-white border-0 border-t-0 text-sm text-inherit"><strong class="text-slate-700">Email / Login :</strong> &nbsp; {{ user.email }}</li>
+                  <li class="relative block px-4 py-2 pl-0 leading-normal bg-white border-0 border-t-0 text-sm text-inherit"><strong class="text-slate-700">Mot de passe :</strong> &nbsp; ***********</li>
                     </ul>
                 </div>
             </div>
@@ -410,25 +529,26 @@
                         {% if user.notes is empty %}
                             <li class="relative flex items-center px-0 py-2 bg-white border-0 rounded-t-lg text-inherit">
                                 <div class="w-full mx-2 p-1 text-center justify-center bg-slate-100 bg-opacity-40 border rounded border-dashed border-slate-300">
-                                    <span onclick="openNoteModal()" class="text-xs font-semibold leading-tight text-slate-300 cursor-pointer hover:scale-102 hover:text-slate-700 hover:underline"><strong class="font-extrabold">+ </strong>Ajouter un commentaire</span>
+                                    <span onclick="openNoteModal()" class="text-xs font-semibold leading-tight text-slate-300 cursor-pointer hover:scale-102 hover:text-slate-700 hover:underline"><strong class="font-extrabold">+ </strong>Ajouter une note</span>
                                 </div>
                             </li>
                         {% else %}
                             {% for note in user.notes %}
                                 <li class="relative flex items-center px-0 py-2 bg-white border-0 rounded-t-lg text-inherit">
                                     <div class="flex flex-col items-start justify-center w-full">
-                                        <h6 class="mb-0 leading-normal text-sm">
+                                        <h6 class="mb-0 leading-normal text-sm font-bold">{{ note.title }}</h6>
+                                        <p class="mb-0 leading-normal text-sm">
                                             <span class="whitespace-pre-line break-words">{{ note.content|length > 100 ? note.content|slice(0, 100) ~ '...' : note.content }}</span>
                                             {% if note.content|length > 100 %}
-                                                <a onclick="viewFullNote(`{{ note.content|e('js') }}`)"
+                                                <a onclick="viewFullNote('{{ note.title|e('js') }}', `{{ note.content|e('js') }}`)"
                                                    class="inline-block ml-1 text-xs font-semibold text-slate-400 hover:text-slate-700 hover:underline cursor-pointer">
                                                     Voir plus
                                                 </a>
                                             {% endif %}
-                                        </h6>
+                                        </p>
                                     </div>
                                     <div class="flex items-center ml-auto">
-                                        <a onclick="editNote({{ note.id }}, `{{ note.content|e('js') }}`)"
+                                        <a onclick="editNote({{ note.id }}, '{{ note.title|e('js') }}', `{{ note.content|e('js') }}`)"
                                            class="inline-block pl-0 pr-4 mb-0 font-bold text-center align-middle transition-all bg-transparent border-0 rounded-lg shadow-none cursor-pointer leading-pro text-xs ease-soft-in text-slate-400 hover:text-slate-700 hover:underline" 
                                            href="javascript:;">Modifier</a>
                                         <div class="h-4 mx-1 bg-slate-300 w-px"></div>
@@ -440,7 +560,7 @@
                             {% endfor %}
                             <li class="relative flex items-center px-0 py-2 bg-white border-0 rounded-t-lg text-inherit">
                                 <div class="w-full mx-2 p-1 text-center justify-center bg-slate-100 bg-opacity-40 border rounded border-dashed border-slate-300">
-                                    <span onclick="openNoteModal()" class="text-xs font-semibold leading-tight text-slate-300 cursor-pointer hover:scale-102 hover:text-slate-700 hover:underline"><strong class="font-extrabold">+ </strong>Ajouter un commentaire</span>
+                                    <span onclick="openNoteModal()" class="text-xs font-semibold leading-tight text-slate-300 cursor-pointer hover:scale-102 hover:text-slate-700 hover:underline"><strong class="font-extrabold">+ </strong>Ajouter une note</span>
                                 </div>
                             </li>
                         {% endif %}
@@ -453,7 +573,3 @@
 {% endblock %}
 
 {% block additional_scripts %}{% endblock %}
-
-{% set input_classes = "text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow" %}
-{% set action_button_classes = "inline-block pl-0 pr-4 mb-0 ml-auto font-bold text-center align-middle transition-all bg-transparent border-0 rounded-lg shadow-none cursor-pointer leading-pro text-xs ease-soft-in text-slate-400 hover:text-slate-700 hover:underline" %}
-{% set delete_button_classes = "inline-block pl-4 mb-0 ml-0 font-bold text-center align-middle transition-all bg-transparent border-0 shadow-none cursor-pointer leading-pro text-xs ease-soft-in text-slate-400 hover:text-red-600 hover:underline" %} 

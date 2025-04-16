@@ -20,6 +20,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 127)]
     private ?string $name = null;
 
+    #[ORM\Column(length: 127)]
+    private ?string $firstname = null;
+
     #[ORM\Column(length: 127, unique: true)]
     private ?string $email = null;
 
@@ -28,6 +31,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column]
     private ?string $password = null;
+
+    #[ORM\Column(length: 127)]
+    private ?string $phone = null;
+
+    #[ORM\Column(length: 256)]
+    private ?string $social = null;
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Character::class)]
     private Collection $characters;
@@ -78,6 +87,23 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    public function getFirstname(): ?string
+    {
+        return $this->firstname;
+    }
+
+    public function setFirstname(string $firstname): static
+    {
+        $this->firstname = $firstname;
+
+        return $this;
+    }
+
+    public function getFullName(): string
+    {
+        return $this->firstname . ' ' . $this->name;
+    }
+
     public function getEmail(): ?string
     {
         return $this->email;
@@ -109,6 +135,28 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setRoles(array $roles): self
     {
         $this->roles = $roles;
+        return $this;
+    }
+
+    public function getPhone(): ?string
+    {
+        return $this->phone;
+    }
+
+    public function setPhone(string $phone): static
+    {
+        $this->phone = $phone;
+        return $this;
+    }
+
+    public function getSocial(): ?string
+    {
+        return $this->social;
+    }
+
+    public function setSocial(string $social): static
+    {
+        $this->social = $social;
         return $this;
     }
 
@@ -159,6 +207,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->registrations->filter(function (Registration $registration) {
             return $registration->getEventType()->getStatus() !== EventType::STATUS_HIDDEN;
         });
+    }
+
+    public function lastRegistrationWithState(string $state): ?Registration
+    {
+        return $this->registrations->filter(function (Registration $registration) use ($state) {
+            return $registration->getEventType()->getStatus() === $state;
+        })->last() ?: null;
     }
 
     /**
