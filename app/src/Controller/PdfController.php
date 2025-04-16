@@ -37,6 +37,14 @@ class PdfController extends AbstractController
         $pdf->Cell($width, $size * 0.4, mb_convert_encoding($text, 'ISO-8859-1', 'UTF-8'), 0, 0, $align);
     }
 
+    private function mbMultiCell($pdf, $x, $y, $text, $size = 12, $width = 0, $align = '')
+    {
+        if (!is_null($x) && !is_null($y)) {
+            $pdf->SetXY($x, $y);
+        }
+        $pdf->MultiCell($width, $size * 0.4, mb_convert_encoding($text, 'ISO-8859-1', 'UTF-8'), 0, $align);
+    }
+
     #[Route('/pdf/{id}', name: 'app_pdf')]
     public function generatePdf(int $id): Response
     {
@@ -81,37 +89,53 @@ class PdfController extends AbstractController
 
         // Ajout du numéro de billet
         $pdf->SetFont('Arial', '', 12);
-        $this->mbCell($pdf, 33, 53, $user->getRegistrations()->last()->getHelloassoTicket(), 16, 40);
+        $this->mbCell($pdf, 33, 53.7, $user->getRegistrations()->last()->getHelloassoTicket(), 12, 28);
+
+        // user name
+        $pdf->SetFont('Arial', 'B', 14);
+        $pdf->SetTextColor(180, 180, 180);
+        $this->mbCell($pdf, 17, 63, $user->getName(), 14, 45);
+
+        // user class
+        $pdf->SetFont('Arial', '', 12);
+        $pdf->SetTextColor(0, 0, 0);
+        $this->mbCell($pdf, 73, 17.6, $character->getClass(), 11, 80);
 
         // Configuration de la police
         $pdf->SetFont('Arial', 'B', 16);
-        $this->mbCell($pdf, 73, 10, $character->getName(), 16, 80);
+        $this->mbCell($pdf, 73, 11, $character->getName(), 14, 80);
 
         $pdf->SetFont('Arial', '', 12);
-        $this->mbCell($pdf, 73, 17.2, $character->getClass(), 12, 80);
+        $this->mbCell($pdf, 73, 17.6, $character->getClass(), 11, 80);
 
         $this->mbCell($pdf, 75.2, 32, $character->getPvMax(), 16, 7, 'C');
 
         $this->mbCell($pdf, 114.5, 32, $character->getArmor(), 16, 7, 'C');
 
         // skills learned
-        $y = 53;
+        $pdf->SetY(53);
         foreach ($character->getSkillsLearned() as $skillLearned) {
+            $pdf->SetX(73);
             $pdf->SetFont('Arial', 'BU', 10);
-            $this->mbCell($pdf, 73, $y, $skillLearned->getSkill()->getLabel() . ' :', 12, 35);
+            $this->mbCell($pdf, null, null, $skillLearned->getSkill()->getLabel() . ' :', 8, 0);
+            $pdf->Ln(4);
+            $pdf->SetX(75);
             $pdf->SetFont('Arial', '', 10);
-            $this->mbCell($pdf, 75, $y + 5, $skillLearned->getSkill()->getShort(), 12, 0);
-            $y += 11;
+            $this->mbMultiCell($pdf, null, null, $skillLearned->getSkill()->getDescription(), 8, 0);
+            $pdf->Ln(1.5);
         }
 
         // possessions
-        $y = 206;
+        $pdf->SetY(206);
         foreach ($character->getPossessions() as $possession) {
+            $pdf->SetX(73);
             $pdf->SetFont('Arial', 'BU', 10);
-            $this->mbCell($pdf, 73, $y, $possession->getGear()->getLabel() . ' :', 12, 35);
+            $this->mbCell($pdf, null, null, $possession->getGear()->getLabel() . ' :', 8, 0);
+            $pdf->Ln(4);
+            $pdf->SetX(75);
             $pdf->SetFont('Arial', '', 10);
-            $this->mbCell($pdf, 75, $y + 5, $possession->getGear()->getShort(), 12, 0);
-            $y += 11;
+            $this->mbMultiCell($pdf, null, null, $possession->getGear()->getShort(), 8, 0);
+            $pdf->Ln(1.5);
         }
 
         // radiations levels
@@ -126,7 +150,7 @@ class PdfController extends AbstractController
 
         // Génération du PDF
         return new Response(
-            $pdf->Output('character_sheet.pdf', 'I'),
+            $pdf->Output('character_sheet.pdf', 'D'),
             Response::HTTP_OK,
             [
                 'Content-Type' => 'application/pdf',
