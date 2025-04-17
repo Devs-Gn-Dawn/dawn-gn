@@ -19,7 +19,7 @@
                 <div class="h-full flex items-center gap-2">
                   <input type="text" 
                          id="characterName"
-                         class="mb-1 px-2 py-1 text-xl font-semibold bg-transparent border border-transparent hover:border-dashed hover:border-slate-300 rounded hover:border-slate-400 focus:border focus:border-slate-500 focus:outline-none" 
+                         class="mb-1 px-2 py-1 text-xl text-slate-700 font-semibold bg-transparent border border-transparent hover:border-dashed hover:border-slate-300 rounded hover:border-slate-400 focus:border focus:border-slate-500 focus:outline-none" 
                          value="{{ character.name }}" 
                          name="character[name]" 
                          data-target="tooltip_trigger" 
@@ -371,9 +371,9 @@
             {% if (character.isMain() or character.isSecondary()) and character.isNotValidated() %}
                 <a href="#" onclick="confirmSubmit('{{ path('character_submit', {'id': character.id}) }}')" class="inline-block px-6 py-3 font-bold text-center text-white uppercase align-middle transition-all rounded-lg cursor-pointer bg-gradient-to-tl from-cyan-300 to-cyan-600 leading-pro text-xs ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 hover:scale-102 active:opacity-85 hover:shadow-soft-xs hover:text-cyan-100">Soumettre ce personnage aux orgas</a>
             {% elseif not character.getUser().hasMainCharacter() %}
-                <a href="#" onclick="confirmSetType('{{ path('character_set_type', {'id': character.id, 'type': 'main'}) }}', 'principal')" class="inline-block px-6 py-3 font-bold text-center text-white uppercase align-middle transition-all rounded-lg cursor-pointer bg-gradient-to-tl from-cyan-300 to-cyan-600 leading-pro text-xs ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 hover:scale-102 active:opacity-85 hover:shadow-soft-xs hover:text-cyan-100">Faire de ce personnage le personnage principal</a>
+                <a href="#" onclick="confirmSetType('{{ path('character_set_type', {'id': character.id, 'type': 'main'}) }}', 'principal')" class="inline-block px-6 py-3 font-bold text-center text-white uppercase align-middle transition-all rounded-lg cursor-pointer bg-gradient-to-tl from-cyan-300 to-cyan-600 leading-pro text-xs ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 hover:scale-102 active:opacity-85 hover:shadow-soft-xs hover:text-cyan-100">Définir comme personnage principal</a>
             {% elseif not character.getUser().hasSecondaryCharacter() %}
-                <a href="#" onclick="confirmSetType('{{ path('character_set_type', {'id': character.id, 'type': 'secondary'}) }}', 'reroll')" class="inline-block px-6 py-3 font-bold text-center text-white uppercase align-middle transition-all rounded-lg cursor-pointer bg-gradient-to-tl from-cyan-300 to-cyan-600 leading-pro text-xs ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 hover:scale-102 active:opacity-85 hover:shadow-soft-xs hover:text-cyan-100">Faire de ce personnage un reroll</a>
+                <a href="#" onclick="confirmSetType('{{ path('character_set_type', {'id': character.id, 'type': 'secondary'}) }}', 'reroll')" class="inline-block px-6 py-3 font-bold text-center text-white uppercase align-middle transition-all rounded-lg cursor-pointer bg-gradient-to-tl from-cyan-300 to-cyan-600 leading-pro text-xs ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 hover:scale-102 active:opacity-85 hover:shadow-soft-xs hover:text-cyan-100">Définir comme personnage reroll</a>
             {% endif %}
             
         </div>
