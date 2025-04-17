@@ -43,9 +43,9 @@
                     <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
                   </div> #}
                 </div>
-                <div class="mb-0 font-semibold leading-normal text-sm"><span class="font-extrabold">{{ character.getAvailableXp() }}</span>/{{ character.getGainedXp() }} XP <a href="#" id="info" data-target="tooltip_trigger" data-placement="top"><i class="fa fa-question-circle hover:text-slate-700 text-sm" aria-hidden="true"></i></a> 
+                <div class="mb-0 font-semibold leading-normal text-sm"><span class="font-extrabold">{{ character.getAvailableXp() }}</span>/{{ character.getGainedXp() }} PA <a href="#" id="info" data-target="tooltip_trigger" data-placement="top"><i class="fa fa-question-circle hover:text-slate-700 text-sm" aria-hidden="true"></i></a> 
                   <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm" role="tooltip">
-                    Points d'XP gagnés lors des précédents opus et encore non utilisés
+                    PA gagnés lors des précédents opus et encore non utilisés
                     <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
                   </div>
                 </div>
@@ -112,13 +112,13 @@
                 <div class="w-full max-w-full px-3 mx-auto mt-4 sm:my-auto sm:mr-0 sm:w-1/5 md:w-1/5 md:flex-none">
                   <div class="relative right-0">
                     <div class="h-full text-right">
-                      <h6 class="mb-1"><span class="text-slate-400">{{ character.getXpSkill() - character.getSkillsXpUsed() }}</span>/{{ character.getXpSkill() }} XP 
+                      <h6 class="mb-1"><span class="text-slate-400">{{ character.getXpSkill() - character.getSkillsXpUsed() }}</span>/{{ character.getXpSkill() }} PA 
                         {% if character.getAvailableXp() > 0 and character.isNotValidated() %}
                           <button onclick="showAddSkillXpModal()" data-target="tooltip_trigger" data-placement="top" class="text-xs font-semibold leading-tight text-slate-300 cursor-pointer hover:scale-102 hover:text-slate-700 hover:underline">
                             <i class="fa fa-plus-circle text-slate-400 hover:text-slate-700 text-sm" aria-hidden="true"></i>
                           </button> 
                           <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm" role="tooltip">
-                            Ajouter XP
+                            Ajouter PA
                             <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
                           </div>
                         {% endif %}
@@ -164,7 +164,7 @@
                       <tr>
                         <td class="mx-8 text-center shadow-transparent" colspan="2">
                           <div class="flex p-3 mt-3 text-center justify-center bg-slate-100 bg-opacity-40  border rounded border-dashed border-slate-300">
-                            <span onclick="showAddSkillModal()" class="text-xs font-semibold leading-tight text-slate-300 cursor-pointer hover:scale-102 hover:text-slate-700 hover:underline"><strong class="font-extrabold">+ </strong>Ajouter une compétence (<span data-target="skillsPaAvailable">{{ character.getXpSkill() - character.getSkillsXpUsed()}}</span> XP disponibles)</span>
+                            <span onclick="showAddSkillModal()" class="text-xs font-semibold leading-tight text-slate-300 cursor-pointer hover:scale-102 hover:text-slate-700 hover:underline"><strong class="font-extrabold">+ </strong>Ajouter une compétence (<span data-target="skillsPaAvailable">{{ character.getXpSkill() - character.getSkillsXpUsed()}}</span> PA disponibles)</span>
                           </div>
                         </td>
                       </tr>
@@ -231,13 +231,13 @@
                 <div class="w-full max-w-full px-3 mx-auto mt-4 sm:my-auto sm:mr-0 sm:w-1/5 md:w-1/5 md:flex-none">
                   <div class="relative right-0">
                     <div class="h-full text-right">
-                      <h6 class="mb-1"><span class="text-slate-400">{{ character.getXpGear() - character.getGearXpUsed() }}</span>/{{ character.getXpGear() }} XP 
+                      <h6 class="mb-1"><span class="text-slate-400">{{ character.getXpGear() - character.getGearXpUsed() }}</span>/{{ character.getXpGear() }} PA 
                         {% if character.getAvailableXp() > 0 and character.isNotValidated() %}
                           <button onclick="showAddGearXpModal()" data-target="tooltip_trigger" data-placement="top" class="text-xs font-semibold leading-tight text-slate-300 cursor-pointer hover:scale-102 hover:text-slate-700 hover:underline">
                             <i class="fa fa-plus-circle text-slate-400 hover:text-slate-700 text-sm" aria-hidden="true"></i>
                           </button> 
                           <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm" role="tooltip">
-                          Ajouter XP
+                          Ajouter PA
                           <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
                         </div>
                         {% endif %}
@@ -290,7 +290,7 @@
                       <tr>
                         <td class="mx-8 text-center shadow-transparent">
                           <div class="flex p-3 mt-3 text-center justify-center bg-slate-100 bg-opacity-40  border rounded border-dashed border-slate-300">
-                            <span onclick="showAddGearModal()" class="text-xs font-semibold leading-tight text-slate-300 cursor-pointer hover:scale-102 hover:text-slate-700 hover:underline"><strong class="font-extrabold">+ </strong>Ajouter du matériel ou une ressource ({{ character.getXpGear() - character.getGearXpUsed() }} XP disponibles)</span>
+                            <span onclick="showAddGearModal()" class="text-xs font-semibold leading-tight text-slate-300 cursor-pointer hover:scale-102 hover:text-slate-700 hover:underline"><strong class="font-extrabold">+ </strong>Ajouter du matériel ou une ressource ({{ character.getXpGear() - character.getGearXpUsed() }} PA disponibles)</span>
                           </div>
                         </td>
                       </tr>
@@ -476,7 +476,7 @@
                                     <option value="">-- Sélectionnez une compétence --</option>
                                     ${skills.map(skill => `
                                         <option value="${skill.id}" data-cost="${skill.baseCost}" data-description="${skill.description}" data-short="${skill.short}" data-label="${skill.label}">
-                                            ${skill.label} - ${skill.baseCost}XP
+                                            ${skill.label} - ${skill.baseCost}PA
                                         </option>
                                     `).join('')}
                                 </select>
@@ -508,7 +508,7 @@
                                 skillDescription.classList.remove("hidden");
                                 skillDescription.querySelector(".font-extrabold").textContent = selectedOption.dataset.label;
                                 skillDescription.querySelector(".description").textContent = selectedOption.dataset.description;
-                                skillDescription.querySelector(".cost").textContent = selectedOption.dataset.cost + "XP";
+                                skillDescription.querySelector(".cost").textContent = selectedOption.dataset.cost + "PA";
                             } else {
                                 skillDescription.classList.add("hidden");
                             }
@@ -527,16 +527,16 @@
         const usedSkillXp = {{ character.getSkillsXpUsed() }};
 
         createModal({
-            title: "Ajouter des points d'XP aux compétences",
+            title: "Ajouter des PA aux compétences",
             html: `
                 <form id="skillXpForm" class="text-left">
                     <div class="mb-4">
-                        <label class="block text-sm font-medium text-gray-700">Points d'XP à ajouter</label>
+                        <label class="block text-sm font-medium text-gray-700">Nombre de PA à ajouter</label>
                         <input type="number" id="skillXp" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 mt-1 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow" 
                                min="1" max="${availableXp}" value="1">
                         <p class="mt-2 text-sm text-gray-500">
-                            Points d'XP disponibles : ${availableXp}<br>
-                            Points d'XP actuels : ${currentSkillXp - usedSkillXp}
+                            PA disponibles : ${availableXp}<br>
+                            PA actuels : ${currentSkillXp - usedSkillXp}
                         </p>
                     </div>
                 </form>
@@ -550,8 +550,8 @@
             },
             url: "{{ path('api_character_skill_xp_add', {'id': character.id}) }}",
             confirmButtonText: "Ajouter",
-            successTitle: "Points d'XP ajoutés !",
-            successMessage: "Les points d'XP ont été ajoutés avec succès.",
+            successTitle: "PA ajoutés !",
+            successMessage: "Les PA ont été ajoutés avec succès.",
             didOpen: () => {
                 const xpInput = document.getElementById("skillXp");
                 xpInput.addEventListener("input", function() {
@@ -572,16 +572,16 @@
         const usedGearXp = {{ character.getGearXpUsed() }};
 
         createModal({
-            title: "Ajouter des points d'XP aux équipements",
+            title: "Ajouter des PA aux équipements",
             html: `
                 <form id="gearXpForm" class="text-left">
                     <div class="mb-4">
-                        <label class="block text-sm font-medium text-gray-700">Points d'XP à ajouter</label>
+                        <label class="block text-sm font-medium text-gray-700">Nombre de PA à ajouter</label>
                         <input type="number" id="gearXp" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 mt-1 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow" 
                                min="1" max="${availableXp}" value="1">
                         <p class="mt-2 text-sm text-gray-500">
-                            Points d'XP disponibles : ${availableXp}<br>
-                            Points d'XP actuels : ${currentGearXp - usedGearXp}
+                            PA disponibles : ${availableXp}<br>
+                            PA actuels : ${currentGearXp - usedGearXp}
                         </p>
                     </div>
                 </form>
@@ -595,8 +595,8 @@
             },
             url: "{{ path('api_character_gear_xp_add', {'id': character.id}) }}",
             confirmButtonText: "Ajouter",
-            successTitle: "Points d'XP ajoutés !",
-            successMessage: "Les points d'XP ont été ajoutés avec succès.",
+            successTitle: "PA ajoutés !",
+            successMessage: "Les PA ont été ajoutés avec succès.",
             didOpen: () => {
                 const xpInput = document.getElementById("gearXp");
                 xpInput.addEventListener("input", function() {
@@ -635,7 +635,7 @@
                                     <option value="">-- Sélectionnez un équipement --</option>
                                     ${gear.map(item => `
                                         <option value="${item.id}" data-cost="${item.baseCost}" data-description="${item.description}" data-short="${item.short}" data-label="${item.label}">
-                                            ${item.label} - ${item.baseCost}XP
+                                            ${item.label} - ${item.baseCost}PA
                                         </option>
                                     `).join('')}
                                 </select>
@@ -667,7 +667,7 @@
                                 gearDescription.classList.remove("hidden");
                                 gearDescription.querySelector(".font-extrabold").textContent = selectedOption.dataset.label;
                                 gearDescription.querySelector(".description").textContent = selectedOption.dataset.description;
-                                gearDescription.querySelector(".cost").textContent = selectedOption.dataset.cost + "XP";
+                                gearDescription.querySelector(".cost").textContent = selectedOption.dataset.cost + "PA";
                             } else {
                                 gearDescription.classList.add("hidden");
                             }
