@@ -345,7 +345,7 @@ class CharacterController extends AbstractController
         return $this->redirectToRoute('app_character_edit', ['id' => $character->getId()]);
     }
 
-    #[Route('/{id}/delete', name: 'character_delete', methods: ['GET'])]
+    #[Route('/{id}/delete', name: 'character_delete', methods: ['POST'])]
     public function delete(Character $character): Response
     {
         // Vérifier que l'utilisateur est propriétaire du personnage
@@ -360,7 +360,7 @@ class CharacterController extends AbstractController
         return $this->redirectToRoute('app_character_index');
     }
 
-    #[Route('/{id}/submit', name: 'character_submit', methods: ['GET'])]
+    #[Route('/{id}/submit', name: 'character_submit', methods: ['POST'])]
     public function submit(Character $character): Response
     {
         // Vérifier que l'utilisateur est propriétaire du personnage
