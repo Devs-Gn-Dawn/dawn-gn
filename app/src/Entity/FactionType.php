@@ -37,6 +37,16 @@ enum FactionType: string
         };
     }
 
+    public static function getBreadCrumbTextColor(FactionType $faction): string
+    {
+        return match ($faction) {
+            self::NOMADS => 'text-white',
+            self::TECHERS => 'text-white',
+            self::RODOIR => 'text-white',
+            self::NEOCUBA => 'text-slate-700',
+        };
+    }
+
     public static function getAvatar(FactionType $faction): string
     {
         return match ($faction) {

@@ -355,6 +355,11 @@ class Character
         return FactionType::getBanner($this->getFactionType());
     }
 
+    public function getBreadCrumbTextColor(): string
+    {
+        return FactionType::getBreadCrumbTextColor($this->getFactionType());
+    }
+    
     public function getAvatar(): string
     {
         return FactionType::getAvatar($this->getFactionType());

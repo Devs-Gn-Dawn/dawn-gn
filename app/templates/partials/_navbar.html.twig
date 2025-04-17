@@ -1,16 +1,16 @@
 <nav class="{% if navRelative %}relative{% else %}absolute z-20{% endif %} rounded-2xl px-6 w-full flex flex-wrap items-center justify-between w-full py-2 transition-all shadow-none duration-250 ease-soft-in lg:flex-nowrap lg:justify-start" navbar-main navbar-scroll="true">
   <div class="flex items-center justify-between w-full py-1 mx-auto flex-wrap-inherit">
     <nav data-breadcrumb>
-      <ol class="flex flex-wrap pt-1 pl-2 pr-4 mr-12 bg-transparent rounded-lg sm:mr-16">
+      <ol class="flex flex-wrap pt-1 pl-2 pr-4 ml-5 mr-12 bg-transparent rounded-lg sm:mr-16">
         {# Premier niveau toujours présent #}
-        <li class="text-sm opacity-50 leading-normal {% if navRelative %}text-slate-700{% endif %}">
-          <a href="/">Dawn, Le GN</a>
+        <li class="text-sm opacity-60 leading-normal  {% if navRelative %} text-slate-700 {% else %} {{ character.getBreadCrumbTextColor() }} {% endif %}">
+          <a href="/">Dawn, Le GN </a>
         </li>
         
         {# Reste du breadcrumb dynamique #}
         {% set breadcrumb = breadcrumb|default([]) %}
         {% for path, item in breadcrumb %}
-          <li class="text-sm {% if not loop.last %}opacity-50{% endif %} pl-2 leading-normal {% if navRelative %}text-slate-700{% endif %} before:float-left before:pr-2 before:text-gray-600 before:content-['/']" {% if loop.last %}aria-current="page"{% endif %}>
+          <li class="text-sm {% if not loop.last %}opacity-60{% endif %} pl-2 leading-normal {% if navRelative %}text-slate-700 {% else %} {{ character.getBreadCrumbTextColor() }} {% endif %} before:float-left before:pr-2 before:content-['/']" {% if loop.last %}aria-current="page"{% endif %}>
             {% if path != '#' and not loop.last %}
               <a href="{{ path }}">{{ item|raw }}</a>
             {% else %}
@@ -26,7 +26,7 @@
       <ul class="flex flex-row justify-end pl-0 mb-0 list-none md-max:w-full">
         <li class="relative flex items-center pr-2">
           <p class="hidden transform-dropdown-show"></p>
-          <a href="javascript:;" class="block p-0 text-sm transition-all ease-nav-brand {% if not navRelative %} hover:text-slate-50{% else %}text-slate-500{% endif %} hover:scale-102" dropdown-trigger aria-expanded="false">
+          <a href="javascript:;" class="block p-0 text-sm transition-all ease-nav-brand {% if navRelative %} hover:text-slate-500{% else %}{{ character.getBreadCrumbTextColor() }}{% endif %} hover:scale-102" dropdown-trigger aria-expanded="false">
             <i class="fa fa-user sm:mr-1" aria-hidden="true"></i>
           </a>
           <ul dropdown-menu class="text-sm transform-dropdown before:font-awesome before:leading-default before:duration-350 before:ease-soft lg:shadow-soft-3xl duration-250 min-w-44 pointer-events-none absolute right-0 top-0 z-50 origin-top list-none rounded-lg border-0 border-solid border-transparent bg-white bg-clip-padding px-2 py-2 text-left text-slate-500 opacity-0 transition-all sm:-mr-6 lg:absolute lg:right-0 lg:left-auto lg:block lg:cursor-pointer">
