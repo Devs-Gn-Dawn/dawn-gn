@@ -19,7 +19,7 @@
                 <div class="h-full flex items-center gap-2">
                   <input type="text" 
                          id="characterName"
-                         class="mb-1 px-2 py-1 text-xl text-slate-700 font-semibold bg-transparent border border-transparent hover:border-dashed hover:border-slate-300 rounded hover:border-slate-400 focus:border focus:border-slate-500 focus:outline-none" 
+                         class="mb-1 py-1 text-xl text-slate-900 font-semibold bg-transparent border border-transparent hover:border-dashed hover:border-slate-300 rounded hover:border-slate-400 hover:px-2 hover:bg-slate-50 hover:bg-opacity-50 focus:outline-none" 
                          value="{{ character.name }}" 
                          name="character[name]" 
                          data-target="tooltip_trigger" 
@@ -288,7 +288,7 @@
                       {% endfor %}
                       {% if character.isNotValidated() %}
                       <tr>
-                        <td class="mx-8 text-center shadow-transparent">
+                        <td class="mx-8 text-center shadow-transparent" colspan="2">
                           <div class="flex p-3 mt-3 text-center justify-center bg-slate-100 bg-opacity-40  border rounded border-dashed border-slate-300">
                             <span onclick="showAddGearModal()" class="text-xs font-semibold leading-tight text-slate-300 cursor-pointer hover:scale-102 hover:text-slate-700 hover:underline"><strong class="font-extrabold">+ </strong>Ajouter du matériel ou une ressource ({{ character.getXpGear() - character.getGearXpUsed() }} PA disponibles)</span>
                           </div>
@@ -471,7 +471,7 @@
                     html: `
                         <form id="skillForm" class="text-left">
                             <div class="mb-4">
-                                <label class="block text-sm font-medium text-gray-700">Compétence</label>
+                                <label class="block text-sm font-medium text-gray-700">Liste des compétences :</label>
                                 <select id="skill" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 mt-1 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow">
                                     <option value="">-- Sélectionnez une compétence --</option>
                                     ${skills.map(skill => `
@@ -626,11 +626,11 @@
                 }
 
                 createModal({
-                    title: "Ajouter un équipement",
+                    title: "Ajouter du matériel ou une ressource",
                     html: `
                         <form id="gearForm" class="text-left">
                             <div class="mb-4">
-                                <label class="block text-sm font-medium text-gray-700">Équipement</label>
+                                <label class="block text-sm font-medium text-gray-700">Liste du matériels et ressources :</label>
                                 <select id="gear" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 mt-1 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow">
                                     <option value="">-- Sélectionnez un équipement --</option>
                                     ${gear.map(item => `
