@@ -8,6 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use App\Entity\CharacterType;
+use App\Entity\ValidationType;
 
 #[ORM\Entity(repositoryClass: CharacterRepository::class)]
 #[ORM\Table(name: '`character`')]
@@ -45,8 +46,8 @@ class Character
     #[ORM\Column(type: Types::STRING, enumType: CharacterType::class)]
     private CharacterType $type = CharacterType::MAIN;
 
-    #[ORM\Column(type: Types::BOOLEAN)]
-    private bool $isValidated = false;
+    #[ORM\Column(type: Types::INTEGER, enumType: ValidationType::class)]
+    private ValidationType $validationType = ValidationType::NON_VALIDE;
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'characters')]
     #[ORM\JoinColumn(name: 'fk_user', referencedColumnName: 'id', nullable: false)]
@@ -228,15 +229,35 @@ class Character
         return CharacterType::getIcon($this->getType());
     }
 
-    public function isValidated(): bool
+    public function getValidationType(): ValidationType
     {
-        return $this->isValidated;
+        return $this->validationType;
     }
 
-    public function setIsValidated(bool $isValidated): static
+    public function setValidationType(ValidationType $validationType): static
     {
-        $this->isValidated = $isValidated;
+        $this->validationType = $validationType;
         return $this;
+    }
+
+    public function isValidated(): bool
+    {
+        return $this->validationType === ValidationType::VALIDE;
+    }
+
+    public function isRejected(): bool
+    {
+        return $this->validationType === ValidationType::REJETE;
+    }
+
+    public function isInValidation(): bool
+    {
+        return $this->validationType === ValidationType::EN_COURS;
+    }
+
+    public function isNotValidated(): bool
+    {
+        return $this->validationType === ValidationType::NON_VALIDE;
     }
 
     public function getGainedXp(): int

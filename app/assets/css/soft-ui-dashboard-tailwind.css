@@ -1942,7 +1942,7 @@ h6 {
 .border-red-600 {
   --tw-border-opacity: 1;
   border-color: rgb(234 6 6 / var(--tw-border-opacity));
-} 
+}
 
 .border-slate-100 {
   --tw-border-opacity: 1;
@@ -1963,7 +1963,7 @@ h6 {
   --tw-border-opacity: 1;
   border-color: rgb(52 71 103 / var(--tw-border-opacity));
 }
-  
+
 .border-slate-800 {
   --tw-border-opacity: 1;
   border-color: rgb(58 65 111 / var(--tw-border-opacity));
@@ -3657,6 +3657,11 @@ h6 {
 .hover\:bg-gray-200:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(233 236 239 / var(--tw-bg-opacity));
+}
+
+.hover\:bg-slate-600:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(98 117 148 / var(--tw-bg-opacity));
 }
 
 .hover\:bg-slate-700:hover {

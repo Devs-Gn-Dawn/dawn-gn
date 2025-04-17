@@ -20,6 +20,7 @@ use App\Entity\Possession;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Psr\Log\LoggerInterface;
 use App\Entity\CharacterType;
+use App\Entity\ValidationType;
 
 #[Route('/characters')]
 #[IsGranted('ROLE_USER')]
@@ -65,7 +66,7 @@ class CharacterController extends AbstractController
             $character->setXpSkill(20);
             $character->setXpGear(10);
             $character->setType(CharacterType::DRAFT);
-            $character->setIsValidated(false);
+            $character->setValidationType(ValidationType::NON_VALIDE);
 
             $this->entityManager->persist($character);
             $this->entityManager->flush();
@@ -96,6 +97,13 @@ class CharacterController extends AbstractController
         return $this->redirectToRoute('app_character_edit', ['id' => $mainCharacter->getId()]);
     }
 
+    #[Route('/{id}/check', name: 'app_character_check', methods: ['GET'])]
+    public function check(Character $character): Response
+    {
+        // redirect to edit page
+        return $this->redirectToRoute('app_character_edit', ['id' => $character->getId()]);
+    }
+
     #[Route('/{id}/edit', name: 'app_character_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Character $character): Response
     {
@@ -120,6 +128,19 @@ class CharacterController extends AbstractController
         return $this->json(ClassType::getChoicesForFaction($faction));
     }
 
+    private function checkCharacterValidation(Character $character): void
+    {
+        if ($character->isValidated()) {
+            throw new \Exception('Ce personnage est déjà validé.');
+        }
+        if ($character->isRejected()) {
+            throw new \Exception('Ce personnage a été rejeté.');
+        }
+        if ($character->isInValidation()) {
+            throw new \Exception('Ce personnage est en cours de validation.');
+        }
+    }
+
     #[Route('/{id}/skill/add', name: 'character_skill_add', methods: ['GET', 'POST'])]
     public function addSkill(Request $request, Character $character): Response
     {
@@ -129,8 +150,10 @@ class CharacterController extends AbstractController
         }
 
         // Vérifier que le personnage n'est pas déjà validé
-        if ($character->isValidated()) {
-            $this->addFlash('warning', 'Ce personnage est déjà validé.');
+        try {
+            $this->checkCharacterValidation($character);
+        } catch (\Exception $e) {
+            $this->addFlash('warning', $e->getMessage());
             return $this->redirectToRoute('app_character_edit', ['id' => $character->getId()]);
         }
 
@@ -198,8 +221,10 @@ class CharacterController extends AbstractController
         }
 
         // Vérifier que le personnage n'est pas déjà validé
-        if ($character->isValidated()) {
-            $this->addFlash('warning', 'Ce personnage est déjà validé.');
+        try {
+            $this->checkCharacterValidation($character);
+        } catch (\Exception $e) {
+            $this->addFlash('warning', $e->getMessage());
             return $this->redirectToRoute('app_character_edit', ['id' => $character->getId()]);
         }
 
@@ -234,8 +259,10 @@ class CharacterController extends AbstractController
         }
 
         // Vérifier que le personnage n'est pas déjà validé
-        if ($character->isValidated()) {
-            $this->addFlash('warning', 'Ce personnage est déjà validé.');
+        try {
+            $this->checkCharacterValidation($character);
+        } catch (\Exception $e) {
+            $this->addFlash('warning', $e->getMessage());
             return $this->redirectToRoute('app_character_edit', ['id' => $character->getId()]);
         }
 
@@ -290,8 +317,10 @@ class CharacterController extends AbstractController
         }
 
         // Vérifier que le personnage n'est pas déjà validé
-        if ($character->isValidated()) {
-            $this->addFlash('warning', 'Ce personnage est déjà validé.');
+        try {
+            $this->checkCharacterValidation($character);
+        } catch (\Exception $e) {
+            $this->addFlash('warning', $e->getMessage());
             return $this->redirectToRoute('app_character_edit', ['id' => $character->getId()]);
         }
 
@@ -340,8 +369,10 @@ class CharacterController extends AbstractController
         }
 
         // Vérifier que le personnage n'est pas déjà validé
-        if ($character->isValidated()) {
-            $this->addFlash('warning', 'Ce personnage est déjà validé.');
+        try {
+            $this->checkCharacterValidation($character);
+        } catch (\Exception $e) {
+            $this->addFlash('warning', $e->getMessage());
             return $this->redirectToRoute('app_character_edit', ['id' => $character->getId()]);
         }
 
@@ -351,7 +382,7 @@ class CharacterController extends AbstractController
             return $this->redirectToRoute('app_character_edit', ['id' => $character->getId()]);
         }
 
-        $character->setIsValidated(true);
+        $character->setValidationType(ValidationType::EN_COURS);
         $this->entityManager->flush();
 
         $this->addFlash('success', 'Votre personnage a été soumis aux orgas avec succès.');
@@ -461,9 +492,9 @@ class CharacterController extends AbstractController
             return $this->json(['error' => 'Vous n\'êtes pas autorisé à modifier ce personnage.'], 403);
         }
 
-        // Vérifier que le personnage n'est pas déjà validé
-        if ($character->isValidated()) {
-            return $this->json(['error' => 'Ce personnage est déjà validé.'], 400);
+        // Vérifier que le personnage n'a pas été rejeté
+        if ($character->getValidationType() === ValidationType::REJETE) {
+            return $this->json(['error' => 'Ce personnage a été rejeté.'], 400);
         }
 
         $data = json_decode($request->getContent(), true);
@@ -517,8 +548,10 @@ class CharacterController extends AbstractController
         }
 
         // Vérifier que le personnage n'est pas déjà validé
-        if ($character->isValidated()) {
-            return $this->json(['error' => 'Ce personnage est déjà validé.'], 400);
+        try {
+            $this->checkCharacterValidation($character);
+        } catch (\Exception $e) {
+            return $this->json(['error' => $e->getMessage()], 400);
         }
 
         $data = json_decode($request->getContent(), true);
@@ -551,8 +584,10 @@ class CharacterController extends AbstractController
         }
 
         // Vérifier que le personnage n'est pas déjà validé
-        if ($character->isValidated()) {
-            return $this->json(['error' => 'Ce personnage est déjà validé.'], 400);
+        try {
+            $this->checkCharacterValidation($character);
+        } catch (\Exception $e) {
+            return $this->json(['error' => $e->getMessage()], 400);
         }
 
         $data = json_decode($request->getContent(), true);
@@ -596,8 +631,10 @@ class CharacterController extends AbstractController
         }
 
         // Vérifier que le personnage n'est pas déjà validé
-        if ($character->isValidated()) {
-            return $this->json(['error' => 'Ce personnage est déjà validé.'], 400);
+        try {
+            $this->checkCharacterValidation($character);
+        } catch (\Exception $e) {
+            return $this->json(['error' => $e->getMessage()], 400);
         }
 
         $data = json_decode($request->getContent(), true);
@@ -644,8 +681,10 @@ class CharacterController extends AbstractController
         }
 
         // Vérifier que le personnage n'est pas déjà validé
-        if ($character->isValidated()) {
-            return $this->json(['error' => 'Ce personnage est déjà validé.'], 400);
+        try {
+            $this->checkCharacterValidation($character);
+        } catch (\Exception $e) {
+            return $this->json(['error' => $e->getMessage()], 400);
         }
 
         // Vérifier que le type est valide

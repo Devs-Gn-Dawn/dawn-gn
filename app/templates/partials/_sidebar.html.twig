@@ -58,9 +58,10 @@
       </li>
 
       {% if app.user.hasMainCharacter() %}
+      {% set mainCharacter = app.user.getMainCharacter() %}
       <li class="mt-0.5 w-full">
         {% set active = app.request.get('_route') starts with 'app_character_sheet' %}
-        <a class="py-2.7 text-sm ease-nav-brand my-0 mx-4 flex items-center whitespace-nowrap px-4 transition-colors hover:scale-102 {% if active %}shadow-soft-xl rounded-lg bg-white font-semibold text-slate-700{% endif %}" href="{{ path('app_character_main') }}">
+        <a class="py-2.7 text-sm ease-nav-brand my-0 mx-4 flex items-center whitespace-nowrap px-4 transition-colors hover:scale-102 {% if active %}shadow-soft-xl rounded-lg bg-white font-semibold text-slate-700{% endif %}" href="{{ path('app_pdf', { id: mainCharacter.id }) }}">
           <div class="{% if active %}bg-gradient-to-tl from-gray-900 to-slate-800{% endif %} shadow-soft-2xl mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-white bg-center stroke-0 text-center xl:p-2.5">
             <i class="ni ni-paper-diploma {% if active %}text-white{% endif %}" aria-hidden="true"></i>
           </div>

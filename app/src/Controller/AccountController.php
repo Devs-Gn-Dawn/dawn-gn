@@ -15,6 +15,8 @@ use App\Entity\Note;
 use App\Entity\Registration;
 use App\Entity\EventType;
 use App\Repository\RegistrationRepository;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use App\Entity\User;
 
 #[IsGranted('ROLE_USER')]
 class AccountController extends AbstractController
@@ -33,7 +35,7 @@ class AccountController extends AbstractController
             'breadcrumb' => [
                 '/account' => 'Mes informations',
             ],
-            'eventTypes' => EventType::getChoices(),
+            'eventTypes' => EventType::getChoices(EventType::STATUS_OPEN),
         ]);
     }
 
@@ -152,6 +154,7 @@ class AccountController extends AbstractController
         $user = $this->getUser();
 
         $note = new Note();
+        $note->setTitle($data['title']);
         $note->setContent($data['content']);
         $note->setUser($user);
 
@@ -169,6 +172,7 @@ class AccountController extends AbstractController
         }
 
         $data = json_decode($request->getContent(), true);
+        $note->setTitle($data['title']);
         $note->setContent($data['content']);
 
         $entityManager->flush();
@@ -248,5 +252,58 @@ class AccountController extends AbstractController
         } catch (\Exception $e) {
             return new JsonResponse(['error' => 'Une erreur est survenue lors de la modification de l\'inscription'], 500);
         }
+    }
+
+    #[Route('/account/profile/edit', name: 'app_account_profile_edit', methods: ['POST'])]
+    public function editProfile(Request $request, EntityManagerInterface $entityManager): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        $user = $this->getUser();
+        /**
+         * @var User $user
+         */
+
+        if (!isset($data['name']) || !isset($data['firstname']) || !isset($data['phone']) || !isset($data['social'])) {
+            return new JsonResponse(['error' => 'Données manquantes'], 400);
+        }
+
+        $user->setName($data['name']);
+        $user->setFirstname($data['firstname']);
+        $user->setPhone($data['phone']);
+        $user->setSocial($data['social']);
+
+        $entityManager->flush();
+
+        return new JsonResponse(['message' => 'Profil modifié avec succès']);
+    }
+
+    #[Route('/account/login/edit', name: 'app_account_login_edit', methods: ['POST'])]
+    public function editLoginInfo(Request $request, EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        $user = $this->getUser();
+
+        if (!$user instanceof User) {
+            return new JsonResponse(['error' => 'Utilisateur non trouvé'], 404);
+        }
+
+        if (isset($data['email']) && $data['email'] !== $user->getEmail()) {
+            $existingUser = $entityManager->getRepository(User::class)->findOneBy(['email' => $data['email']]);
+            if ($existingUser) {
+                return new JsonResponse(['error' => 'Cet email est déjà utilisé'], 400);
+            }
+            $user->setEmail($data['email']);
+        }
+
+        if (!empty($data['password'])) {
+            if ($data['password'] !== $data['password_confirm']) {
+                return new JsonResponse(['error' => 'Les mots de passe ne correspondent pas'], 400);
+            }
+            $user->setPassword($passwordHasher->hashPassword($user, $data['password']));
+        }
+
+        $entityManager->flush();
+
+        return new JsonResponse(['success' => true]);
     }
 }
