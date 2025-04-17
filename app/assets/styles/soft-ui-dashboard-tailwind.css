@@ -2115,6 +2115,10 @@ h6 {
   background-color: rgb(255 255 255 / 0.8);
 }
 
+.bg-opacity-10 {
+  --tw-bg-opacity: 0.1;
+}
+
 .bg-opacity-40 {
   --tw-bg-opacity: 0.4;
 }
