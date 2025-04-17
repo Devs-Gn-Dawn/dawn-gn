@@ -49,7 +49,6 @@ if (document.querySelector("[fixed-plugin]")) {
 
 if (document.querySelector("[navbar-main]")) {
   loadJS(to_build + "assets/js/sidenav-burger.js", true);
-  loadJS(to_build + "assets/js/navbar-sticky.js", true);
 }
 
 if (document.querySelector("canvas")) {
@@ -140,20 +139,20 @@ if (sidenav_close_button) {
   });
 }
 
-// Function for the fixed navbar
-function navbar_fixed_plugin() {
-  if (buttonNavbarFixed.getAttribute("checked") === "true") {
-    buttonNavbarFixed.setAttribute("checked", "false");
-    navbar.classList.remove("sticky");
-    navbar.classList.remove("top-[1%]");
-    navbar.classList.add("relative");
-  } else {
-    buttonNavbarFixed.setAttribute("checked", "true");
-    navbar.classList.remove("relative");
-    navbar.classList.add("sticky");
-    navbar.classList.add("top-[1%]");
-  }
-}
+// // Function for the fixed navbar
+// function navbar_fixed_plugin() {
+//   if (buttonNavbarFixed.getAttribute("checked") === "true") {
+//     buttonNavbarFixed.setAttribute("checked", "false");
+//     navbar.classList.remove("sticky");
+//     navbar.classList.remove("top-[1%]");
+//     navbar.classList.add("relative");
+//   } else {
+//     buttonNavbarFixed.setAttribute("checked", "true");
+//     navbar.classList.remove("relative");
+//     navbar.classList.add("sticky");
+//     navbar.classList.add("top-[1%]");
+//   }
+// }
 
 // Tickets function
 function sweetTicket() {

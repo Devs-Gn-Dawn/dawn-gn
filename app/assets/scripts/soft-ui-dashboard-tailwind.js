@@ -43,7 +43,6 @@ if (document.querySelector("[fixed-plugin]")) {
 
 if (document.querySelector("[navbar-main]")) {
   loadJS(to_build + "build/js/sidenav-burger.js", true);
-  loadJS(to_build + "build/js/navbar-sticky.js", true);
 }
 
 if (document.querySelector("canvas")) {
