@@ -472,7 +472,7 @@
                         <form id="skillForm" class="text-left">
                             <div class="mb-4">
                                 <label class="block text-sm font-medium text-gray-700">Compétence</label>
-                                <select id="skill" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-slate-500 focus:ring-slate-500">
+                                <select id="skill" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 mt-1 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow">
                                     <option value="">-- Sélectionnez une compétence --</option>
                                     ${skills.map(skill => `
                                         <option value="${skill.id}" data-cost="${skill.baseCost}" data-description="${skill.description}" data-short="${skill.short}" data-label="${skill.label}">
@@ -513,7 +513,7 @@
                                 skillDescription.classList.add("hidden");
                             }
                         });
-                    }
+                    },
                 });
             })
             .catch(error => {
@@ -532,7 +532,7 @@
                 <form id="skillXpForm" class="text-left">
                     <div class="mb-4">
                         <label class="block text-sm font-medium text-gray-700">Points d'XP à ajouter</label>
-                        <input type="number" id="skillXp" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-slate-500 focus:ring-slate-500" 
+                        <input type="number" id="skillXp" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 mt-1 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow" 
                                min="1" max="${availableXp}" value="1">
                         <p class="mt-2 text-sm text-gray-500">
                             Points d'XP disponibles : ${availableXp}<br>
@@ -577,7 +577,7 @@
                 <form id="gearXpForm" class="text-left">
                     <div class="mb-4">
                         <label class="block text-sm font-medium text-gray-700">Points d'XP à ajouter</label>
-                        <input type="number" id="gearXp" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-slate-500 focus:ring-slate-500" 
+                        <input type="number" id="gearXp" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 mt-1 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow" 
                                min="1" max="${availableXp}" value="1">
                         <p class="mt-2 text-sm text-gray-500">
                             Points d'XP disponibles : ${availableXp}<br>
@@ -631,7 +631,7 @@
                         <form id="gearForm" class="text-left">
                             <div class="mb-4">
                                 <label class="block text-sm font-medium text-gray-700">Équipement</label>
-                                <select id="gear" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-slate-500 focus:ring-slate-500">
+                                <select id="gear" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 mt-1 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow">
                                     <option value="">-- Sélectionnez un équipement --</option>
                                     ${gear.map(item => `
                                         <option value="${item.id}" data-cost="${item.baseCost}" data-description="${item.description}" data-short="${item.short}" data-label="${item.label}">

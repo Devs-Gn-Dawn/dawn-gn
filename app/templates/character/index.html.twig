@@ -86,11 +86,11 @@
                     <form id="newCharacterForm" class="text-left">
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-700">Nom du personnage</label>
-                            <input type="text" id="character_name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-slate-500 focus:ring-slate-500" required>
+                            <input type="text" id="character_name" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 mt-1 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow" required>
                         </div>
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-700">Faction</label>
-                            <select id="faction-select" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-slate-500 focus:ring-slate-500" required>
+                            <select id="faction-select" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 mt-1 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow" required>
                                 <option value="">Choisir une faction</option>
                                 ${Object.entries(window.factions).map(([label, value]) => 
                                     `<option value="${value}">${label}</option>`
@@ -99,7 +99,7 @@
                         </div>
                         <div class="mb-4">
                             <label id="class-label" class="block text-sm font-medium text-gray-700">Classe</label>
-                            <select id="class-select" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-slate-500 focus:ring-slate-500" required disabled>
+                            <select id="class-select" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 mt-1 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow" required disabled>
                                 <option value="">Choisir une classe</option>
                             </select>
                         </div>

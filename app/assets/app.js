@@ -7,9 +7,9 @@ require("./styles/app.css");
 // Classes de boutons globales
 window.BUTTON_CLASSES = {
   primary:
-    "border-0 inline-flex justify-center rounded-md bg-gradient-to-tl from-gray-900 to-slate-800 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:scale-102 hover:bg-slate-800 w-30",
+    "border-0 inline-flex w-full justify-center rounded-md bg-gradient-to-tl from-gray-900 to-slate-800 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:scale-102 hover:bg-slate-800 sm:ml-3 sm:w-auto",
   secondary:
-    "border-0 inline-flex justify-center rounded-md bg-gradient-to-tl from-slate-600 to-slate-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:scale-102 hover:opacity-75 w-30",
+    "border border-solid inline-flex w-full justify-center rounded-md bg-transparent px-3 py-2 text-sm font-semibold text-slate-800 shadow-sm hover:scale-102 hover:bg-slate-600 hover:text-white sm:ml-3 sm:w-auto",
   danger:
     "border-0 inline-flex justify-center rounded-md bg-gradient-to-tl from-red-600 to-rose-400 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:scale-102 hover:opacity-75 w-40",
   link: {
@@ -57,11 +57,11 @@ window.showContactForm = function () {
             <form id="contactForm" class="text-left">
                 <div class="mb-4">
                     <label class="block text-sm font-medium text-gray-700">Sujet</label>
-                    <input type="text" id="subject" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-slate-500 focus:ring-slate-500">
+                    <input type="text" id="subject" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 mt-1 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow">
                 </div>
                 <div class="mb-4">
                     <label class="block text-sm font-medium text-gray-700">Message</label>
-                    <textarea id="message" rows="4" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-slate-500 focus:ring-slate-500"></textarea>
+                    <textarea id="message" rows="4" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 mt-1 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow"></textarea>
                 </div>
             </form>
         `,
@@ -123,6 +123,7 @@ window.createModal = function (options) {
     confirmButtonText: options.confirmButtonText || "Ajouter",
     cancelButtonText: "Annuler",
     customClass: options.customClass || window.modalClasses,
+    width: "70%",
     didOpen: options.didOpen,
     preConfirm: () => {
       const data = options.getData();
