@@ -21,7 +21,7 @@ security:
         enable_csrf: true
         username_parameter: email
         password_parameter: password
-        default_target_path: app_account
+        default_target_path: app_character_index
         always_use_default_target_path: true
       logout:
         path: app_logout
