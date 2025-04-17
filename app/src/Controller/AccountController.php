@@ -89,7 +89,7 @@ class AccountController extends AbstractController
         ]);
     }
 
-    #[Route('/account/emergency-contact/{id}/delete', name: 'app_account_emergency_contact_delete', methods: ['DELETE'])]
+    #[Route('/account/emergency-contact/{id}/delete', name: 'app_account_emergency_contact_delete', methods: ['POST', 'DELETE'])]
     public function deleteEmergencyContact(EntityManagerInterface $entityManager, EmergencyContact $contact): JsonResponse
     {
         // Vérifier que le contact appartient bien à l'utilisateur connecté
@@ -134,7 +134,7 @@ class AccountController extends AbstractController
         return new JsonResponse(['message' => 'Allergie modifiée avec succès']);
     }
 
-    #[Route('/allergy/{id}/delete', name: 'app_account_allergy_delete', methods: ['DELETE'])]
+    #[Route('/allergy/{id}/delete', name: 'app_account_allergy_delete', methods: ['POST', 'DELETE'])]
     public function deleteAllergy(Allergy $allergy, EntityManagerInterface $entityManager): JsonResponse
     {
         if ($allergy->getUser() !== $this->getUser()) {
@@ -180,7 +180,7 @@ class AccountController extends AbstractController
         return new JsonResponse(['message' => 'Note modifiée avec succès']);
     }
 
-    #[Route('/note/{id}/delete', name: 'app_account_note_delete', methods: ['DELETE'])]
+    #[Route('/note/{id}/delete', name: 'app_account_note_delete', methods: ['POST', 'DELETE'])]
     public function deleteNote(Note $note, EntityManagerInterface $entityManager): JsonResponse
     {
         if ($note->getUser() !== $this->getUser()) {
