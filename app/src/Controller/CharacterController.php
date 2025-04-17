@@ -346,47 +346,43 @@ class CharacterController extends AbstractController
     }
 
     #[Route('/{id}/delete', name: 'character_delete', methods: ['POST'])]
-    public function delete(Character $character): Response
+    public function delete(Character $character): JsonResponse
     {
         // Vérifier que l'utilisateur est propriétaire du personnage
         if ($character->getUser() !== $this->getUser()) {
-            throw $this->createAccessDeniedException('Vous n\'êtes pas autorisé à supprimer ce personnage.');
+            return $this->json(['error' => 'Vous n\'êtes pas autorisé à supprimer ce personnage.'], 403);
         }
 
         $this->entityManager->remove($character);
         $this->entityManager->flush();
 
-        $this->addFlash('success', 'Votre personnage a été supprimé avec succès.');
-        return $this->redirectToRoute('app_character_index');
+        return $this->json(['success' => true]);
     }
 
     #[Route('/{id}/submit', name: 'character_submit', methods: ['POST'])]
-    public function submit(Character $character): Response
+    public function submit(Character $character): JsonResponse
     {
         // Vérifier que l'utilisateur est propriétaire du personnage
         if ($character->getUser() !== $this->getUser()) {
-            throw $this->createAccessDeniedException('Vous n\'êtes pas autorisé à soumettre ce personnage.');
+            return $this->json(['error' => 'Vous n\'êtes pas autorisé à soumettre ce personnage.'], 403);
         }
 
         // Vérifier que le personnage n'est pas déjà validé
         try {
             $this->checkCharacterValidation($character);
         } catch (\Exception $e) {
-            $this->addFlash('warning', $e->getMessage());
-            return $this->redirectToRoute('app_character_edit', ['id' => $character->getId()]);
+            return $this->json(['error' => $e->getMessage()], 400);
         }
 
         // Vérifier que le personnage a un nom, une faction et une classe
         if (empty($character->getName()) || empty($character->getFaction()) || empty($character->getClass())) {
-            $this->addFlash('error', 'Votre personnage doit avoir un nom, une faction et une classe avant d\'être soumis.');
-            return $this->redirectToRoute('app_character_edit', ['id' => $character->getId()]);
+            return $this->json(['error' => 'Votre personnage doit avoir un nom, une faction et une classe avant d\'être soumis.'], 400);
         }
 
         $character->setValidationType(ValidationType::EN_COURS);
         $this->entityManager->flush();
 
-        $this->addFlash('success', 'Votre personnage a été soumis aux orgas avec succès.');
-        return $this->redirectToRoute('app_character_edit', ['id' => $character->getId()]);
+        return $this->json(['success' => true]);
     }
 
     #[Route('/{id}/background', name: 'app_character_background', methods: ['GET', 'POST'])]
