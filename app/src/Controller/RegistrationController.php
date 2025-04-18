@@ -24,11 +24,15 @@ class RegistrationController extends AbstractController
             $email = $request->request->get('email');
             $password = $request->request->get('password');
             $name = $request->request->get('name');
+            $firstname = $request->request->get('firstname');
 
             // Vérification basique des données
-            if ($email && $password && $name) {
+            if ($email && $password && $name && $firstname) {
                 $user->setEmail($email);
                 $user->setName($name);
+                $user->setFirstname($firstname);
+                $user->setPhone('');
+                $user->setSocial('');
 
                 // Hashage du mot de passe
                 $hashedPassword = $userPasswordHasher->hashPassword(
@@ -43,10 +47,10 @@ class RegistrationController extends AbstractController
 
                 // Redirection vers la page de connexion
                 $this->addFlash('success', 'Votre compte a été créé avec succès !');
-                return $this->redirectToRoute('app_login');
+                // return $this->redirectToRoute('app_login');
+            } else {
+                $this->addFlash('error', 'Veuillez remplir tous les champs.');
             }
-
-            $this->addFlash('error', 'Veuillez remplir tous les champs.');
         }
 
         return $this->render('registration/register.html.twig');

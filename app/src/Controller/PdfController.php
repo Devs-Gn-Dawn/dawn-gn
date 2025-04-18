@@ -34,6 +34,7 @@ class PdfController extends AbstractController
         if (!is_null($x) && !is_null($y)) {
             $pdf->SetXY($x, $y);
         }
+        //avec bordure : $pdf->Cell($width, $size * 0.4, mb_convert_encoding($text, 'ISO-8859-1', 'UTF-8'), 1, 0, $align);
         $pdf->Cell($width, $size * 0.4, mb_convert_encoding($text, 'ISO-8859-1', 'UTF-8'), 0, 0, $align);
     }
 
@@ -42,7 +43,13 @@ class PdfController extends AbstractController
         if (!is_null($x) && !is_null($y)) {
             $pdf->SetXY($x, $y);
         }
+        //avec bordure : $pdf->MultiCell($width, $size * 0.4, mb_convert_encoding($text, 'ISO-8859-1', 'UTF-8'), 1, $align);
         $pdf->MultiCell($width, $size * 0.4, mb_convert_encoding($text, 'ISO-8859-1', 'UTF-8'), 0, $align);
+    }
+
+    private function mbWrite($pdf, $text, $size = 12)
+    {
+        $pdf->Write($size * 0.4, mb_convert_encoding($text, 'ISO-8859-1', 'UTF-8'));
     }
 
     #[Route('/pdf/{id}', name: 'app_pdf')]
@@ -89,7 +96,7 @@ class PdfController extends AbstractController
 
         // Ajout du numéro de billet
         $pdf->SetFont('Arial', '', 12);
-        $this->mbCell($pdf, 33, 53.7, $user->getRegistrations()->last()->getHelloassoTicket(), 12, 28);
+        $this->mbCell($pdf, 33, 53.7, $user->lastRegistrationWithState(constant('App\Entity\EventType::STATUS_OPEN'))->getHelloassoTicket(), 12, 28);
 
         // user name
         $pdf->SetFont('Arial', 'B', 14);
@@ -99,7 +106,7 @@ class PdfController extends AbstractController
 
         // user class
         $pdf->SetFont('Arial', '', 12);
-        $pdf->SetTextColor(0, 0, 0);
+        $pdf->SetTextColor(51, 51, 51);
         $this->mbCell($pdf, 73, 17.6, $character->getClass(), 11, 80);
 
         // Configuration de la police
@@ -110,33 +117,30 @@ class PdfController extends AbstractController
         $this->mbCell($pdf, 73, 17.6, $character->getClass(), 11, 80);
 
         $this->mbCell($pdf, 75.2, 32, $character->getPvMax(), 16, 7, 'C');
-
+                   //($pdf, $x, $y, $text, $size = 12, $width = 0, $align = '')
         $this->mbCell($pdf, 114.5, 32, $character->getArmor(), 16, 7, 'C');
 
         // skills learned
         $pdf->SetY(53);
+        $pdf->SetLeftMargin(75);
         foreach ($character->getSkillsLearned() as $skillLearned) {
-            $pdf->SetX(73);
-            $pdf->SetFont('Arial', 'BU', 10);
-            $this->mbCell($pdf, null, null, $skillLearned->getSkill()->getLabel() . ' :', 8, 0);
-            $pdf->Ln(4);
             $pdf->SetX(75);
-            $pdf->SetFont('Arial', '', 10);
-            $this->mbMultiCell($pdf, null, null, $skillLearned->getSkill()->getDescription(), 8, 0);
-            $pdf->Ln(1.5);
+            $pdf->SetFont('Arial', 'B', 9);
+            $this->mbWrite($pdf, $skillLearned->getSkill()->getLabel() . ' :', 8);
+            $pdf->SetFont('Arial', '', 9);
+            $this->mbWrite($pdf, ' '. $skillLearned->getSkill()->getShort(), 8);
+            $pdf->Ln(4);
         }
 
         // possessions
         $pdf->SetY(206);
         foreach ($character->getPossessions() as $possession) {
-            $pdf->SetX(73);
-            $pdf->SetFont('Arial', 'BU', 10);
-            $this->mbCell($pdf, null, null, $possession->getGear()->getLabel() . ' :', 8, 0);
-            $pdf->Ln(4);
             $pdf->SetX(75);
-            $pdf->SetFont('Arial', '', 10);
-            $this->mbMultiCell($pdf, null, null, $possession->getGear()->getShort(), 8, 0);
-            $pdf->Ln(1.5);
+            $pdf->SetFont('Arial', 'B', 9);
+            $this->mbWrite($pdf, $possession->getGear()->getLabel() . ' :', 8);
+            $pdf->SetFont('Arial', '', 9);
+            $this->mbWrite($pdf, ' '. $possession->getGear()->getShort(), 8);
+            $pdf->Ln(4);
         }
 
         // radiations levels
@@ -151,7 +155,10 @@ class PdfController extends AbstractController
 
         // Génération du PDF
         return new Response(
-            $pdf->Output('character_sheet.pdf', 'D'),
+            // output en mode dowload
+            //$pdf->Output('character_sheet.pdf', 'D'),
+            // output en mode live
+            $pdf->Output('character_sheet.pdf', 'I'),
             Response::HTTP_OK,
             [
                 'Content-Type' => 'application/pdf',
