@@ -71,6 +71,10 @@ class PdfController extends AbstractController
             throw $this->createAccessDeniedException('Accès refusé');
         }
 
+        if (!$character->isValidated()) {
+            throw $this->createAccessDeniedException('Personnage non validé');
+        }
+
         // Création du QR code
         $qrCode = new QrCode($this->generateUrl('app_character_check', ['id' => $id], UrlGeneratorInterface::ABSOLUTE_URL));
         $writer = new PngWriter();
@@ -117,7 +121,7 @@ class PdfController extends AbstractController
         $this->mbCell($pdf, 73, 17.6, $character->getClass(), 11, 80);
 
         $this->mbCell($pdf, 75.2, 32, $character->getPvMax(), 16, 7, 'C');
-                   //($pdf, $x, $y, $text, $size = 12, $width = 0, $align = '')
+        //($pdf, $x, $y, $text, $size = 12, $width = 0, $align = '')
         $this->mbCell($pdf, 114.5, 32, $character->getArmor(), 16, 7, 'C');
 
         // skills learned
@@ -128,7 +132,7 @@ class PdfController extends AbstractController
             $pdf->SetFont('Arial', 'B', 9);
             $this->mbWrite($pdf, $skillLearned->getSkill()->getLabel() . ' :', 8);
             $pdf->SetFont('Arial', '', 9);
-            $this->mbWrite($pdf, ' '. $skillLearned->getSkill()->getShort(), 8);
+            $this->mbWrite($pdf, ' ' . $skillLearned->getSkill()->getShort(), 8);
             $pdf->Ln(4);
         }
 
@@ -139,7 +143,7 @@ class PdfController extends AbstractController
             $pdf->SetFont('Arial', 'B', 9);
             $this->mbWrite($pdf, $possession->getGear()->getLabel() . ' :', 8);
             $pdf->SetFont('Arial', '', 9);
-            $this->mbWrite($pdf, ' '. $possession->getGear()->getShort(), 8);
+            $this->mbWrite($pdf, ' ' . $possession->getGear()->getShort(), 8);
             $pdf->Ln(4);
         }
 
