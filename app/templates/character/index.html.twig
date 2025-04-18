@@ -48,7 +48,7 @@
                                                     {{ character.getValidationType().getLabel() }}
                                                 </span>
                                             </td>
-                                            <td class="p-2 align-middle bg-transparent border-b whitespace-nowrap shadow-transparent">
+                                            <td class="p-2 align-middle bg-transparent border-b whitespace-nowrap text-center hover:scale-102 shadow-transparent">
                                                 <a href="{{ path('app_character_edit', {'id': character.id}) }}" class="text-xs font-semibold leading-tight text-slate-400 cursor-pointer hover:text-slate-700 hover:underline">
                                                     {% if not character.isNotValidated %}
                                                         Voir
