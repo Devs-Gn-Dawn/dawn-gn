@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use SymfonyCasts\Bundle\ResetPassword\Model\ResetPasswordRequestInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
@@ -52,6 +53,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Note::class, orphanRemoval: true)]
     private Collection $notes;
+
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $passwordRequestedAt = null;
+
+    #[ORM\Column(length: 100, nullable: true)]
+    private ?string $resetToken = null;
 
     public function __construct()
     {
@@ -311,5 +318,39 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getUserIdentifier(): string
     {
         return $this->email;
+    }
+
+    public function getPasswordRequestedAt(): ?\DateTimeInterface
+    {
+        return $this->passwordRequestedAt;
+    }
+
+    public function setPasswordRequestedAt(?\DateTimeInterface $passwordRequestedAt): self
+    {
+        $this->passwordRequestedAt = $passwordRequestedAt;
+        return $this;
+    }
+
+    public function getResetToken(): ?string
+    {
+        return $this->resetToken;
+    }
+
+    public function setResetToken(?string $resetToken): self
+    {
+        $this->resetToken = $resetToken;
+        return $this;
+    }
+
+    public function isPasswordRequestNonExpired(int $ttl): bool
+    {
+        if (!$this->passwordRequestedAt) {
+            return false;
+        }
+
+        $requestedAt = clone $this->passwordRequestedAt;
+        $requestedAt->add(new \DateInterval('PT' . $ttl . 'H'));
+
+        return $requestedAt > new \DateTime();
     }
 }
