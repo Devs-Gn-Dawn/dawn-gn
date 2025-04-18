@@ -22,6 +22,12 @@
                     <div class="relative z-0 flex flex-col min-w-0 break-words bg-white border-0 shadow-soft-xl rounded-2xl bg-clip-border">
                         <div class="flex-auto p-6">
                             <form method="post">
+                                {% for message in app.flashes('success') %}
+                                    <div class="bg-green-200 text-green-900 pl-2 mb-4">
+                                        {{ message }}
+                                    </div>
+                                {% endfor %}
+                                
                                 {% if error %}
                                     <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
                                 {% endif %}
