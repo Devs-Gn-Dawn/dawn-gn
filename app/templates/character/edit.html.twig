@@ -163,8 +163,8 @@
                       {% if character.isNotValidated() %}
                       <tr>
                         <td class="mx-8 text-center shadow-transparent" colspan="2">
-                          <div class="flex p-3 mt-3 text-center justify-center bg-slate-100 bg-opacity-40  border rounded border-dashed border-slate-300">
-                            <span onclick="showAddSkillModal()" class="text-xs font-semibold leading-tight text-slate-300 cursor-pointer hover:scale-102 hover:text-slate-700 hover:underline"><strong class="font-extrabold">+ </strong>Ajouter une compétence (<span data-target="skillsPaAvailable">{{ character.getXpSkill() - character.getSkillsXpUsed()}}</span> PA disponibles)</span>
+                          <div class="flex p-3 mt-3 text-center justify-center bg-slate-100 bg-opacity-40  border rounded border-dashed border-slate-300 hover:border-solid">
+                            <span onclick="showAddSkillModal()" class="text-xs font-semibold leading-tight text-slate-500 cursor-pointer hover:scale-102 hover:text-slate-900 hover:underline"><strong class="font-extrabold">+ </strong>Ajouter une compétence (<span data-target="skillsPaAvailable">{{ character.getXpSkill() - character.getSkillsXpUsed()}}</span> PA disponibles)</span>
                           </div>
                         </td>
                       </tr>
@@ -289,8 +289,8 @@
                       {% if character.isNotValidated() %}
                       <tr>
                         <td class="mx-8 text-center shadow-transparent" colspan="2">
-                          <div class="flex p-3 mt-3 text-center justify-center bg-slate-100 bg-opacity-40  border rounded border-dashed border-slate-300">
-                            <span onclick="showAddGearModal()" class="text-xs font-semibold leading-tight text-slate-300 cursor-pointer hover:scale-102 hover:text-slate-700 hover:underline"><strong class="font-extrabold">+ </strong>Ajouter du matériel ou une ressource ({{ character.getXpGear() - character.getGearXpUsed() }} PA disponibles)</span>
+                          <div class="flex p-3 mt-3 text-center justify-center bg-slate-100 bg-opacity-40  border rounded border-dashed border-slate-300 hover:border-solid">
+                            <span onclick="showAddGearModal()" class="text-xs font-semibold leading-tight text-slate-500 cursor-pointer hover:scale-102 hover:text-slate-900 hover:underline"><strong class="font-extrabold">+ </strong>Ajouter du matériel ou une ressource ({{ character.getXpGear() - character.getGearXpUsed() }} PA disponibles)</span>
                           </div>
                         </td>
                       </tr>

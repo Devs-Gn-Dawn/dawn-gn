@@ -396,8 +396,8 @@
                     <ul class="mx-3 flex flex-col pl-0 mb-0 rounded-lg">
                         {% if user.emergencyContacts is empty %}
                             <li class="relative flex items-center px-0 py-2 bg-white border-0 rounded-t-lg text-inherit">
-                                <div class="w-full mx-2 p-1 text-center justify-center bg-slate-100 bg-opacity-40 border rounded border-dashed border-slate-300">
-                                    <span onclick="openEmergencyContactModal()" class="text-xs font-semibold leading-tight text-slate-300 cursor-pointer hover:scale-102 hover:text-slate-700 hover:underline"><strong class="font-extrabold">+ </strong>Ajouter un contact</span>
+                                <div class="w-full mx-2 p-1 text-center justify-center bg-slate-100 bg-opacity-40 border rounded border-dashed border-slate-300 hover:border-solid">
+                                    <span onclick="openEmergencyContactModal()" class="text-xs font-semibold leading-tight text-slate-500 cursor-pointer hover:scale-102 hover:text-slate-900 hover:underline"><strong class="font-extrabold">+ </strong>Ajouter un contact</span>
                                 </div>
                             </li>
                         {% else %}
@@ -417,8 +417,8 @@
                                 </li>
                             {% endfor %}
                             <li class="relative flex items-center px-0 py-2 bg-white border-0 rounded-t-lg text-inherit">
-                                <div class="w-full mx-2 p-1 text-center justify-center bg-slate-100 bg-opacity-40 border rounded border-dashed border-slate-300">
-                                    <span onclick="openEmergencyContactModal()" class="text-xs font-semibold leading-tight text-slate-300 cursor-pointer hover:scale-102 hover:text-slate-700 hover:underline"><strong class="font-extrabold">+ </strong>Ajouter un contact</span>
+                                <div class="w-full mx-2 p-1 text-center justify-center bg-slate-100 bg-opacity-40 border rounded border-dashed border-slate-300 hover:border-solid">
+                                    <span onclick="openEmergencyContactModal()" class="text-xs font-semibold leading-tight text-slate-500 cursor-pointer hover:scale-102 hover:text-slate-900 hover:underline"><strong class="font-extrabold">+ </strong>Ajouter un contact</span>
                                 </div>
                             </li>
                         {% endif %}
@@ -427,9 +427,9 @@
                     <h6 class="mt-6 font-bold leading-tight uppercase text-xs text-slate-500">Allergies</h6>
                     <ul class="mx-3 flex flex-col pl-0 mb-0 rounded-lg">
                         {% if user.allergies is empty %}
-                            <li class="relative flex items-center px-0 py-2 bg-white border-0 rounded-t-lg text-inherit">
-                                <div class="w-full mx-2 p-1 text-center justify-center bg-slate-100 bg-opacity-40 border rounded border-dashed border-slate-300">
-                                    <span onclick="openAllergyModal()" class="text-xs font-semibold leading-tight text-slate-300 cursor-pointer hover:scale-102 hover:text-slate-700 hover:underline"><strong class="font-extrabold">+ </strong>Ajouter une allergie</span>
+                            <li class="relative flex items-center px-0 py-2 bg-white border-0 rounded-t-lg">
+                                <div class="w-full mx-2 p-1 text-center justify-center bg-slate-100 bg-opacity-40 border rounded border-dashed border-slate-300 hover:border-solid">
+                                    <span onclick="openAllergyModal()" class="text-xs font-semibold leading-tight text-slate-500 cursor-pointer hover:scale-102 hover:text-slate-900 hover:underline"><strong class="font-extrabold">+ </strong>Ajouter une allergie</span>
                                 </div>
                             </li>
                         {% else %}
@@ -439,7 +439,7 @@
                                         <h6 class="mb-0 leading-normal text-sm">{{ allergy.name }}</h6>
                                     </div>
                                     <a onclick="editAllergy({{ allergy.id }}, '{{ allergy.name|e('js') }}')"
-                                       class="inline-block pl-0 pr-4 mb-0 ml-auto font-bold text-center align-middle transition-all bg-transparent border-0 rounded-lg shadow-none cursor-pointer leading-pro text-xs ease-soft-in text-slate-400 hover:text-slate-700 hover:underline"
+                                       class="inline-block pl-0 pr-4 mb-0 ml-auto font-bold text-center align-middle transition-all bg-transparent border-0 rounded-lg shadow-none cursor-pointer leading-pro text-xs ease-soft-in text-slate-400 hover:text-slate-900 hover:underline"
                                        href="javascript:;">Modifier</a>
                                     <div class="h-4 mx-1 bg-slate-300 w-px"></div>
                                     <a onclick="deleteAllergy({{ allergy.id }})"
@@ -447,9 +447,9 @@
                                        href="javascript:;">Supprimer</a>
                                 </li>
                             {% endfor %}
-                            <li class="relative flex items-center px-0 py-2 bg-white border-0 rounded-t-lg text-inherit">
-                                <div class="w-full mx-2 p-1 text-center justify-center bg-slate-100 bg-opacity-40 border rounded border-dashed border-slate-300">
-                                    <span onclick="openAllergyModal()" class="text-xs font-semibold leading-tight text-slate-300 cursor-pointer hover:scale-102 hover:text-slate-700 hover:underline"><strong class="font-extrabold">+ </strong>Ajouter une allergie</span>
+                            <li class="relative flex items-center px-0 py-2 bg-white border-0 rounded-t-lg">
+                                <div class="w-full mx-2 p-1 text-center justify-center bg-slate-100 bg-opacity-40 border rounded border-dashed border-slate-300 hover:border-solid">
+                                    <span onclick="openAllergyModal()" class="text-xs font-semibold leading-tight text-slate-500 cursor-pointer hover:scale-102 hover:text-slate-900 hover:underline"><strong class="font-extrabold">+ </strong>Ajouter une allergie</span>
                                 </div>
                             </li>
                         {% endif %}
@@ -528,8 +528,8 @@
                     <ul class="flex flex-col pl-0 mb-0 rounded-lg">
                         {% if user.notes is empty %}
                             <li class="relative flex items-center px-0 py-2 bg-white border-0 rounded-t-lg text-inherit">
-                                <div class="w-full mx-2 p-1 text-center justify-center bg-slate-100 bg-opacity-40 border rounded border-dashed border-slate-300">
-                                    <span onclick="openNoteModal()" class="text-xs font-semibold leading-tight text-slate-300 cursor-pointer hover:scale-102 hover:text-slate-700 hover:underline"><strong class="font-extrabold">+ </strong>Ajouter une note</span>
+                                <div class="w-full mx-2 p-1 text-center justify-center bg-slate-100 bg-opacity-40 border rounded border-dashed border-slate-300 hover:border-solid">
+                                    <span onclick="openNoteModal()" class="text-xs font-semibold leading-tight text-slate-500 cursor-pointer hover:scale-102 hover:text-slate-900 hover:underline"><strong class="font-extrabold">+ </strong>Ajouter une note</span>
                                 </div>
                             </li>
                         {% else %}
@@ -549,7 +549,7 @@
                                     </div>
                                     <div class="flex items-center ml-auto">
                                         <a onclick="editNote({{ note.id }}, '{{ note.title|e('js') }}', `{{ note.content|e('js') }}`)"
-                                           class="inline-block pl-0 pr-4 mb-0 font-bold text-center align-middle transition-all bg-transparent border-0 rounded-lg shadow-none cursor-pointer leading-pro text-xs ease-soft-in text-slate-400 hover:text-slate-700 hover:underline" 
+                                           class="inline-block pl-0 pr-4 mb-0 font-bold text-center align-middle transition-all bg-transparent border-0 rounded-lg shadow-none cursor-pointer leading-pro text-xs ease-soft-in text-slate-400 hover:text-slate-900 hover:underline" 
                                            href="javascript:;">Modifier</a>
                                         <div class="h-4 mx-1 bg-slate-300 w-px"></div>
                                         <a onclick="deleteNote({{ note.id }})"
@@ -559,8 +559,8 @@
                                 </li>
                             {% endfor %}
                             <li class="relative flex items-center px-0 py-2 bg-white border-0 rounded-t-lg text-inherit">
-                                <div class="w-full mx-2 p-1 text-center justify-center bg-slate-100 bg-opacity-40 border rounded border-dashed border-slate-300">
-                                    <span onclick="openNoteModal()" class="text-xs font-semibold leading-tight text-slate-300 cursor-pointer hover:scale-102 hover:text-slate-700 hover:underline"><strong class="font-extrabold">+ </strong>Ajouter une note</span>
+                                <div class="w-full mx-2 p-1 text-center justify-center bg-slate-100 bg-opacity-40 border rounded border-dashed border-slate-300 hover:border-solid">
+                                    <span onclick="openNoteModal()" class="text-xs font-semibold leading-tight text-slate-500 cursor-pointer hover:scale-102 hover:text-slate-900 hover:underline"><strong class="font-extrabold">+ </strong>Ajouter une note</span>
                                 </div>
                             </li>
                         {% endif %}
