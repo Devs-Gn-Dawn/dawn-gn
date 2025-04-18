@@ -57,7 +57,7 @@
         </a>
       </li>
 
-      {% if app.user.hasMainCharacter() %}
+      {% if app.user.hasMainCharacter() and app.user.mainCharacter.isValidated %}
       {% set mainCharacter = app.user.getMainCharacter() %}
       <li class="mt-0.5 w-full">
         {% set active = app.request.get('_route') starts with 'app_character_sheet' %}
