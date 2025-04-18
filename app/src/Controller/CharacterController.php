@@ -105,8 +105,16 @@ class CharacterController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_character_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Character $character): Response
+    public function edit(Request $request, int $id, CharacterRepository $characterRepository): Response
     {
+        // Récupérer le personnage par son ID
+        $character = $characterRepository->find($id);
+
+        // Rediriger si le personnage n'existe pas
+        if (!$character) {
+            return $this->redirectToRoute('app_character_index');
+        }
+
         // Vérifier que l'utilisateur est propriétaire du personnage
         if ($character->getUser() !== $this->getUser()) {
             throw $this->createAccessDeniedException('Vous n\'êtes pas autorisé à modifier ce personnage.');
