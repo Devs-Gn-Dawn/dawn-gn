@@ -27,7 +27,13 @@ class RegistrationController extends AbstractController
             $firstname = $request->request->get('firstname');
 
             // Vérification basique des données
-            if ($email && $password && $name && $firstname) {
+            if (empty($email) || empty($password) || empty($name) || empty($firstname)) {
+                $this->addFlash('error', 'Veuillez remplir tous les champs.');
+            } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $this->addFlash('error', 'Veuillez entrer une adresse email valide.');
+            } elseif ($entityManager->getRepository(User::class)->findOneBy(['email' => $email])) {
+                $this->addFlash('error', 'Cette adresse email est déjà utilisée.');
+            } else {
                 $user->setEmail($email);
                 $user->setName($name);
                 $user->setFirstname($firstname);
@@ -48,8 +54,6 @@ class RegistrationController extends AbstractController
                 // Redirection vers la page de connexion
                 $this->addFlash('success', 'Votre compte a été créé avec succès !');
                 // return $this->redirectToRoute('app_login');
-            } else {
-                $this->addFlash('error', 'Veuillez remplir tous les champs.');
             }
         }
 
