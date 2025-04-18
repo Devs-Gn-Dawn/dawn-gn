@@ -272,6 +272,17 @@
                         <div class="mb-4">
                             <input type="tel" id="profile-phone" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow" placeholder="Téléphone" required>
                         </div>
+                        <div class="mb-4 text-left relative flex items-center">
+                            <div class="flex flex-col items-start justify-center mr-4">
+                            <input id="follow" class="mt-0.54 rounded-10 duration-250 ease-soft-in-out after:rounded-circle after:shadow-soft-2xl after:duration-250 checked:after:translate-x-5.25 h-5 relative float-left ml-auto w-10 cursor-pointer appearance-none border border-solid border-gray-200 bg-slate-800/10 bg-none bg-contain bg-left bg-no-repeat align-top transition-all after:absolute after:top-px after:h-4 after:w-4 after:translate-x-px after:bg-white after:content-[''] checked:border-slate-800/95 checked:bg-green-700/95 checked:bg-none checked:bg-right" type="checkbox" " />
+                            </div>
+                            <div class="flex items-center ml-auto w-full text-sm">
+                            J'autorise / Je n'autorise pas l’utilisation, la diffusion, la publication ou la reproduction des photographies et des vidéos prises lors des différents évènements Dawn.
+                            </div>
+                            
+                            
+                            
+                        </div>
                         {# <div class="mb-4">
                             <input type="text" id="profile-social" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow" placeholder="Réseaux sociaux">
                         </div> #}
@@ -483,6 +494,15 @@
                   <li class="relative block px-4 py-2 pt-0 pl-0 leading-normal bg-white border-0 rounded-t-lg text-sm text-inherit"><strong class="text-slate-700">Nom :</strong> &nbsp; {{ user.name }}</li>
                   <li class="relative block px-4 py-2 pl-0 leading-normal bg-white border-0 rounded-t-lg text-sm text-inherit"><strong class="text-slate-700">Prénom :</strong> &nbsp; {{ user.firstname }}</li>
                   <li class="relative block px-4 py-2 pl-0 leading-normal bg-white border-0 border-t-0 text-sm text-inherit"><strong class="text-slate-700">Téléphone :</strong> &nbsp; {{ user.phone }}</li>
+                  <li class="relative block px-4 py-2 pl-0 leading-normal bg-white border-0 border-t-0 text-sm text-inherit">
+                <a onclick="editProfile()" href="#"class="text-slate-700" data-target="tooltip_trigger" data-placement="top">
+                    <strong class="font-extrabold">Droit à l'image : </strong><span>J'autorise / Je n'autorise pas</span>&nbsp;
+                  </a> 
+                  <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm" role="tooltip">
+                                J'autorise / Je n'autorise pas l’utilisation, la diffusion, la publication ou la reproduction des photographies et des vidéos prises lors des différents évènements Dawn.
+                                <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
+                            </div>
+                  </li>
                   {# <li class="relative block px-4 py-2 pb-0 pl-0 bg-white border-0 border-t-0 rounded-b-lg text-inherit">
                     <strong class="leading-normal text-sm text-slate-700">Social:</strong> &nbsp;
                     {% if user.social %}
