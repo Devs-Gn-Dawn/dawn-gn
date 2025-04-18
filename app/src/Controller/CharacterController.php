@@ -361,6 +361,17 @@ class CharacterController extends AbstractController
             return $this->json(['error' => 'Vous n\'êtes pas autorisé à supprimer ce personnage.'], 403);
         }
 
+        // Supprimer les possessions
+        foreach ($character->getPossessions() as $possession) {
+            $this->entityManager->remove($possession);
+        }
+
+        // Supprimer les compétences apprises
+        foreach ($character->getSkillsLearned() as $skillLearned) {
+            $this->entityManager->remove($skillLearned);
+        }
+
+        // Supprimer le personnage
         $this->entityManager->remove($character);
         $this->entityManager->flush();
 

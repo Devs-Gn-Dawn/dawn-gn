@@ -359,7 +359,7 @@ class Character
     {
         return FactionType::getBreadCrumbTextColor($this->getFactionType());
     }
-    
+
     public function getAvatar(): string
     {
         return FactionType::getAvatar($this->getFactionType());
