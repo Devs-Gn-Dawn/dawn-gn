@@ -32,6 +32,8 @@ services:
     networks:
       - app-network
     entrypoint: ["docker-entrypoint"]
+    dns:
+      - 8.8.8.8
 
   db:
     image: mysql:8.0
