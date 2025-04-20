@@ -33,6 +33,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?string $password = null;
 
+    #[ORM\Column]
+    private ?bool $droitImage = false;
+
     #[ORM\Column(length: 127)]
     private ?string $phone = null;
 
@@ -142,6 +145,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setRoles(array $roles): self
     {
         $this->roles = $roles;
+        return $this;
+    }
+
+    public function getDroitImage(): ?bool
+    {
+        return $this->droitImage;
+    }
+
+    public function setDroitImage(bool $droitImage): self
+    {
+        $this->droitImage = $droitImage;
         return $this;
     }
 

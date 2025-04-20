@@ -263,14 +263,15 @@ class AccountController extends AbstractController
          * @var User $user
          */
 
-        if (!isset($data['name']) || !isset($data['firstname']) || !isset($data['phone']) || !isset($data['social'])) {
+        if (!isset($data['name']) || !isset($data['firstname']) || !isset($data['phone']) || !isset($data['droitImage'])) {
             return new JsonResponse(['error' => 'Données manquantes'], 400);
         }
 
         $user->setName($data['name']);
         $user->setFirstname($data['firstname']);
         $user->setPhone($data['phone']);
-        $user->setSocial($data['social']);
+        // $user->setSocial($data['social']);
+        $user->setDroitImage($data['droitImage']);
 
         $entityManager->flush();
 
