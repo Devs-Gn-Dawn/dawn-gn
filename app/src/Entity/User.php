@@ -70,7 +70,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->emergencyContacts = new ArrayCollection();
         $this->allergies = new ArrayCollection();
         $this->notes = new ArrayCollection();
-        $this->roles = ['ROLE_USER'];
+        $this->roles = [RoleType::ROLE_USER];
     }
 
     public function getId(): ?int
@@ -366,5 +366,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $requestedAt->add(new \DateInterval('PT' . $ttl . 'H'));
 
         return $requestedAt > new \DateTime();
+    }
+
+    public function hasRole(string $role): bool
+    {
+        return in_array($role, $this->roles);
+    }
+
+    public function addRole(string $role): self
+    {
+        if (!$this->hasRole($role)) {
+            $this->roles[] = $role;
+        }
+        return $this;
+    }
+
+    public function removeRole(string $role): self
+    {
+        if ($this->hasRole($role)) {
+            $this->roles = array_diff($this->roles, [$role]);
+        }
+        return $this;
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->hasRole(RoleType::ROLE_ADMIN);
+    }
+
+    public function isOrga(): bool
+    {
+        return $this->hasRole(RoleType::ROLE_ORGA);
     }
 }
