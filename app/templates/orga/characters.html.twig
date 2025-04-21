@@ -58,9 +58,9 @@
                                         <span class="badge badge-sm bg-gradient-warning">{{ character.getValidationType().getLabel() }}</span>
                                     </td>
                                     <td class="align-middle">
-                                        <button type="button" class="btn btn-link text-secondary mb-0" onclick="showCharacterDetails({{ character.id }}, '{{ character.name }}', '{{ character.user.getFullName() }}', '{{ character.user.email }}', '{{ character.faction }}', '{{ character.class }}', '{{ character.description }}', '{{ character.background }}')">
+                                        <a href="{{ path('app_orga_character_edit', {'id': character.id}) }}" class="btn btn-link text-secondary mb-0">
                                             <i class="ni ni-settings text-sm"></i>
-                                        </button>
+                                        </a>
                                         <button type="button" class="btn btn-link text-success mb-0" onclick="validateCharacter({{ character.id }})">
                                             <i class="ni ni-check-bold text-sm"></i>
                                         </button>

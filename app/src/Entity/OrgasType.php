@@ -9,19 +9,17 @@ enum OrgasType: string
     case RODOIR = 'Rodoir';
     case NEOCUBA = 'Néo-cuba';
     case PNJ = 'Pnj';
-    case GENERIQUE = 'Générique';
 
-    
-    public function getEmail(): string
+
+    public static function getEmail(string $faction): string
     {
-        return match ($this) {
+        return match ($faction) {
             self::NOMADS => 'orgas-nomads@dawn-gn.com',
             self::TECHERS => 'orgas-techers@dawn-gn.com',
             self::RODOIR => 'orgas-rodoir@dawn-gn.com',
             self::NEOCUBA => 'orgas-neocuba@dawn-gn.com',
             self::PNJ => 'orgas-pnj@dawn-gn.com',
-            self::GENERIQUE => 'orgas-nomads@dawn-gn.com',
+            default => 'orgas-nomads@dawn-gn.com',
         };
     }
-    
 }
