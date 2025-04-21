@@ -1,0 +1,173 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion des personnages{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card mb-4">
+                <div class="card-header pb-0">
+                    <div class="row">
+                        <div class="col-lg-6 col-7">
+                            <h6>Personnages en attente de validation</h6>
+                        </div>
+                        <div class="col-lg-6 col-5 my-auto text-end">
+                            <div class="btn-group" role="group">
+                                <button type="button" class="btn btn-outline-primary btn-sm mb-0" onclick="showFilterModal()">
+                                    <i class="ni ni-filters"></i> Filtres
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body px-0 pt-0 pb-2">
+                    <div class="table-responsive p-0">
+                        <table class="table align-items-center mb-0">
+                            <thead>
+                                <tr>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Joueur</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Personnage</th>
+                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Faction</th>
+                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Classe</th>
+                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Statut</th>
+                                    <th class="text-secondary opacity-7">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for character in characters %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex px-2 py-1">
+                                            <div class="d-flex flex-column justify-content-center">
+                                                <h6 class="mb-0 text-sm">{{ character.user.getFullName() }}</h6>
+                                                <p class="text-xs text-secondary mb-0">{{ character.user.email }}</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <p class="text-sm font-weight-bold mb-0">{{ character.name }}</p>
+                                    </td>
+                                    <td class="align-middle text-center text-sm">
+                                        <span class="badge badge-sm bg-gradient-info">{{ character.faction }}</span>
+                                    </td>
+                                    <td class="align-middle text-center">
+                                        <span class="text-secondary text-sm font-weight-bold">{{ character.class }}</span>
+                                    </td>
+                                    <td class="align-middle text-center">
+                                        <span class="badge badge-sm bg-gradient-warning">En attente</span>
+                                    </td>
+                                    <td class="align-middle">
+                                        <button type="button" class="btn btn-link text-secondary mb-0" onclick="showCharacterDetails({{ character.id }}, '{{ character.name }}', '{{ character.user.getFullName() }}', '{{ character.user.email }}', '{{ character.faction }}', '{{ character.class }}', '{{ character.description }}', '{{ character.background }}')">
+                                            <i class="ni ni-settings text-sm"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-link text-success mb-0" onclick="validateCharacter({{ character.id }})">
+                                            <i class="ni ni-check-bold text-sm"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-link text-danger mb-0" onclick="rejectCharacter({{ character.id }})">
+                                            <i class="ni ni-fat-remove text-sm"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+function showCharacterDetails(id, name, userName, userEmail, faction, characterClass, description, background) {
+    createModal({
+        title: `Détails du personnage : ${name}`,
+        html: `
+            <div class="row">
+                <div class="col-md-6">
+                    <h6>Informations générales</h6>
+                    <p><strong>Joueur :</strong> ${userName}</p>
+                    <p><strong>Email :</strong> ${userEmail}</p>
+                    <p><strong>Faction :</strong> ${faction}</p>
+                    <p><strong>Classe :</strong> ${characterClass}</p>
+                </div>
+                <div class="col-md-6">
+                    <h6>Description</h6>
+                    <p>${description}</p>
+                    <h6>Background</h6>
+                    <p>${background}</p>
+                </div>
+            </div>
+        `,
+        confirmButtonText: "Fermer",
+        showCancelButton: false,
+        customClass: {
+            confirmButton: window.BUTTON_CLASSES.secondary
+        }
+    });
+}
+
+function showFilterModal() {
+    createModal({
+        title: "Filtres",
+        html: `
+            <form id="filterForm" class="text-left">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700">Faction</label>
+                    <select id="factionFilter" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 mt-1 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow">
+                        <option value="">Toutes</option>
+                        {% for faction in factions %}
+                            <option value="{{ faction }}">{{ faction }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </form>
+        `,
+        getData: () => ({
+            faction: document.getElementById('factionFilter').value
+        }),
+        validate: () => true,
+        url: "{{ path('api_character_filter') }}",
+        confirmButtonText: "Appliquer",
+        successTitle: "Filtres appliqués",
+        successMessage: "Les filtres ont été appliqués avec succès.",
+        onSuccess: (response) => {
+            if (response.success) {
+                window.location.reload();
+            }
+        }
+    });
+}
+
+function validateCharacter(characterId) {
+    createModal({
+        title: "Confirmation de validation",
+        html: "Êtes-vous sûr de vouloir valider ce personnage ?",
+        confirmButtonText: "Valider",
+        getData: () => ({}),
+        validate: () => true,
+        url: "{{ path('api_character_validate', {'id': 'CHARACTER_ID'}) }}".replace('CHARACTER_ID', characterId),
+        successTitle: "Personnage validé !",
+        successMessage: "Le personnage a été validé avec succès."
+    });
+}
+
+function rejectCharacter(characterId) {
+    createModal({
+        title: "Confirmation de rejet",
+        html: "Êtes-vous sûr de vouloir rejeter ce personnage ?",
+        confirmButtonText: "Rejeter",
+        customClass: window.modalDeleteClasses,
+        getData: () => ({}),
+        validate: () => true,
+        url: "{{ path('api_character_reject', {'id': 'CHARACTER_ID'}) }}".replace('CHARACTER_ID', characterId),
+        successTitle: "Personnage rejeté !",
+        successMessage: "Le personnage a été rejeté avec succès."
+    });
+}
+</script>
+{% endblock %}
+{% endblock %} 
