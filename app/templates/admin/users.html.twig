@@ -12,19 +12,11 @@
                         <div class="flex-none w-full max-w-full px-3">
                             <div class="flex items-center justify-between">
                                 <h6>Liste des utilisateurs</h6>
-                                {% if currentFilter.role %}
-                                    <span class="badge badge-sm bg-gradient-info">
-                                        Filtre : {{ currentFilter.role == 'ROLE_ADMIN' ? 'Administrateur' : (currentFilter.role == 'ROLE_ORGA' ? 'Organisateur' : 'Utilisateur') }}
-                                    </span>
-                                {% endif %}
                             </div>
                         </div>
                         <div class="flex-none w-full max-w-full px-3 mt-4">
                             <div class="flex justify-end">
                                 <div class="btn-group" role="group">
-                                    <button type="button" class="btn btn-outline-primary btn-sm mb-0" onclick="showFilterModal()">
-                                        <i class="ni ni-filters"></i> Filtres
-                                    </button>
                                     <button type="button" class="btn btn-outline-primary btn-sm mb-0 ms-2" onclick="showAddUserModal()">
                                         <i class="ni ni-fat-add"></i> Nouvel utilisateur
                                     </button>
@@ -35,31 +27,31 @@
                 </div>
                 <div class="flex-auto px-0 pt-0 pb-2">
                     <div class="p-0 overflow-x-auto">
-                        <table class="items-center w-full mb-0 align-top border-gray-200 text-slate-500">
-                            <thead class="align-bottom">
+                        <table id="usersTable" class="display">
+                            <thead class="">
                                 <tr>
-                                    <th class="px-6 py-3 font-bold text-left uppercase align-middle bg-transparent border-b border-gray-200 shadow-none text-xxs border-b-solid tracking-none whitespace-nowrap text-slate-600">Utilisateur</th>
-                                    <th class="px-6 py-3 pl-2 font-bold text-left uppercase align-middle bg-transparent border-b border-gray-200 shadow-none text-xxs border-b-solid tracking-none whitespace-nowrap text-slate-600">Email</th>
-                                    <th class="px-6 py-3 font-bold text-center uppercase align-middle bg-transparent border-b border-gray-200 shadow-none text-xxs border-b-solid tracking-none whitespace-nowrap text-slate-500">Rôles</th>
-                                    <th class="px-6 py-3 font-bold text-center uppercase align-middle bg-transparent border-b border-gray-200 shadow-none text-xxs border-b-solid tracking-none whitespace-nowrap text-slate-600">Personnages</th>
-                                    <th class="px-6 py-3 font-bold text-center uppercase align-middle bg-transparent border-b border-gray-200 shadow-none text-xxs border-b-solid tracking-none whitespace-nowrap text-slate-600">Inscriptions</th>
-                                    <th class="px-6 py-3 font-semibold capitalize align-middle bg-transparent border-b border-gray-200 border-solid shadow-none tracking-none whitespace-nowrap text-slate-600"></th>
+                                    <th class="">Utilisateur</th>
+                                    <th class="">Email</th>
+                                    <th class="">Rôles</th>
+                                    <th class="">Personnages</th>
+                                    <th class="">Inscriptions</th>
+                                    <th class=""></th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for user in users %}
                                 <tr>
-                                    <td class="p-2 align-middle bg-transparent border-b whitespace-nowrap shadow-transparent">
+                                    <td class="">
                                         <div class="flex px-2 py-1">
                                             <div class="flex flex-col justify-center">
                                                 <h6 class="mb-0 text-sm leading-normal">{{ user.firstname }} {{ user.name }}</h6>
                                             </div>
                                         </div>
                                     </td>
-                                    <td class="p-2 align-middle bg-transparent border-b whitespace-nowrap shadow-transparent">
+                                    <td class="">
                                         <p class="mb-0 text-xs font-semibold leading-tight">{{ user.email }}</p>
                                     </td>
-                                    <td class="p-2 text-center align-middle bg-transparent border-b whitespace-nowrap shadow-transparent">
+                                    <td class="">
                                         {% for role in user.roles %}
                                             {% if role == 'ROLE_ADMIN' %}
                                                 <span class="badge badge-sm bg-gradient-danger">Admin</span>
@@ -70,13 +62,13 @@
                                             {% endif %}
                                         {% endfor %}
                                     </td>
-                                    <td class="p-2 text-center align-middle bg-transparent border-b whitespace-nowrap shadow-transparent">
+                                    <td class="">
                                         <span class="text-xs font-semibold leading-tight">{{ user.characters|length }}</span>
                                     </td>
-                                    <td class="p-2 text-center align-middle bg-transparent border-b whitespace-nowrap shadow-transparent">
+                                    <td class="">
                                         <span class="text-xs font-semibold leading-tight">{{ user.registrations|length }}</span>
                                     </td>
-                                    <td class="p-2 align-middle bg-transparent border-b whitespace-nowrap text-center shadow-transparent">
+                                    <td class="">
                                         <button type="button" class="text-xs font-semibold leading-tight text-slate-400 hover:text-slate-700 hover:underline hover:scale-102" onclick="showEditUserModal({{ user.id }}, '{{ user.name }}', '{{ user.firstname }}', '{{ user.email }}', '{{ user.phone }}', {{ user.roles|json_encode }})">
                                             <i class="ni ni-settings text-sm"></i>
                                         </button>
@@ -100,6 +92,19 @@
 {% block javascripts %}
 {{ parent() }}
 <script>
+$(document).ready(function() {
+    $('#usersTable').DataTable({
+        responsive: true,
+        searching: true,
+        ordering: true,
+        paging: true,
+        info: true,
+        lengthChange: true,
+        lengthMenu: [10, 25, 50, 100],
+        
+    });
+});
+
 function showEditUserModal(userId, name, firstname, email, phone, roles) {
     createModal({
         title: `Modifier l'utilisateur : ${firstname} ${name}`,
@@ -215,40 +220,11 @@ function showAddUserModal() {
     });
 }
 
-function showFilterModal() {
-    createModal({
-        title: "Filtres",
-        html: `
-            <form id="filterForm" class="text-left">
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700">Rôle</label>
-                    <select id="roleFilter" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 mt-1 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow">
-                        <option value="">Tous</option>
-                        <option value="ROLE_ADMIN" {{ currentFilter.role == 'ROLE_ADMIN' ? 'selected' : '' }}>Administrateur</option>
-                        <option value="ROLE_ORGA" {{ currentFilter.role == 'ROLE_ORGA' ? 'selected' : '' }}>Organisateur</option>
-                        <option value="ROLE_USER" {{ currentFilter.role == 'ROLE_USER' ? 'selected' : '' }}>Utilisateur</option>
-                    </select>
-                </div>
-            </form>
-        `,
-        getData: () => ({
-            role: document.getElementById('roleFilter').value
-        }),
-        validate: () => true,
-        url: "{{ path('api_user_filter') }}",
-        confirmButtonText: "Appliquer",
-        successTitle: "Filtres appliqués",
-        successMessage: "Les filtres ont été appliqués avec succès.",
-        onSuccess: (response) => {
-            if (response.success) {
-                window.location.reload();
-            }
-        }
-    });
-}
-
 function deleteUser(userId) {
-    confirmDelete("{{ path('api_user_delete', {'id': 'USER_ID'}) }}".replace('USER_ID', userId), {});
+    confirmDelete("{{ path('api_user_delete', {'id': 'USER_ID'}) }}".replace('USER_ID', userId), {
+        successTitle: "Utilisateur supprimé !",
+        successMessage: "L'utilisateur a été supprimé avec succès."
+    });
 }
 </script>
 {% endblock %}

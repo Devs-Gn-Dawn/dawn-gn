@@ -11,6 +11,7 @@
             {% include 'partials/_styles.html.twig' %}
             <link rel="stylesheet" href="{{ asset('build/styles/perfect-scrollbar.css') }}">
             <link rel="stylesheet" href="{{ asset('build/styles/tooltips.css') }}">
+            <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.tailwindcss.css">
         {% endblock %}
     </head>
     <body class="m-0 font-sans antialiased font-normal text-base leading-default bg-gray-50 text-slate-500">
@@ -29,7 +30,9 @@
             {{ encore_entry_script_tags('popper') }}
             {{ encore_entry_script_tags('tooltips') }}
             {% include 'partials/_scripts.html.twig' %}
-            {# <script src="{{ asset('build/js/dropdown.js') }}"></script> #}
+            <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+            <script src="https://cdn.datatables.net/2.2.2/js/dataTables.js"></script>
+            <script src="https://cdn.datatables.net/2.2.2/js/dataTables.tailwindcss.js"></script>
             <script src="{{ asset('build/js/sidenav-burger.js') }}"></script>
         {% endblock %}
     </body>
