@@ -37,3 +37,7 @@ node_modules/
 .cursor/
 config/packages/dev/*
 *.lock
+.DS_Store
+htpassword.txt
+package-lock.json
+package.json
