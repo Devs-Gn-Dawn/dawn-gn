@@ -11,7 +11,8 @@
             {% include 'partials/_styles.html.twig' %}
             <link rel="stylesheet" href="{{ asset('build/styles/perfect-scrollbar.css') }}">
             <link rel="stylesheet" href="{{ asset('build/styles/tooltips.css') }}">
-            <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.tailwindcss.css">
+            <link rel="stylesheet" href="{{ asset('build/styles/dataTables.tailwindcss.css') }}">
+            {# <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.tailwindcss.css"> #}
         {% endblock %}
     </head>
     <body class="m-0 font-sans antialiased font-normal text-base leading-default bg-gray-50 text-slate-500">
