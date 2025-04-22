@@ -17,12 +17,17 @@ use App\Entity\EventType;
 use App\Repository\RegistrationRepository;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use App\Entity\User;
+use Symfony\Component\Mime\Address;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+use Symfony\Component\Mailer\MailerInterface;
 
 #[IsGranted('ROLE_USER')]
 class AccountController extends AbstractController
 {
+
     public function __construct(
-        private RegistrationRepository $registrationRepository
+        private RegistrationRepository $registrationRepository,
+        private MailerInterface $mailer
     ) {}
 
     #[Route('/account', name: 'app_account')]
@@ -306,5 +311,46 @@ class AccountController extends AbstractController
         $entityManager->flush();
 
         return new JsonResponse(['success' => true]);
+    }
+
+    #[Route('/api/contact', name: 'app_account_contact', methods: ['POST'])]
+    public function contact(Request $request, EntityManagerInterface $entityManager): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        $user = $this->getUser();
+
+        if (!$user instanceof User) {
+            return new JsonResponse(['error' => 'Utilisateur non trouvé'], 404);
+        }
+
+        if (empty($data['subject'] ?? null) || empty($data['message'] ?? null)) {
+            return new JsonResponse(['error' => 'Données manquantes'], 400);
+        }
+
+        $userMainFaction = null;
+        if ($user->hasMainCharacter()) {
+            $userMainFaction = $user->getMainCharacter()->getFaction();
+        }
+
+        $orgaEmail = \App\Entity\OrgasType::getEmail($userMainFaction);
+
+        try {
+            $email = (new TemplatedEmail())
+                ->from(new Address('no-reply@dawn-gn.com', 'Dawn GN'))
+                ->to($orgaEmail)
+                ->replyTo($user->getEmail())
+                ->subject('[Dawn GN] - ' . $data['subject'])
+                ->htmlTemplate('contact/email.html.twig')
+                ->context([
+                    'message' => $data['message'],
+                    'user' => $user,
+                ]);
+
+            $this->mailer->send($email);
+
+            return new JsonResponse(['success' => true]);
+        } catch (\Exception $e) {
+            return new JsonResponse(['error' => 'Une erreur est survenue lors de l\'envoi du message'], 500);
+        }
     }
 }
