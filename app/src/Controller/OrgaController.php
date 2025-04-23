@@ -148,7 +148,12 @@ class OrgaController extends AbstractController
     public function editCharacter(Character $character): Response
     {
         return $this->render('orga/character_edit.html.twig', [
-            'character' => $character
+            'character' => $character,
+            'navRelative' => false,
+            'breadcrumb' => [
+                $this->generateUrl('app_orga_characters') => 'Liste des personnages',
+                'Fiche personnage : <b>' . $character->getName() . '</b>'
+            ],
         ]);
     }
 }
