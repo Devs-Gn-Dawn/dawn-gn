@@ -47,6 +47,43 @@
         </a>
       </li>
 
+      {% if is_granted('ROLE_ORGA') %}
+      <li class="mt-0.5 w-full">
+        {% set active = app.request.get('_route') starts with 'app_orga_characters' %}
+        <a href="{{ path('app_orga_characters') }}" class="py-2.7 text-sm ease-nav-brand my-0 mx-4 flex items-center whitespace-nowrap px-4 transition-colors hover:scale-102 {% if active %}shadow-soft-xl rounded-lg bg-white font-semibold text-slate-700{% endif %}">
+          <div class="{% if active %}bg-gradient-to-tl from-gray-900 to-slate-800{% endif %} shadow-soft-2xl mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-white bg-center stroke-0 text-center xl:p-2.5">
+                <i class="fa fa-check-square {% if active %}text-white{% endif %}" aria-hidden="true"></i>
+              </div>
+              <span class="ml-1 duration-300 opacity-100 pointer-events-none ease-soft">Les fiches PJ à valider</span>
+        </a>
+      </li>
+      {% endif %}
+
+
+      {% if is_granted('ROLE_ORGA') %}
+      <li class="mt-0.5 w-full">
+        {% set active = app.request.get('_route') starts with 'app_admin' %}
+        <a href="{{ path('app_admin') }}" class="py-2.7 text-sm ease-nav-brand my-0 mx-4 flex items-center whitespace-nowrap px-4 transition-colors hover:scale-102 {% if active %}shadow-soft-xl rounded-lg bg-white font-semibold text-slate-700{% endif %}">
+          <div class="{% if active %}bg-gradient-to-tl from-gray-900 to-slate-800{% endif %} shadow-soft-2xl mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-white bg-center stroke-0 text-center xl:p-2.5">
+                <i class="ni ni-satisfied {% if active %}text-white{% endif %}" aria-hidden="true"></i>
+              </div>
+              <span class="ml-1 duration-300 opacity-100 pointer-events-none ease-soft">Les PJ de ma faction</span>
+        </a>
+      </li>
+      {% endif %}
+
+      {% if is_granted('ROLE_ORGA') %}
+      <li class="mt-0.5 w-full">
+        {% set active = app.request.get('_route') starts with 'app_admin' %}
+        <a href="{{ path('app_admin') }}" class="py-2.7 text-sm ease-nav-brand my-0 mx-4 flex items-center whitespace-nowrap px-4 transition-colors hover:scale-102 {% if active %}shadow-soft-xl rounded-lg bg-white font-semibold text-slate-700{% endif %}">
+          <div class="{% if active %}bg-gradient-to-tl from-gray-900 to-slate-800{% endif %} shadow-soft-2xl mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-white bg-center stroke-0 text-center xl:p-2.5">
+                <i class="fa fa-group {% if active %}text-white{% endif %}" aria-hidden="true"></i>
+              </div>
+              <span class="ml-1 duration-300 opacity-100 pointer-events-none ease-soft">Voir tous les PJ</span>
+        </a>
+      </li>
+      {% endif %}
+
       <li class="mt-0.5 w-full">
         {% set active = app.request.get('_route') starts with 'app_account_' or app.request.get('_route') == 'app_account' %}
         <a class="py-2.7 text-sm ease-nav-brand my-0 mx-4 flex items-center whitespace-nowrap px-4 transition-colors hover:scale-102 {% if active %}shadow-soft-xl rounded-lg bg-white font-semibold text-slate-700{% endif %}" href="{{ path('app_account') }}">
