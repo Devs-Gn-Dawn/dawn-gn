@@ -33,17 +33,7 @@
             <div class="flex-none w-auto max-w-full my-auto">
               <div class="h-full">
                 <div class="h-full flex items-center gap-2">
-                  <input type="text" 
-                         id="characterName"
-                         class="mb-1 py-1 text-xl text-slate-700 font-semibold bg-transparent border border-transparent hover:border-dashed hover:border-slate-300 rounded hover:border-slate-400 hover:px-2 hover:bg-slate-50 hover:bg-opacity-50 focus:outline-none" 
-                         value="{{ character.name }}" 
-                         name="character[name]" 
-                         data-target="tooltip_trigger" 
-                         data-placement="top">
-                <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm" role="tooltip">
-                  Changer le nom du personnage
-                  <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
-                </div>
+                <h5 class="mb-1 py-1 text-xl text-slate-700 font-semibold bg-transparent border border-transparent">{{ character.name }}</h5>
                   <button type="button" 
                           id="saveNameBtn"
                           class="hidden text-slate-400 transition-colors"
@@ -115,8 +105,8 @@
       </div>
       {% if character.isInValidation() %}
       <div id="characterValidation" class="p-6 pb-0 mx-auto block">
-        <div class="text-center w-full max-w-full shadow-soft-xl rounded-xl py-4 bg-green-200 text-green-900 bg-opacity-70">
-        Un peu de patience, le personnage est en cours de validations auprès des orgas !
+        <div class="text-sm text-center w-full max-w-full shadow-soft-xl rounded-xl py-4 bg-green-200 text-green-900 bg-opacity-70">
+        Ce personnage a besoin d'être validé ou débloqué, les boutons sont accessibles en bas de page.
         </div>
       </div>
       {% endif %}
