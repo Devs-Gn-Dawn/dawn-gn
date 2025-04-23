@@ -50,11 +50,25 @@ window.sweetTicket = function () {
   });
 };
 
-window.showContactForm = function () {
+window.showContactGenericModal = function (showEmailInput = false) {
+  window.showContactForm(true, showEmailInput);
+};
+
+window.showContactForm = function ($isGeneric = false, showEmailInput = false) {
   createModal({
     title: "Contacter mon orga",
     html: `
             <form id="contactForm" class="text-left">
+                ${
+                  showEmailInput
+                    ? `
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700">Email</label>
+                    <input type="email" id="email" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 mt-1 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow">
+                </div>
+                `
+                    : ""
+                }
                 <div class="mb-4">
                     <label class="block text-sm font-medium text-gray-700">Sujet</label>
                     <input type="text" id="subject" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 mt-1 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow">
@@ -68,12 +82,16 @@ window.showContactForm = function () {
     getData: () => ({
       subject: document.getElementById("subject").value,
       message: document.getElementById("message").value,
+      generic: $isGeneric ? 1 : 0,
+      email: showEmailInput ? document.getElementById("email").value : null,
     }),
     validate: (data) => data.subject && data.message,
     url: "/api/contact", // Ajoutez l'URL appropriée
     confirmButtonText: "Envoyer",
     successTitle: "Message envoyé !",
-    successMessage: "Votre message a bien été transmis à votre orga.",
+    successMessage: $isGeneric
+      ? "Votre message a bien été envoyé à l'équipe de Dawn."
+      : "Votre message a bien été transmis à votre orga.",
   });
 };
 

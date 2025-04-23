@@ -23,7 +23,7 @@
 
             {% block body %}{% endblock %}
 
-            {% include 'partials/_footer.html.twig' %}
+            {% include 'partials/_footer.html.twig' with {user: user ?? false} %}
         </main>
         
         {% block javascripts %}

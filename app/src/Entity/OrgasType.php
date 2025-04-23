@@ -14,11 +14,11 @@ enum OrgasType: string
     public static function getEmail(string $faction): string
     {
         return match ($faction) {
-            self::NOMADS => 'orgas-nomads@dawn-gn.com',
-            self::TECHERS => 'orgas-techers@dawn-gn.com',
-            self::RODOIR => 'orgas-rodoir@dawn-gn.com',
-            self::NEOCUBA => 'orgas-neocuba@dawn-gn.com',
-            self::PNJ => 'orgas-pnj@dawn-gn.com',
+            self::NOMADS->value => 'orgas-nomads@dawn-gn.com',
+            self::TECHERS->value => 'orgas-techers@dawn-gn.com',
+            self::RODOIR->value => 'orgas-rodoir@dawn-gn.com',
+            self::NEOCUBA->value => 'orgas-neocuba@dawn-gn.com',
+            self::PNJ->value => 'orgas-pnj@dawn-gn.com',
             default => 'orgas-nomads@dawn-gn.com',
         };
     }

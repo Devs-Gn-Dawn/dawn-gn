@@ -41,6 +41,7 @@ class CharacterController extends AbstractController
             'characters' => $characterRepository->findBy(['user' => $this->getUser()]),
             'breadcrumb' => ['Liste des personnages'],
             'factions' => FactionType::getChoices(),
+            'user' => $this->getUser(),
         ]);
     }
 

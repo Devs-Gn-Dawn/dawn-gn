@@ -9,8 +9,8 @@
         
         <h2>Informations de l'expéditeur</h2>
         <p>
-            <strong>Nom :</strong> {{ user.firstname }} {{ user.name }}<br>
-            <strong>Email :</strong> {{ user.email }}<br>
+            <strong>Nom :</strong> {{ user.firstname ?? 'Non renseigné' }} {{ user.name ?? 'Non renseigné' }}<br>
+            <strong>Email :</strong> {{ user.email ?? replyTo ?? 'Non renseigné' }}<br>
             <strong>Téléphone :</strong> {{ user.phone ?? 'Non renseigné' }}
         </p>
 
