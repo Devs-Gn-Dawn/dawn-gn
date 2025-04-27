@@ -17,6 +17,7 @@ use Endroid\QrCode\ErrorCorrectionLevel\ErrorCorrectionLevelHigh;
 use Endroid\QrCode\RoundBlockSizeMode\RoundBlockSizeModeMargin;
 use Endroid\QrCode\Color\Color;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use App\Entity\AssetType;
 
 class PdfController extends AbstractController
 {
@@ -136,6 +137,24 @@ class PdfController extends AbstractController
             $pdf->Ln(4);
         }
 
+        // special skills
+        $pdf->SetY(146.5);
+        $pdf->SetLeftMargin(75);
+        foreach ($character->getCharacterAssetsByType(AssetType::CAPACITY) as $characterAsset) {
+            $pdf->SetFont('Arial', 'B', 9);
+            $this->mbWrite($pdf, $characterAsset->getAsset()->getLabel() . ' :', 8);
+            $pdf->SetFont('Arial', '', 9);
+            $this->mbWrite($pdf, ' ' . $characterAsset->getAsset()->getShort(), 8);
+            if ($characterAsset->getNote()) {
+                $pdf->SetLeftMargin(77);
+                $pdf->Ln(3);
+                $pdf->SetFont('Arial', '', 8);
+                $this->mbWrite($pdf, $characterAsset->getNote(), 8);
+            }
+            $pdf->SetLeftMargin(75);
+            $pdf->Ln(4);
+        }
+
         // possessions
         $pdf->SetY(206);
         foreach ($character->getPossessions() as $possession) {
@@ -144,6 +163,23 @@ class PdfController extends AbstractController
             $this->mbWrite($pdf, $possession->getGear()->getLabel() . ' :', 8);
             $pdf->SetFont('Arial', '', 9);
             $this->mbWrite($pdf, ' ' . $possession->getGear()->getShort(), 8);
+            $pdf->Ln(4);
+        }
+
+        // objects
+        foreach ($character->getCharacterAssetsByType(AssetType::OBJECT) as $object) {
+            $pdf->SetX(75);
+            $pdf->SetFont('Arial', 'B', 9);
+            $this->mbWrite($pdf, $object->getAsset()->getLabel() . ($object->getQuantity() > 1 ? ' (' . $object->getQuantity() . ')' : '') . ' :', 8);
+            $pdf->SetFont('Arial', '', 9);
+            $this->mbWrite($pdf, ' ' . $object->getAsset()->getShort(), 8);
+            if ($object->getNote()) {
+                $pdf->SetLeftMargin(77);
+                $pdf->Ln(3);
+                $pdf->SetFont('Arial', '', 8);
+                $this->mbWrite($pdf, $object->getNote(), 8);
+            }
+            $pdf->SetLeftMargin(75);
             $pdf->Ln(4);
         }
 

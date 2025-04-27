@@ -9,6 +9,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use App\Entity\CharacterType;
 use App\Entity\ValidationType;
+use App\Entity\AssetType;
 
 #[ORM\Entity(repositoryClass: CharacterRepository::class)]
 #[ORM\Table(name: '`character`')]
@@ -59,10 +60,14 @@ class Character
     #[ORM\OneToMany(mappedBy: 'character', targetEntity: SkillLearned::class, cascade: ['persist'])]
     private Collection $skillsLearned;
 
+    #[ORM\OneToMany(mappedBy: 'character', targetEntity: CharacterAsset::class)]
+    private Collection $characterAssets;
+
     public function __construct()
     {
         $this->possessions = new ArrayCollection();
         $this->skillsLearned = new ArrayCollection();
+        $this->characterAssets = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -198,6 +203,35 @@ class Character
         return $this->skillsLearned;
     }
 
+    public function getCharacterAssets(): Collection
+    {
+        return $this->characterAssets;
+    }
+
+    public function addCharacterAsset(CharacterAsset $characterAsset): static
+    {
+        if (!$this->characterAssets->contains($characterAsset)) {
+            $this->characterAssets->add($characterAsset);
+            $characterAsset->setCharacter($this);
+        }
+        return $this;
+    }
+
+    public function removeCharacterAsset(CharacterAsset $characterAsset): static
+    {
+        if ($this->characterAssets->removeElement($characterAsset)) {
+            $characterAsset->setCharacter(null);
+        }
+        return $this;
+    }
+
+    public function getCharacterAssetsByType(AssetType $type): Collection
+    {
+        return $this->characterAssets->filter(function (CharacterAsset $characterAsset) use ($type) {
+            return $characterAsset->getAsset()->getType() === $type;
+        });
+    }
+
     public function isMain(): bool
     {
         return $this->type === CharacterType::MAIN;
@@ -325,10 +359,41 @@ class Character
 
     public function getSpecialSkills(): array
     {
-        // TODO: Implémenter la logique pour récupérer les compétences spéciales
-        return [];
+        // get assets with type Capacity from character_asset table
+        $assets = $this->characterAssets->filter(function (CharacterAsset $characterAsset) {
+            return $characterAsset->getAsset()->getType() === AssetType::CAPACITY;
+        });
+        $specialSkills = [];
+        foreach ($assets as $asset) {
+            $specialSkills[] = [
+                'id' => $asset->getAsset()->getId(),
+                'name' => $asset->getAsset()->getLabel(),
+                'description' => $asset->getAsset()->getDescription(),
+                'quote' => $asset->getAsset()->getQuote(),
+                'note' => $asset->getNote()
+            ];
+        }
+        return $specialSkills;
     }
 
+    public function getObjects(): array
+    {
+        $assets = $this->characterAssets->filter(function (CharacterAsset $characterAsset) {
+            return $characterAsset->getAsset()->getType() === AssetType::OBJECT;
+        });
+        $objects = [];
+        foreach ($assets as $asset) {
+            $objects[] = [
+                'id' => $asset->getAsset()->getId(),
+                'name' => $asset->getAsset()->getLabel(),
+                'description' => $asset->getAsset()->getDescription(),
+                'quote' => $asset->getAsset()->getQuote(),
+                'note' => $asset->getNote(),
+                'quantity' => $asset->getQuantity()
+            ];
+        }
+        return $objects;
+    }
     public function getEquipment($withPossession = true): array
     {
         $equipment = [];

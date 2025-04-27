@@ -182,7 +182,7 @@
             </div>
           </div>
           <!-- Compétences spéciales-->
-          {% if character.specialAbilities ?? [] is not empty %}
+          {% if character.getSpecialSkills() ?? [] is not empty %}
           <div class="flex-none w-full max-w-full px-3  mb-6">
             <div class="relative flex flex-col min-w-0 pb-2 break-words bg-white border-0 border-transparent border-solid shadow-soft-xl rounded-2xl bg-clip-border">
               <div class="flex flex-wrap mx-3 my-3">
@@ -200,12 +200,15 @@
                 <div class="p-0 mx-5">
                   <table class="items-center w-full table-fixed border-separate border-spacing-2 mb-0 align-top border-gray-200 text-slate-500">
                     <tbody>
-                        {% for specialAbility in character.specialAbilities ?? [] %}
+                      {% for specialSkill in character.getSpecialSkills() ?? [] %}
                       <tr>
                         <td class="p-2 align-middle bg-transparent border-b  shadow-transparent text-pretty">
                           <div class="flex px-2 py-1">
                             <div class="flex flex-col justify-center">
-                              <p class="text-sm leading-normal"><span class="font-extrabold underline text-slate-700">{{ specialAbility.label }}</span> : {{ specialAbility.description }}<br/>
+                              <p class="text-sm leading-normal"><span class="font-extrabold underline text-slate-700">{{ specialSkill.name }}</span> : {{ specialSkill.description }} {% if specialSkill.quote %}<span class="italic">"{{ specialSkill.quote }}"</span>{% endif %}<br/>
+                              {% if specialSkill.note %}
+                                <span class="text-sm leading-normal">{{ specialSkill.note }}</span>
+                              {% endif %}
                               </p>
                             </div>
                           </div>
@@ -308,7 +311,7 @@
             </div>
           </div>
 
-          {% if character.getEquipment(false) ?? [] is not empty %}
+          {% if character.getObjects() ?? [] is not empty %}
            <div class="flex-none w-full max-w-full px-3  mb-6">
             <div class="relative flex flex-col min-w-0 pb-2 break-words bg-white border-0 border-transparent border-solid shadow-soft-xl rounded-2xl bg-clip-border">
               <div class="flex flex-wrap mx-3 my-3">
@@ -325,8 +328,18 @@
               <div class="flex-auto px-0 pt-0 pb-2">
                 <div class="p-0 mx-5">
                     <ul class="list-square list-inside ml-5">
-                        {% for equipment in character.getEquipment(false) %}
-                        <li>{{ equipment['possession'].toString() }}</li>
+                        {% for object in character.getObjects() %}
+                        <li>
+                          <span class="font-extrabold underline text-slate-700">
+                            {{ object['name'] }} 
+                            {% if object['quantity'] > 1 %}
+                              ({{ object['quantity'] }})
+                            {% endif %}
+                          </span> 
+                          {% if object['description'] %}<span class="leading-normal">{{ object['description'] }}</span>{% endif %} 
+                          {% if object['quote'] %}<span class="italic">"{{ object['quote'] }}"</span>{% endif %}
+                          {% if object['note'] %}<br/><span class="text-sm leading-normal">{{ object['note'] }}</span>{% endif %}
+                        </li>
                         {% endfor %}
                     </ul>
                 </div>

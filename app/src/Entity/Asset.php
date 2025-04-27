@@ -16,8 +16,8 @@ class Asset
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(type: 'string', columnDefinition: 'ENUM(\'Object\', \'Capacity\', \'Skill\', \'Gear\')')]
-    private ?string $type = null;
+    #[ORM\Column(type: 'string', enumType: AssetType::class)]
+    private ?AssetType $type = null;
 
     #[ORM\Column]
     private ?bool $is_catalog = null;
@@ -60,12 +60,12 @@ class Asset
         return $this->id;
     }
 
-    public function getType(): ?string
+    public function getType(): ?AssetType
     {
         return $this->type;
     }
 
-    public function setType(string $type): static
+    public function setType(AssetType $type): static
     {
         $this->type = $type;
         return $this;
