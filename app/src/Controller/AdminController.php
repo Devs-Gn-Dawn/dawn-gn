@@ -76,6 +76,7 @@ class AdminController extends AbstractController
         $user->setEmail($data['email']);
         $user->setPhone($data['phone']);
         $user->setRoles($data['roles']);
+        $user->setSocial('');
 
         // Hashage du mot de passe
         $hashedPassword = $passwordHasher->hashPassword($user, $data['password']);

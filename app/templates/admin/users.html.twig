@@ -211,7 +211,7 @@ function showAddUserModal() {
                 roles: roles
             };
         },
-        validate: (data) => data.name && data.firstname && data.email && data.phone && data.password,
+        validate: (data) => data.name && data.firstname && data.email && data.password,
         url: "{{ path('api_user_create') }}",
         confirmButtonText: "Créer",
         successTitle: "Utilisateur créé !",

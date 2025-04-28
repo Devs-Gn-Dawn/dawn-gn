@@ -42,20 +42,23 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 256)]
     private ?string $social = null;
 
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Character::class)]
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Character::class, cascade: ['remove'], orphanRemoval: true)]
     private Collection $characters;
 
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Registration::class)]
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Registration::class, cascade: ['remove'], orphanRemoval: true)]
     private Collection $registrations;
 
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: EmergencyContact::class, orphanRemoval: true)]
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: EmergencyContact::class, cascade: ['remove'], orphanRemoval: true)]
     private Collection $emergencyContacts;
 
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Allergy::class, orphanRemoval: true)]
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Allergy::class, cascade: ['remove'], orphanRemoval: true)]
     private Collection $allergies;
 
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Note::class, orphanRemoval: true)]
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Note::class, cascade: ['remove'], orphanRemoval: true)]
     private Collection $notes;
+
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: ResetPasswordRequest::class, cascade: ['remove'], orphanRemoval: true)]
+    private Collection $resetPasswordRequests;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
     private ?\DateTimeInterface $passwordRequestedAt = null;
@@ -70,6 +73,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->emergencyContacts = new ArrayCollection();
         $this->allergies = new ArrayCollection();
         $this->notes = new ArrayCollection();
+        $this->resetPasswordRequests = new ArrayCollection();
         $this->roles = [RoleType::ROLE_USER];
     }
 
@@ -363,7 +367,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         }
 
         $requestedAt = clone $this->passwordRequestedAt;
-        $requestedAt->add(new \DateInterval('PT' . $ttl . 'H'));
+        if ($requestedAt instanceof \DateTime) {
+            $requestedAt = $requestedAt->modify('+' . $ttl . ' hours');
+        }
 
         return $requestedAt > new \DateTime();
     }
