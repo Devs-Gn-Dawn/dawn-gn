@@ -63,7 +63,7 @@ class CharacterAsset
 
     public function getNote(): ?string
     {
-        return $this->note;
+        return !empty($this->note) ? $this->note : $this->getAsset()->getBaseNote();
     }
 
     public function setNote(?string $note): static
@@ -74,7 +74,7 @@ class CharacterAsset
 
     public function getNoteOrga(): ?string
     {
-        return $this->note_orga;
+        return !empty($this->note_orga) ? $this->note_orga : $this->getAsset()->getBaseNoteOrga();
     }
 
     public function setNoteOrga(?string $note_orga): static
