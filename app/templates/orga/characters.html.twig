@@ -3,35 +3,30 @@
 {% block title %}Gestion des personnages{% endblock %}
 
 {% block body %}
-<div class="container-fluid py-4">
-    <div class="row">
-        <div class="col-12">
-            <div class="card mb-4">
-                <div class="card-header pb-0">
-                    <div class="row">
-                        <div class="col-lg-6 col-7">
-                            <h6>Personnages en attente de validation</h6>
-                        </div>
-                        <div class="col-lg-6 col-5 my-auto text-end">
-                            <div class="btn-group" role="group">
-                                <button type="button" class="btn btn-outline-primary btn-sm mb-0" onclick="showFilterModal()">
-                                    <i class="ni ni-filters"></i> Filtres
-                                </button>
+<div class="w-full px-6 py-6 mx-auto">
+    <div class="flex flex-wrap -mx-3">
+        <div class="flex-none w-full max-w-full px-3">
+            <div class="relative flex flex-col min-w-0 mb-6 break-words bg-white border-0 border-transparent border-solid shadow-soft-xl rounded-2xl bg-clip-border">
+                <div class="p-6 pb-0 mb-0 bg-white border-b-0 border-b-solid rounded-t-2xl border-b-transparent">
+                    <div class="flex flex-wrap -mx-3">
+                        <div class="flex-none w-full max-w-full px-3 grid grid-cols-2 gap-4 mb-6">
+                            <div class="flex items-center justify-self-start ">
+                                <h6>Personnages en attente de validation</h6>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="card-body px-0 pt-0 pb-2">
-                    <div class="table-responsive p-0">
-                        <table class="table align-items-center mb-0">
+                <div class="flex-auto px-6 pb-2 border-t pt-6">
+                    <div class="p-0 overflow-x-auto">
+                        <table id="charactersTable" class="display">
                             <thead>
                                 <tr>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Joueur</th>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Personnage</th>
-                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Faction</th>
-                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Classe</th>
-                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Statut</th>
-                                    <th class="text-secondary opacity-7">Actions</th>
+                                    <th class="">Joueur</th>
+                                    <th class="">Personnage</th>
+                                    <th class="">Faction</th>
+                                    <th class="">Classe</th>
+                                    <th class="">Statut</th>
+                                    <th class=""></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -58,13 +53,13 @@
                                         <span class="badge badge-sm bg-gradient-warning">{{ character.getValidationType().getLabel() }}</span>
                                     </td>
                                     <td class="align-middle">
-                                        <a href="{{ path('app_orga_character_edit', {'id': character.id}) }}" class="btn btn-link text-secondary mb-0">
+                                        <a href="{{ path('app_orga_character_edit', {'id': character.id}) }}" class="inline-block px-2 py-1 font-bold text-center text-white uppercase align-middle transition-all rounded-lg cursor-pointer bg-gradient-to-tl from-cyan-300 to-cyan-600 leading-pro text-xs ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 hover:scale-102 active:opacity-85 hover:shadow-soft-xs hover:text-cyan-100">
                                             <i class="ni ni-settings text-sm"></i>
                                         </a>
-                                        <button type="button" class="btn btn-link text-success mb-0" onclick="validateCharacter({{ character.id }})">
+                                        <button type="button" class="inline-block px-2 py-1 font-bold text-center text-white uppercase align-middle transition-all rounded-lg cursor-pointer bg-gradient-to-tl from-green-300 to-green-600 leading-pro text-xs ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 hover:scale-102 active:opacity-85 hover:shadow-soft-xs hover:text-green-100" onclick="validateCharacter({{ character.id }})">
                                             <i class="ni ni-check-bold text-sm"></i>
                                         </button>
-                                        <button type="button" class="btn btn-link text-danger mb-0" onclick="rejectCharacter({{ character.id }})">
+                                        <button type="button" class="inline-block px-2 py-1 font-bold text-center text-white uppercase align-middle transition-all rounded-lg cursor-pointer bg-gradient-to-tl from-red-300 to-red-600 leading-pro text-xs ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 hover:scale-102 active:opacity-85 hover:shadow-soft-xs hover:text-red-100" onclick="rejectCharacter({{ character.id }})">
                                             <i class="ni ni-fat-remove text-sm"></i>
                                         </button>
                                     </td>
@@ -79,9 +74,26 @@
     </div>
 </div>
 
+{% endblock %}
+
 {% block javascripts %}
 {{ parent() }}
 <script>
+$(document).ready(function() {
+    $('#charactersTable').DataTable({
+        responsive: true,
+        searching: true,
+        ordering: true,
+        paging: true,
+        info: true,
+        lengthChange: true,
+        lengthMenu: [10, 25, 50, 100],
+        language: {
+            url: "{{ asset('build/plugins/fr-FR.json') }}"
+        }
+    });
+});
+
 function showCharacterDetails(id, name, userName, userEmail, faction, characterClass, description, background) {
     createModal({
         title: `Détails du personnage : ${name}`,
@@ -110,38 +122,6 @@ function showCharacterDetails(id, name, userName, userEmail, faction, characterC
     });
 }
 
-function showFilterModal() {
-    createModal({
-        title: "Filtres",
-        html: `
-            <form id="filterForm" class="text-left">
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700">Faction</label>
-                    <select id="factionFilter" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 mt-1 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow">
-                        <option value="">Toutes</option>
-                        {% for faction in factions %}
-                            <option value="{{ faction }}">{{ faction }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-            </form>
-        `,
-        getData: () => ({
-            faction: document.getElementById('factionFilter').value
-        }),
-        validate: () => true,
-        url: "{{ path('api_character_filter') }}",
-        confirmButtonText: "Appliquer",
-        successTitle: "Filtres appliqués",
-        successMessage: "Les filtres ont été appliqués avec succès.",
-        onSuccess: (response) => {
-            if (response.success) {
-                window.location.reload();
-            }
-        }
-    });
-}
-
 function validateCharacter(characterId) {
     createModal({
         title: "Confirmation de validation",
@@ -158,16 +138,15 @@ function validateCharacter(characterId) {
 function rejectCharacter(characterId) {
     createModal({
         title: "Confirmation de rejet",
-        html: "Êtes-vous sûr de vouloir rejeter ce personnage ?",
-        confirmButtonText: "Rejeter",
+        html: "Êtes-vous sûr de vouloir débloquer ce personnage ?",
+        confirmButtonText: "Débloquer",
         customClass: window.modalDeleteClasses,
         getData: () => ({}),
         validate: () => true,
         url: "{{ path('api_character_reject', {'id': 'CHARACTER_ID'}) }}".replace('CHARACTER_ID', characterId),
-        successTitle: "Personnage rejeté !",
-        successMessage: "Le personnage a été rejeté avec succès."
+        successTitle: "Personnage débloqué !",
+        successMessage: "Le personnage a été débloqué avec succès."
     });
 }
 </script>
-{% endblock %}
 {% endblock %} 

@@ -37,36 +37,13 @@ class OrgaController extends AbstractController
     #[Route('/orga/characters', name: 'app_orga_characters')]
     public function characters(Request $request): Response
     {
-        // Récupérer les filtres de la session
-        $faction = $request->getSession()->get('character_filter_faction', null);
-        $class = $request->getSession()->get('character_filter_class', null);
-
-        // Créer la requête de base
-        $qb = $this->entityManager->createQueryBuilder();
-        $qb->select('c')
-            ->from(Character::class, 'c');
-
-        // Appliquer les filtres
-        if ($faction) {
-            $qb->andWhere('c.faction = :faction')
-                ->setParameter('faction', $faction);
-        }
-        if ($class) {
-            $qb->andWhere('c.class = :class')
-                ->setParameter('class', $class);
-        }
 
         return $this->render('orga/characters.html.twig', [
             'breadcrumb' => [
                 '/orga' => 'Organisation',
                 '/orga/characters' => 'Gestion des personnages',
             ],
-            'characters' => $qb->getQuery()->getResult(),
-            'factions' => FactionType::getChoices(),
-            'currentFilter' => [
-                'faction' => $faction,
-                'class' => $class
-            ]
+            'characters' => $this->entityManager->getRepository(Character::class)->findBy(['validationType' => ValidationType::EN_COURS])
         ]);
     }
 

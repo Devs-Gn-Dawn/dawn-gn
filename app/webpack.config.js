@@ -87,7 +87,14 @@ Encore
   })
 
   // enables Sass/SCSS support
-  .enableSassLoader();
+  .enableSassLoader()
+
+  // Copy JSON files from the specified directory
+  .copyFiles({
+    from: "./assets/js/plugins",
+    to: "plugins/[name].[ext]",
+    pattern: /\.json$/,
+  });
 
 // Get the full Webpack config
 const config = Encore.getWebpackConfig();

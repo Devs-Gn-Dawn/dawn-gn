@@ -100,7 +100,9 @@ $(document).ready(function() {
         info: true,
         lengthChange: true,
         lengthMenu: [10, 25, 50, 100],
-        
+        language: {
+            url: "{{ asset('build/plugins/fr-FR.json') }}"
+        }
     });
 });
 
