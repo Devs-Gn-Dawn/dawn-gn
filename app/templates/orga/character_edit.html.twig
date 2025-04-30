@@ -11,7 +11,7 @@
         <div class="w-full max-w-full border ml-2 md:w-1/2 md:flex-none lg:w-4/12 mx-6 -mt-34">
             <ul class="relative flex flex-wrap p-1 list-none bg-transparent">
               <li class="z-30 flex-auto py-2 bg-white/80 rounded-xl text-center text-xs font-semibold leading-tight text-slate-300 cursor-pointer hover:bg-white hover:scale-102 hover:text-slate-700 hover:underline">
-                <a class="z-30 block w-full px-0 py-1 mb-0 transition-colors border-0 rounded-lg ease-soft-in-out text-slate-700">
+                <a class="z-30 block w-full px-0 py-1 mb-0 transition-colors border-0 rounded-lg ease-soft-in-out text-slate-700" onclick="showContactPlayerModal()">
                   <span class="ml-1">Contact joueureuse</span>
                 </a>
               </li>
@@ -746,6 +746,34 @@
         })
         .catch(error => {
             showErrorAlert({ message: "Une erreur est survenue lors de la sauvegarde du background." });
+        });
+    }
+
+    function showContactPlayerModal() {
+        createModal({
+            title: "Contacter lae joueureuse",
+            html: `
+                <form id="contactPlayerForm" class="text-left">
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700">Titre du message</label>
+                        <input type="text" id="title" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 mt-1 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700">Message</label>
+                        <textarea id="message" rows="4" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 mt-1 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow"></textarea>
+                    </div>
+                </form>
+            `,
+            getData: () => ({
+                characterId: {{ character.id }},
+                title: document.getElementById("title").value,
+                message: document.getElementById("message").value,
+            }),
+            validate: (data) => data.message && data.title,
+            url: "{{ path('api_contact_player') }}",
+            confirmButtonText: "Envoyer",
+            successTitle: "Message envoyé !",
+            successMessage: "Votre message a bien été envoyé à lae joueureuse.",
         });
     }
   </script>

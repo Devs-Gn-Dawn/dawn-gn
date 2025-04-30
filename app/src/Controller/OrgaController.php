@@ -13,6 +13,9 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Entity\ValidationType;
 use Symfony\Component\HttpFoundation\Request;
 use App\Entity\FactionType;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Address;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 
 #[IsGranted(RoleType::ROLE_ORGA)]
 class OrgaController extends AbstractController
@@ -84,5 +87,54 @@ class OrgaController extends AbstractController
                 'Fiche personnage : <b>' . $character->getName() . '</b>'
             ],
         ]);
+    }
+
+    private function sendEmail(Character $character, string $message, string $title, MailerInterface $mailer): void
+    {
+        $user = $character->getUser();
+        if (!$user) {
+            throw new \Exception('Utilisateur non trouvé');
+        }
+
+        $email = (new TemplatedEmail())
+            ->from(new Address('no-reply@dawn-gn.com', 'Dawn GN'))
+            ->to($user->getEmail())
+            ->subject('[Dawn GN] - ' . $title)
+            ->htmlTemplate('contact/orga_email.html.twig')
+            ->context([
+                'message' => $message,
+                'title' => $title,
+                'character' => $character,
+            ]);
+
+        $mailer->send($email);
+    }
+
+    #[Route('/api/contact_player', name: 'api_contact_player', methods: ['POST'])]
+    public function contactPlayer(Request $request, MailerInterface $mailer): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+
+        try {
+            if (empty($data['characterId'] ?? null) || empty($data['message'] ?? null) || empty($data['title'] ?? null)) {
+                throw new \Exception('Données manquantes');
+            }
+
+            $character = $this->entityManager->getRepository(Character::class)->find($data['characterId']);
+            if (!$character) {
+                throw new \Exception('Personnage non trouvé');
+            }
+
+            $user = $character->getUser();
+            if (!$user) {
+                throw new \Exception('Utilisateur non trouvé');
+            }
+
+            $this->sendEmail($character, $data['message'], $data['title'], $mailer);
+
+            return new JsonResponse(['success' => true]);
+        } catch (\Exception $e) {
+            return new JsonResponse(['error' => $e->getMessage()], 500);
+        }
     }
 }

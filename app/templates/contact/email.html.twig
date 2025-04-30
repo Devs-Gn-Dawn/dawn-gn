@@ -1,20 +1,15 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="UTF-8">
-        <title>Nouveau message de contact</title>
-    </head>
-    <body>
-        <h1>Nouveau message de contact</h1>
-        
-        <h2>Informations de l'expéditeur</h2>
-        <p>
-            <strong>Nom :</strong> {{ user.firstname ?? 'Non renseigné' }} {{ user.name ?? 'Non renseigné' }}<br>
-            <strong>Email :</strong> {{ user.email ?? replyTo ?? 'Non renseigné' }}<br>
-            <strong>Téléphone :</strong> {{ user.phone ?? 'Non renseigné' }}
-        </p>
+{% extends 'email/base.html.twig' %}
 
-        <h2>Message</h2>
-        <div style="white-space: pre-wrap;">{{ message }}</div>
-    </body>
-</html> 
+{% block title %}Nouveau message de contact{% endblock %}
+
+{% block content %}
+    <h2>Informations de l'expéditeur</h2>
+    <p>
+        <strong>Nom :</strong> {{ user.firstname ?? 'Non renseigné' }} {{ user.name ?? 'Non renseigné' }}<br>
+        <strong>Email :</strong> {{ user.email ?? replyTo ?? 'Non renseigné' }}<br>
+        <strong>Téléphone :</strong> {{ user.phone ?? 'Non renseigné' }}
+    </p>
+
+    <h2>Message</h2>
+    <div style="white-space: pre-wrap;">{{ message }}</div>
+{% endblock %} 
