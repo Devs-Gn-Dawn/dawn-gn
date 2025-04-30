@@ -16,6 +16,8 @@ use App\Entity\FactionType;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+use App\Entity\User;
+use App\Entity\EventType;
 
 #[IsGranted(RoleType::ROLE_ORGA)]
 class OrgaController extends AbstractController
@@ -42,11 +44,41 @@ class OrgaController extends AbstractController
     {
 
         return $this->render('orga/characters.html.twig', [
+            'title' => 'Personnages en cours de validation',
             'breadcrumb' => [
                 '/orga' => 'Organisation',
                 '/orga/characters' => 'Gestion des personnages',
             ],
             'characters' => $this->entityManager->getRepository(Character::class)->findBy(['validationType' => ValidationType::EN_COURS])
+        ]);
+    }
+
+    #[Route('/orga/all_characters', name: 'app_orga_all_characters')]
+    public function allCharacters(): Response
+    {
+        return $this->render('orga/characters.html.twig', [
+            'title' => 'Tous les personnages',
+            'breadcrumb' => ['/orga' => 'Organisation', '/orga/all_characters' => 'Tous les personnages'],
+            'characters' => $this->entityManager->getRepository(Character::class)->findAll()
+        ]);
+    }
+
+    #[Route('/orga/players', name: 'app_orga_players')]
+    public function players(): Response
+    {
+        return $this->render('orga/players.html.twig', [
+            'breadcrumb' => ['/orga' => 'Organisation', '/orga/players' => 'Liste des joueureuses'],
+            'players' => $this->entityManager->getRepository(User::class)->findAll()
+        ]);
+    }
+
+    #[Route('/orga/player/{id}', name: 'app_orga_player')]
+    public function player(User $player): Response
+    {
+        return $this->render('orga/player.html.twig', [
+            'user' => $player,
+            'eventTypes' => EventType::getChoices(),
+            'breadcrumb' => ['/orga' => 'Organisation', '/orga/players' => 'Liste des joueureuses', '/orga/player/' . $player->getId() => $player->getFullName()],
         ]);
     }
 
@@ -89,13 +121,8 @@ class OrgaController extends AbstractController
         ]);
     }
 
-    private function sendEmail(Character $character, string $message, string $title, MailerInterface $mailer): void
+    private function sendEmail(User $user, string $message, string $title, MailerInterface $mailer): void
     {
-        $user = $character->getUser();
-        if (!$user) {
-            throw new \Exception('Utilisateur non trouvé');
-        }
-
         $email = (new TemplatedEmail())
             ->from(new Address('no-reply@dawn-gn.com', 'Dawn GN'))
             ->to($user->getEmail())
@@ -104,7 +131,7 @@ class OrgaController extends AbstractController
             ->context([
                 'message' => $message,
                 'title' => $title,
-                'character' => $character,
+                'user' => $user,
             ]);
 
         $mailer->send($email);
@@ -116,21 +143,16 @@ class OrgaController extends AbstractController
         $data = json_decode($request->getContent(), true);
 
         try {
-            if (empty($data['characterId'] ?? null) || empty($data['message'] ?? null) || empty($data['title'] ?? null)) {
+            if (empty($data['userId'] ?? null) || empty($data['message'] ?? null) || empty($data['title'] ?? null)) {
                 throw new \Exception('Données manquantes');
             }
 
-            $character = $this->entityManager->getRepository(Character::class)->find($data['characterId']);
-            if (!$character) {
-                throw new \Exception('Personnage non trouvé');
-            }
-
-            $user = $character->getUser();
+            $user = $this->entityManager->getRepository(User::class)->find($data['userId']);
             if (!$user) {
                 throw new \Exception('Utilisateur non trouvé');
             }
 
-            $this->sendEmail($character, $data['message'], $data['title'], $mailer);
+            $this->sendEmail($user, $data['message'], $data['title'], $mailer);
 
             return new JsonResponse(['success' => true]);
         } catch (\Exception $e) {

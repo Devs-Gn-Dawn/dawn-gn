@@ -444,7 +444,7 @@ class CharacterController extends AbstractController
     public function getAvailableSkills(Character $character): JsonResponse
     {
         try {
-            $skills = $this->entityManager->getRepository(Skill::class)->findAvailableSkillsForCharacter($character, $this->getUser()->isOrga());
+            $skills = $this->entityManager->getRepository(Skill::class)->findAvailableSkillsForCharacter($character);
 
             if (!$skills) {
                 return $this->json(['error' => 'Aucune compétence disponible pour ce personnage.'], 404);

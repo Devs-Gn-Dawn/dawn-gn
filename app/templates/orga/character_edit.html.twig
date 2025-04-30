@@ -16,7 +16,7 @@
                 </a>
               </li>
               <li class="z-30 flex-auto py-2 ml-2 bg-white/80 rounded-xl text-center text-xs font-semibold leading-tight text-slate-300 cursor-pointer hover:bg-white hover:scale-102 hover:text-slate-700 hover:underline">
-                <a class="z-30 block w-full px-0 py-1 mb-0 transition-all border-0 rounded-lg ease-soft-in-out text-slate-700">
+                <a href="{{ path('app_orga_player', {'id': character.user.id}) }}" class="z-30 block w-full px-0 py-1 mb-0 transition-all border-0 rounded-lg ease-soft-in-out text-slate-700">
                   <span class="ml-1">Informations de lae joueureuse</span>
                 </a>
               </li>                  
@@ -384,6 +384,7 @@
                 <a href="#" onclick="confirmSetType('{{ path('character_set_type', {'id': character.id, 'type': 'secondary'}) }}', 'reroll')" class="inline-block px-6 py-3 font-bold text-center text-white uppercase align-middle transition-all rounded-lg cursor-pointer bg-gradient-to-tl from-cyan-300 to-cyan-600 leading-pro text-xs ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 hover:scale-102 active:opacity-85 hover:shadow-soft-xs hover:text-cyan-100">Définir comme personnage reroll</a>
             {% endif %}#}
 
+          {% if character.isInValidation() %}
           <button type="button" onclick="confirmUnlockCharacter()" class="inline-block px-6 py-3 font-bold text-center text-white uppercase align-middle transition-all rounded-lg cursor-pointer bg-gradient-to-tl from-cyan-300 to-cyan-600 leading-pro text-xs ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 hover:scale-102 active:opacity-85 hover:shadow-soft-xs hover:text-cyan-100" data-target="tooltip_trigger" data-placement="top">Débloquer le personnage</button>
           <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-cyan-600 rounded-lg text-sm" role="tooltip">
             Débloquer le personnage, lae joueureuse peut à nouveau le modifier
@@ -394,7 +395,7 @@
             Permet à lae joueureuse d'imprimer sa fiche
             <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
           </div> 
-
+          {% endif %}
         </div>
 
   <script>
@@ -765,7 +766,7 @@
                 </form>
             `,
             getData: () => ({
-                characterId: {{ character.id }},
+                userId: {{ character.getUser().id }},
                 title: document.getElementById("title").value,
                 message: document.getElementById("message").value,
             }),

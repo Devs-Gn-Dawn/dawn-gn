@@ -1,4 +1,4 @@
-
+{% extends 'base.html.twig' %}
 
 {% block title %}Les informations de lae joueureuse - Dawn GN{% endblock %}
 
@@ -12,6 +12,34 @@
             function truncateText(text, maxLength = 100) {
                 if (text.length <= maxLength) return text;
                 return text.substr(0, maxLength) + '...';
+            }
+
+            window.showContactPlayerModal = function() {
+                createModal({
+                    title: "Contacter lae joueureuse",
+                    html: `
+                        <form id="contactPlayerForm" class="text-left">
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-700">Titre du message</label>
+                                <input type="text" id="title" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 mt-1 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow">
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-700">Message</label>
+                                <textarea id="message" rows="4" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 mt-1 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow"></textarea>
+                            </div>
+                        </form>
+                    `,
+                    getData: () => ({
+                        userId: {{ user.id }},
+                        title: document.getElementById("title").value,
+                        message: document.getElementById("message").value,
+                    }),
+                    validate: (data) => data.message && data.title,
+                    url: "{{ path('api_contact_player') }}",
+                    confirmButtonText: "Envoyer",
+                    successTitle: "Message envoyé !",
+                    successMessage: "Votre message a bien été envoyé à lae joueureuse.",
+                });
             }
 
             // Fonction pour afficher la note complète
@@ -424,9 +452,7 @@
                     <ul class="mx-3 flex flex-col pl-0 mb-0 rounded-lg">
                         {% if user.emergencyContacts is empty %}
                             <li class="relative flex items-center px-0 py-2 bg-white border-0 rounded-t-lg text-inherit">
-                                <div class="w-full mx-2 p-1 text-center justify-center bg-slate-100 bg-opacity-40 border rounded border-dashed border-slate-300 hover:border-solid">
-                                    <span onclick="openEmergencyContactModal()" class="text-xs font-semibold leading-tight text-slate-500 cursor-pointer hover:scale-102 hover:text-slate-900 hover:underline"><strong class="font-extrabold">+ </strong>Ajouter un contact</span>
-                                </div>
+                                Aucun contact d'urgence renseigné
                             </li>
                         {% else %}
                             {% for contact in user.emergencyContacts %}
@@ -435,20 +461,15 @@
                                         <h6 class="mb-0 leading-normal text-sm">{{ contact.name }}</h6>
                                         <p class="mb-0 leading-tight text-xs">{{ contact.phone }}</p>
                                     </div>
-                                    <a onclick="editEmergencyContact({{ contact.id }}, '{{ contact.name|e('js') }}', '{{ contact.phone|e('js') }}')"
+                                    {# <a onclick="editEmergencyContact({{ contact.id }}, '{{ contact.name|e('js') }}', '{{ contact.phone|e('js') }}')"
                                        class="inline-block pl-0 pr-4 mb-0 ml-auto font-bold text-center align-middle transition-all bg-transparent border-0 rounded-lg shadow-none cursor-pointer leading-pro text-xs ease-soft-in text-slate-400 hover:text-slate-700 hover:underline"
                                        href="javascript:;">Modifier</a>
                                     <div class="h-4 mx-1 bg-slate-300 w-px"></div>
                                     <a onclick="deleteEmergencyContact({{ contact.id }})"
                                        class="inline-block pl-4 mb-0 ml-0 font-bold text-center align-middle transition-all bg-transparent border-0 shadow-none cursor-pointer leading-pro text-xs ease-soft-in text-slate-400 hover:text-red-600 hover:underline"
-                                       href="javascript:;">Supprimer</a>
+                                       href="javascript:;">Supprimer</a> #}
                                 </li>
                             {% endfor %}
-                            <li class="relative flex items-center px-0 py-2 bg-white border-0 rounded-t-lg text-inherit">
-                                <div class="w-full mx-2 p-1 text-center justify-center bg-slate-100 bg-opacity-40 border rounded border-dashed border-slate-300 hover:border-solid">
-                                    <span onclick="openEmergencyContactModal()" class="text-xs font-semibold leading-tight text-slate-500 cursor-pointer hover:scale-102 hover:text-slate-900 hover:underline"><strong class="font-extrabold">+ </strong>Ajouter un contact</span>
-                                </div>
-                            </li>
                         {% endif %}
                     </ul>
                     
@@ -456,9 +477,7 @@
                     <ul class="mx-3 flex flex-col pl-0 mb-0 rounded-lg">
                         {% if user.allergies is empty %}
                             <li class="relative flex items-center px-0 py-2 bg-white border-0 rounded-t-lg">
-                                <div class="w-full mx-2 p-1 text-center justify-center bg-slate-100 bg-opacity-40 border rounded border-dashed border-slate-300 hover:border-solid">
-                                    <span onclick="openAllergyModal()" class="text-xs font-semibold leading-tight text-slate-500 cursor-pointer hover:scale-102 hover:text-slate-900 hover:underline"><strong class="font-extrabold">+ </strong>Ajouter une allergie</span>
-                                </div>
+                                Aucune allergie renseignée
                             </li>
                         {% else %}
                             {% for allergy in user.allergies %}
@@ -466,20 +485,15 @@
                                     <div class="flex flex-col items-start justify-center">
                                         <h6 class="mb-0 leading-normal text-sm">{{ allergy.name }}</h6>
                                     </div>
-                                    <a onclick="editAllergy({{ allergy.id }}, '{{ allergy.name|e('js') }}')"
+                                    {# <a onclick="editAllergy({{ allergy.id }}, '{{ allergy.name|e('js') }}')"
                                        class="inline-block pl-0 pr-4 mb-0 ml-auto font-bold text-center align-middle transition-all bg-transparent border-0 rounded-lg shadow-none cursor-pointer leading-pro text-xs ease-soft-in text-slate-400 hover:text-slate-900 hover:underline"
                                        href="javascript:;">Modifier</a>
                                     <div class="h-4 mx-1 bg-slate-300 w-px"></div>
                                     <a onclick="deleteAllergy({{ allergy.id }})"
                                        class="inline-block pl-4 mb-0 ml-0 font-bold text-center align-middle transition-all bg-transparent border-0 shadow-none cursor-pointer leading-pro text-xs ease-soft-in text-slate-400 hover:text-red-600 hover:underline"
-                                       href="javascript:;">Supprimer</a>
+                                       href="javascript:;">Supprimer</a> #}
                                 </li>
                             {% endfor %}
-                            <li class="relative flex items-center px-0 py-2 bg-white border-0 rounded-t-lg">
-                                <div class="w-full mx-2 p-1 text-center justify-center bg-slate-100 bg-opacity-40 border rounded border-dashed border-slate-300 hover:border-solid">
-                                    <span onclick="openAllergyModal()" class="text-xs font-semibold leading-tight text-slate-500 cursor-pointer hover:scale-102 hover:text-slate-900 hover:underline"><strong class="font-extrabold">+ </strong>Ajouter une allergie</span>
-                                </div>
-                            </li>
                         {% endif %}
                     </ul>
                 </div>
@@ -491,16 +505,7 @@
                 <div class="p-4 pb-0 mb-0 bg-white border-b-0 rounded-t-2xl">
                     <div class="flex flex-wrap -mx-3">
                         <div class="flex items-center w-full max-w-full px-3 shrink-0 md:w-8/12 md:flex-none">
-                            <h6 class="mb-0">Mon profil</h6>
-                        </div>
-                        <div class="w-full max-w-full px-3 text-right shrink-0 md:w-4/12 md:flex-none">
-                            <a onclick="editProfile()" href="#" data-target="tooltip_trigger" data-placement="top">
-                                <i class="leading-normal fas fa-user-edit text-sm text-slate-400 hover:text-slate-700"></i>
-                            </a>
-                            <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm" role="tooltip">
-                                Editer le profil
-                                <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
-                            </div>
+                            <h6 class="mb-0">Son profil</h6>
                         </div>
                     </div>
                 </div>
@@ -531,8 +536,11 @@
                     {% endif %}
                   </li> #}
                 </ul>
+                  <button onclick="showContactPlayerModal()" class="inline-block px-2 py-1 font-bold text-center text-white uppercase align-middle transition-all rounded-lg cursor-pointer bg-gradient-to-tl from-cyan-300 to-cyan-600 leading-pro text-xs ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 hover:scale-102 active:opacity-85 hover:shadow-soft-xs hover:text-cyan-100">
+                    <i class="ni ni-mail-send text-sm"></i> Contacter lae joueureuse
+                  </button>
               </div>
-              <div class="p-4 pb-0 mb-0 bg-white border-b-0 rounded-t-2xl">
+              {# <div class="p-4 pb-0 mb-0 bg-white border-b-0 rounded-t-2xl">
                 <div class="flex flex-wrap -mx-3">
                   <div class="flex items-center w-full max-w-full px-3 shrink-0 md:w-8/12 md:flex-none">
                     <h6 class="mb-0">Mes informations de connexion</h6>
@@ -554,7 +562,7 @@
                   <li class="relative block px-4 py-2 pl-0 leading-normal bg-white border-0 border-t-0 text-sm text-inherit"><strong class="text-slate-700">Email / Login :</strong> &nbsp; {{ user.email }}</li>
                   <li class="relative block px-4 py-2 pl-0 leading-normal bg-white border-0 border-t-0 text-sm text-inherit"><strong class="text-slate-700">Mot de passe :</strong> &nbsp; ***********</li>
                     </ul>
-                </div>
+                </div> #}
             </div>
         </div>
 
@@ -567,9 +575,7 @@
                     <ul class="flex flex-col pl-0 mb-0 rounded-lg">
                         {% if user.notes is empty %}
                             <li class="relative flex items-center px-0 py-2 bg-white border-0 rounded-t-lg text-inherit">
-                                <div class="w-full mx-2 p-1 text-center justify-center bg-slate-100 bg-opacity-40 border rounded border-dashed border-slate-300 hover:border-solid">
-                                    <span onclick="openNoteModal()" class="text-xs font-semibold leading-tight text-slate-500 cursor-pointer hover:scale-102 hover:text-slate-900 hover:underline"><strong class="font-extrabold">+ </strong>Ajouter une note</span>
-                                </div>
+                                Aucune note renseignée
                             </li>
                         {% else %}
                             {% for note in user.notes %}
@@ -586,7 +592,7 @@
                                             {% endif %}
                                         </p>
                                     </div>
-                                    <div class="flex items-center ml-auto">
+                                    {# <div class="flex items-center ml-auto">
                                         <a onclick="editNote({{ note.id }}, '{{ note.title|e('js') }}', `{{ note.content|e('js') }}`)"
                                            class="inline-block pl-0 pr-4 mb-0 font-bold text-center align-middle transition-all bg-transparent border-0 rounded-lg shadow-none cursor-pointer leading-pro text-xs ease-soft-in text-slate-400 hover:text-slate-900 hover:underline" 
                                            href="javascript:;">Modifier</a>
@@ -594,14 +600,14 @@
                                         <a onclick="deleteNote({{ note.id }})"
                                            class="inline-block pl-4 mb-0 font-bold text-center align-middle transition-all bg-transparent border-0 shadow-none cursor-pointer leading-pro text-xs ease-soft-in text-slate-400 hover:text-red-600 hover:underline" 
                                            href="javascript:;">Supprimer</a>
-                                    </div>
+                                    </div> #}
                                 </li>
                             {% endfor %}
-                            <li class="relative flex items-center px-0 py-2 bg-white border-0 rounded-t-lg text-inherit">
+                            {# <li class="relative flex items-center px-0 py-2 bg-white border-0 rounded-t-lg text-inherit">
                                 <div class="w-full mx-2 p-1 text-center justify-center bg-slate-100 bg-opacity-40 border rounded border-dashed border-slate-300 hover:border-solid">
                                     <span onclick="openNoteModal()" class="text-xs font-semibold leading-tight text-slate-500 cursor-pointer hover:scale-102 hover:text-slate-900 hover:underline"><strong class="font-extrabold">+ </strong>Ajouter une note</span>
                                 </div>
-                            </li>
+                            </li> #}
                         {% endif %}
                     </ul>
                 </div>
@@ -609,6 +615,60 @@
         </div>
     </div>
 </div>
+
+<div class="w-full px-6 mx-auto">
+    <div class="relative flex flex-col flex-auto min-w-0 p-4 overflow-hidden break-words border-0 shadow-blur rounded-2xl bg-white/80 bg-clip-border backdrop-blur-2xl backdrop-saturate-200">
+        <div class="flex flex-wrap -mx-3">
+            <div class="flex items-center w-full max-w-full px-3 shrink-0 md:w-8/12 md:flex-none">
+                <h6 class="mb-0">Liste des personnages</h6>
+            </div>
+        </div>
+        <div class="flex-auto p-4">
+            <table class="items-center w-full mb-0 align-top border-gray-200 text-slate-500">
+                <thead>
+                    <tr>
+                        <th class="px-6 py-3 font-bold text-left uppercase align-middle bg-transparent border-b border-gray-200 shadow-none text-xxs border-b-solid tracking-none whitespace-nowrap text-slate-600">Nom</th>
+                        <th class="px-6 py-3 pl-2 font-bold text-center uppercase align-middle bg-transparent border-b border-gray-200 shadow-none text-xxs border-b-solid tracking-none whitespace-nowrap text-slate-600">Faction</th>
+                        <th class="px-6 py-3 font-bold text-center uppercase align-middle bg-transparent border-b border-gray-200 shadow-none text-xxs border-b-solid tracking-none whitespace-nowrap text-slate-500">Type</th>
+                        <th class="px-6 py-3 font-bold text-center uppercase align-middle bg-transparent border-b border-gray-200 shadow-none text-xxs border-b-solid tracking-none whitespace-nowrap text-slate-600">Statut</th>
+                        <th class="px-6 py-3 font-semibold capitalize align-middle bg-transparent border-b border-gray-200 border-solid shadow-none tracking-none whitespace-nowrap text-slate-600"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for character in user.characters %}
+                        <tr class="even:bg-gray-50 dark:even:bg-gray-900/50">
+                            <td>
+                                <p class="text-sm font-weight-bold mb-0">{{ character.name }}</p>
+                            </td>
+                            <td class="align-middle text-center text-sm">
+                                <span class="badge badge-sm bg-gradient-info">{{ character.faction }}</span>
+                            </td>
+                            <td class="align-middle text-center">
+                                <span class="text-secondary text-sm font-weight-bold">{{ character.class }}</span>
+                            </td>
+                            <td class="align-middle text-center">
+                                <span class="badge badge-sm bg-gradient-warning">{{ character.getValidationType().getLabel() }}</span>
+                            </td>
+                            <td class="align-middle">
+                                <a href="{{ path('app_orga_character_edit', {'id': character.id}) }}" class="inline-block px-2 py-1 font-bold text-center text-white uppercase align-middle transition-all rounded-lg cursor-pointer bg-gradient-to-tl from-cyan-300 to-cyan-600 leading-pro text-xs ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 hover:scale-102 active:opacity-85 hover:shadow-soft-xs hover:text-cyan-100">
+                                    <i class="ni ni-settings text-sm"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center" colspan="5">
+                                Aucun personnage renseigné
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
 {% endblock %}
 
 {% block additional_scripts %}{% endblock %}
