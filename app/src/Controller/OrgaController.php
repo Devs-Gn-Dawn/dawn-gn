@@ -73,54 +73,6 @@ class OrgaController extends AbstractController
         }
     }
 
-    #[Route('/api/character/filter', name: 'api_character_filter', methods: ['POST'])]
-    public function filterCharacters(Request $request): JsonResponse
-    {
-        $data = json_decode($request->getContent(), true);
-        $faction = $data['faction'] ?? null;
-        $class = $data['class'] ?? null;
-
-        // Sauvegarder les filtres en session
-        $request->getSession()->set('character_filter_faction', $faction);
-
-        // Créer la requête
-        $qb = $this->entityManager->createQueryBuilder();
-        $qb->select('c')
-            ->from(Character::class, 'c');
-
-        // Appliquer les filtres
-        if ($faction) {
-            $qb->andWhere('c.faction = :faction')
-                ->setParameter('faction', $faction);
-        }
-        if ($class) {
-            $qb->andWhere('c.class = :class')
-                ->setParameter('class', $class);
-        }
-
-        $characters = $qb->getQuery()->getResult();
-
-        // Transformer les données pour la réponse JSON
-        $charactersData = array_map(function ($character) {
-            return [
-                'id' => $character->getId(),
-                'name' => $character->getName(),
-                'faction' => $character->getFaction(),
-                'class' => $character->getClass(),
-                'validationType' => $character->getValidationType(),
-                'user' => [
-                    'fullName' => $character->getUser()->getFullName(),
-                    'email' => $character->getUser()->getEmail()
-                ]
-            ];
-        }, $characters);
-
-        return $this->json([
-            'success' => true,
-            'characters' => $charactersData
-        ]);
-    }
-
     #[Route('/orga/character/{id}/edit', name: 'app_orga_character_edit')]
     public function editCharacter(Character $character): Response
     {
