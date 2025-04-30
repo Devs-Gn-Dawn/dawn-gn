@@ -56,10 +56,10 @@
                                         <a href="{{ path('app_orga_character_edit', {'id': character.id}) }}" class="inline-block px-2 py-1 font-bold text-center text-white uppercase align-middle transition-all rounded-lg cursor-pointer bg-gradient-to-tl from-cyan-300 to-cyan-600 leading-pro text-xs ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 hover:scale-102 active:opacity-85 hover:shadow-soft-xs hover:text-cyan-100">
                                             <i class="ni ni-settings text-sm"></i>
                                         </a>
-                                        <button type="button" class="inline-block px-2 py-1 font-bold text-center text-white uppercase align-middle transition-all rounded-lg cursor-pointer bg-gradient-to-tl from-green-300 to-green-600 leading-pro text-xs ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 hover:scale-102 active:opacity-85 hover:shadow-soft-xs hover:text-green-100" onclick="validateCharacter({{ character.id }})">
+                                        <button type="button" class="inline-block px-2 py-1 font-bold text-center text-white uppercase align-middle transition-all rounded-lg cursor-pointer bg-gradient-to-tl from-green-300 to-green-600 leading-pro text-xs ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 hover:scale-102 active:opacity-85 hover:shadow-soft-xs hover:text-green-100" onclick="confirmValidateCharacter({{ character.id }})">
                                             <i class="ni ni-check-bold text-sm"></i>
                                         </button>
-                                        <button type="button" class="inline-block px-2 py-1 font-bold text-center text-white uppercase align-middle transition-all rounded-lg cursor-pointer bg-gradient-to-tl from-red-300 to-red-600 leading-pro text-xs ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 hover:scale-102 active:opacity-85 hover:shadow-soft-xs hover:text-red-100" onclick="rejectCharacter({{ character.id }})">
+                                        <button type="button" class="inline-block px-2 py-1 font-bold text-center text-white uppercase align-middle transition-all rounded-lg cursor-pointer bg-gradient-to-tl from-red-300 to-red-600 leading-pro text-xs ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 hover:scale-102 active:opacity-85 hover:shadow-soft-xs hover:text-red-100" onclick="confirmRejectCharacter({{ character.id }})">
                                             <i class="ni ni-fat-remove text-sm"></i>
                                         </button>
                                     </td>
@@ -122,30 +122,37 @@ function showCharacterDetails(id, name, userName, userEmail, faction, characterC
     });
 }
 
-function validateCharacter(characterId) {
+function confirmValidateCharacter(characterId) {
     createModal({
         title: "Confirmation de validation",
-        html: "Êtes-vous sûr de vouloir valider ce personnage ?",
+        html: `Êtes-vous sûr de vouloir valider ce personnage ?<br/><br/><span class="text-green-700">Cette action permettra à lae joueureuse d'imprimer sa fiche.</span>`,
         confirmButtonText: "Valider",
         getData: () => ({}),
         validate: () => true,
-        url: "{{ path('api_character_validate', {'id': 'CHARACTER_ID'}) }}".replace('CHARACTER_ID', characterId),
+        url: `/api/character/${characterId}/validate`,
         successTitle: "Personnage validé !",
-        successMessage: "Le personnage a été validé avec succès."
+        successMessage: "Le personnage a été validé avec succès.",
+        onSuccess: () => {
+            // Recharger la page après la validation
+            window.location.reload();
+        }
     });
 }
 
-function rejectCharacter(characterId) {
+function confirmRejectCharacter(characterId) {
     createModal({
         title: "Confirmation de rejet",
-        html: "Êtes-vous sûr de vouloir débloquer ce personnage ?",
-        confirmButtonText: "Débloquer",
-        customClass: window.modalDeleteClasses,
+        html: `Êtes-vous sûr de vouloir rejeter ce personnage ?<br/><br/><span class="text-red-700">Cette action permettra à lae joueureuse de modifier à nouveau son personnage.</span>`,
+        confirmButtonText: "Rejeter",
         getData: () => ({}),
         validate: () => true,
-        url: "{{ path('api_character_reject', {'id': 'CHARACTER_ID'}) }}".replace('CHARACTER_ID', characterId),
-        successTitle: "Personnage débloqué !",
-        successMessage: "Le personnage a été débloqué avec succès."
+        url: `/api/character/${characterId}/reject`,
+        successTitle: "Personnage rejeté !",
+        successMessage: "Le personnage a été rejeté avec succès.",
+        onSuccess: () => {
+            // Recharger la page après le rejet
+            window.location.reload();
+        }
     });
 }
 </script>

@@ -67,7 +67,7 @@ class OrgaController extends AbstractController
     public function rejectCharacter(Character $character): JsonResponse
     {
         try {
-            $character->setValidationType(ValidationType::REJETE);
+            $character->setValidationType(ValidationType::NON_VALIDE);
             $this->entityManager->flush();
 
             return $this->json(['success' => true]);
