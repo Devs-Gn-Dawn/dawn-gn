@@ -52,14 +52,21 @@ class OrgaController extends AbstractController
     #[Route('/orga/characters', name: 'app_orga_characters')]
     public function characters(Request $request): Response
     {
-
+        $where = ['validationType' => ValidationType::EN_COURS];
+        $characters = $this->entityManager->getRepository(Character::class)->findBy($where);
+        if ($this->getUser()->getFaction()) {
+            $characters = array_filter($characters, function (Character $character) {
+                return $character->getFaction() == $this->getUser()->getFaction()->value && $character->getUser()->getFaction() == null
+                    || $character->getUser()->getFaction() == $this->getUser()->getFaction();
+            });
+        }
         return $this->render('orga/characters.html.twig', [
             'title' => 'Personnages en cours de validation',
             'breadcrumb' => [
                 '/orga' => 'Organisation',
                 '/orga/characters' => 'Gestion des personnages',
             ],
-            'characters' => $this->entityManager->getRepository(Character::class)->findBy(['validationType' => ValidationType::EN_COURS])
+            'characters' => $characters
         ]);
     }
 

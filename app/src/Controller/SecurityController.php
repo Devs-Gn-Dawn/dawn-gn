@@ -60,7 +60,11 @@ class SecurityController extends AbstractController
             $emailFrom = $data['email'] ?? null;
         } else {
             $emailFrom = $user->getEmail();
-            if ($user->hasMainCharacter() && ($data['generic'] ?? 0) == 0) {
+            if (($data['generic'] ?? 0) == 0) {
+                $userMainFaction = '';
+            } elseif ($user->getFaction()) {
+                $userMainFaction = $user->getFaction();
+            } elseif ($user->hasMainCharacter()) {
                 $userMainFaction = $user->getMainCharacter()->getFaction();
             }
         }

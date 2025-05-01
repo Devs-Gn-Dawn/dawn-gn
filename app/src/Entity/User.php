@@ -9,6 +9,7 @@ use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use SymfonyCasts\Bundle\ResetPassword\Model\ResetPasswordRequestInterface;
+use App\Entity\FactionType;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
@@ -65,6 +66,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 100, nullable: true)]
     private ?string $resetToken = null;
+
+    #[ORM\Column(type: 'string', enumType: FactionType::class, nullable: true)]
+    private ?FactionType $faction = null;
 
     public function __construct()
     {
@@ -403,5 +407,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function isOrga(): bool
     {
         return $this->hasRole(RoleType::ROLE_ORGA);
+    }
+
+    public function getFaction(): ?FactionType
+    {
+        return $this->faction;
+    }
+
+    public function setFaction(?FactionType $faction): self
+    {
+        $this->faction = $faction;
+        return $this;
     }
 }
