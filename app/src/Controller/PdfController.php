@@ -67,6 +67,7 @@ class PdfController extends AbstractController
         if (!$character) {
             throw $this->createNotFoundException('Personnage non trouvé');
         }
+        $player = $character->getUser();
 
         if (!$user->isOrga()) {
             if ($character->getUser() !== $user) {
@@ -103,13 +104,13 @@ class PdfController extends AbstractController
 
         // Ajout du numéro de billet
         $pdf->SetFont('Arial', '', 12);
-        $this->mbCell($pdf, 33, 53.7, $user->lastRegistrationWithState(constant('App\Entity\EventType::STATUS_OPEN'))->getHelloassoTicket(), 12, 28);
+        $this->mbCell($pdf, 33, 53.7, $player->lastRegistrationWithState(constant('App\Entity\EventType::STATUS_OPEN'))->getHelloassoTicket(), 12, 28);
 
         // user name
         $pdf->SetFont('Arial', 'B', 14);
         $pdf->SetTextColor(180, 180, 180);
-        $this->mbCell($pdf, 17, 63, $user->getFirstname(), 14, 45);
-        $this->mbCell($pdf, 17, 70, $user->getName(), 14, 45);
+        $this->mbCell($pdf, 17, 63, $player->getFirstname(), 14, 45);
+        $this->mbCell($pdf, 17, 70, $player->getName(), 14, 45);
 
         // user class
         $pdf->SetFont('Arial', '', 12);
