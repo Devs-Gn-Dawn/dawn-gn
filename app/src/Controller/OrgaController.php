@@ -34,9 +34,10 @@ class OrgaController extends AbstractController
 {
     private $entityManager;
 
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(EntityManagerInterface $entityManager, private MailerInterface $mailer)
     {
         $this->entityManager = $entityManager;
+        $this->mailer = $mailer;
     }
 
     #[Route('/orga', name: 'app_orga')]
@@ -107,6 +108,12 @@ class OrgaController extends AbstractController
             $character->setValidationType(ValidationType::VALIDE);
             $this->entityManager->flush();
 
+            $this->sendEmail(
+                $character->getUser(),
+                'Votre personnage a été validé. Vous pouvez le retrouver à l\'adresse suivante : ' . $this->generateUrl('app_character_sheet', ['id' => $character->getId()]),
+                'Personnage validé'
+            );
+
             return $this->json(['success' => true]);
         } catch (\Exception $e) {
             return $this->json(['error' => 'Une erreur est survenue lors de la validation du personnage.'], 500);
@@ -119,6 +126,12 @@ class OrgaController extends AbstractController
         try {
             $character->setValidationType(ValidationType::NON_VALIDE);
             $this->entityManager->flush();
+
+            $this->sendEmail(
+                $character->getUser(),
+                'Votre personnage n\'a pas été validé. Vous pouvez le retrouver à l\'adresse suivante : ' . $this->generateUrl('app_character_sheet', ['id' => $character->getId()]),
+                'Personnage non validé'
+            );
 
             return $this->json(['success' => true]);
         } catch (\Exception $e) {
@@ -139,7 +152,7 @@ class OrgaController extends AbstractController
         ]);
     }
 
-    private function sendEmail(User $user, string $message, string $title, MailerInterface $mailer): void
+    private function sendEmail(User $user, string $message, string $title): void
     {
         $email = (new TemplatedEmail())
             ->from(new Address('no-reply@dawn-gn.com', 'Dawn GN'))
@@ -152,11 +165,11 @@ class OrgaController extends AbstractController
                 'user' => $user,
             ]);
 
-        $mailer->send($email);
+        $this->mailer->send($email);
     }
 
     #[Route('/api/contact_player', name: 'api_contact_player', methods: ['POST'])]
-    public function contactPlayer(Request $request, MailerInterface $mailer): JsonResponse
+    public function contactPlayer(Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
 
@@ -170,7 +183,7 @@ class OrgaController extends AbstractController
                 throw new \Exception('Utilisateur non trouvé');
             }
 
-            $this->sendEmail($user, $data['message'], $data['title'], $mailer);
+            $this->sendEmail($user, $data['message'], $data['title']);
 
             return new JsonResponse(['success' => true]);
         } catch (\Exception $e) {
