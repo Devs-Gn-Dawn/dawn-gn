@@ -3,6 +3,7 @@ framework:
   secret: "%env(APP_SECRET)%"
   http_method_override: false
   handle_all_throwables: true
+  error_controller: App\Controller\ErrorController::show
   session:
     handler_id: null
     cookie_secure: auto
