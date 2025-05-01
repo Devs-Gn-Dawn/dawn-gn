@@ -371,6 +371,7 @@ class Character
                 'description' => $asset->getAsset()->getDescription(),
                 'quote' => $asset->getAsset()->getQuote(),
                 'note' => $asset->getNote(),
+                'noteOrga' => $asset->getNoteOrga(),
                 'characterAssetId' => $asset->getId()
             ];
         }
@@ -390,6 +391,7 @@ class Character
                 'description' => $asset->getAsset()->getDescription(),
                 'quote' => $asset->getAsset()->getQuote(),
                 'note' => $asset->getNote(),
+                'noteOrga' => $asset->getNoteOrga(),
                 'quantity' => $asset->getQuantity(),
                 'characterAssetId' => $asset->getId()
             ];
@@ -404,7 +406,9 @@ class Character
                 $equipment[] = [
                     'possession' => $possession,
                     'cost' => $possession->getCost(),
-                    'quote' => $possession->getNote(),
+                    'quote' => '',
+                    'note' => $possession->getNote(),
+                    'noteOrga' => $possession->getNoteOrga(),
                     'type' => 'possession'
                 ];
             }

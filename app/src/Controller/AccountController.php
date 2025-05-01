@@ -208,6 +208,11 @@ class AccountController extends AbstractController
         }
 
         try {
+            if ($this->getUser()->isOrga()) {
+                $user = $entityManager->getRepository(User::class)->find($data['userId']);
+            } else {
+                $user = $this->getUser();
+            }
             // check if the event is valid
             if (!in_array($data['event'], EventType::getChoices())) {
                 return new JsonResponse(['error' => 'Événement invalide'], 400);
@@ -217,7 +222,7 @@ class AccountController extends AbstractController
 
             // check if the event is already registered
             $existingRegistration = $this->registrationRepository->findOneBy([
-                'user' => $this->getUser(),
+                'user' => $user,
                 'event' => $data['event']
             ]);
 
@@ -226,7 +231,7 @@ class AccountController extends AbstractController
             }
 
             $registration = new Registration();
-            $registration->setUser($this->getUser());
+            $registration->setUser($user);
             $registration->setEvent($data['event']);
             $registration->setHelloassoTicket($data['ticket']);
 

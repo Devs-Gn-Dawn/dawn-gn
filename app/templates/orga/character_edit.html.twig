@@ -3,505 +3,513 @@
 {% block title %}Modifier le Personnage{% endblock %}
 
 {% block body %}
-      <div class="w-full px-6 mx-auto">
-        <div class="relative flex items-center p-0 mt-6 overflow-hidden bg-right bg-cover min-h-75 rounded-2xl" style="background-image: url('{{ asset('build/images/bandeaux/' ~ character.getBanner() ~ '.jpg') }}'); background-position-y: 50%">
-            <!-- <span class="absolute inset-y-0 w-full h-full bg-center bg-cover bg-gradient-to-tl from-red-900 to-red-700 opacity-30"></span> -->
-        </div>
+  <div class="w-full px-6 mx-auto">
+    <div class="relative flex items-center p-0 mt-6 overflow-hidden bg-right bg-cover min-h-75 rounded-2xl" style="background-image: url('{{ asset('build/images/bandeaux/' ~ character.getBanner() ~ '.jpg') }}'); background-position-y: 50%">
+        <!-- <span class="absolute inset-y-0 w-full h-full bg-center bg-cover bg-gradient-to-tl from-red-900 to-red-700 opacity-30"></span> -->
+    </div>
 
-        <div class="w-full max-w-full border ml-2 md:w-1/2 md:flex-none lg:w-4/12 mx-6 -mt-34">
-            <ul class="relative flex flex-wrap p-1 list-none bg-transparent">
-              <li class="z-30 flex-auto py-2 bg-white/80 rounded-xl text-center text-xs font-semibold leading-tight text-slate-300 cursor-pointer hover:bg-white hover:scale-102 hover:text-slate-700 hover:underline">
-                <a class="z-30 block w-full px-0 py-1 mb-0 transition-colors border-0 rounded-lg ease-soft-in-out text-slate-700" onclick="showContactPlayerModal()">
-                  <span class="ml-1">Contact joueureuse</span>
+    <div class="w-full max-w-full border ml-2 md:w-1/2 md:flex-none lg:w-4/12 mx-6 -mt-34">
+        <ul class="relative flex flex-wrap p-1 list-none bg-transparent">
+          <li class="z-30 flex-auto py-2 bg-white/80 rounded-xl text-center text-xs font-semibold leading-tight text-slate-300 cursor-pointer hover:bg-white hover:scale-102 hover:text-slate-700 hover:underline">
+            <a class="z-30 block w-full px-0 py-1 mb-0 transition-colors border-0 rounded-lg ease-soft-in-out text-slate-700" onclick="showContactPlayerModal()">
+              <span class="ml-1">Contact joueureuse</span>
+            </a>
+          </li>
+          <li class="z-30 flex-auto py-2 ml-2 bg-white/80 rounded-xl text-center text-xs font-semibold leading-tight text-slate-300 cursor-pointer hover:bg-white hover:scale-102 hover:text-slate-700 hover:underline">
+            <a href="{{ path('app_orga_player', {'id': character.user.id}) }}" class="z-30 block w-full px-0 py-1 mb-0 transition-all border-0 rounded-lg ease-soft-in-out text-slate-700">
+              <span class="ml-1">Informations de lae joueureuse</span>
+            </a>
+          </li>                  
+        </ul>
+    </div>
+
+    <div class="relative flex flex-col flex-auto min-w-0 p-4 overflow-hidden break-words border-0 shadow-blur rounded-2xl bg-white/80 bg-clip-border backdrop-blur-2xl backdrop-saturate-200">
+      <div class="flex flex-wrap -mx-3 px-6">
+        {# <div class="flex-none w-auto max-w-full px-3">
+          <div class="text-base ease-soft-in-out h-18.5 w-18.5 relative inline-flex items-center justify-center rounded-xl text-white transition-all duration-200">
+            <img src="../assets/img/bruce-mars.jpg" alt="profile_image" class="w-full shadow-soft-sm rounded-xl" />
+          </div>
+        </div> #}
+        <div class="flex-none w-auto max-w-full my-auto">
+          <div class="h-full">
+            <div class="h-full flex items-center gap-2">
+            <h5 class="mb-1 py-1 text-xl text-slate-700 font-semibold bg-transparent border border-transparent">{{ character.name }}</h5>
+
+            </div>
+            <div class="mb-0 font-semibold leading-normal text-base"><span class="font-extrabold">{{ character.getFactionType().getLabel() }}</span> - {{ character.class }}
+            
+            {# <a href="#" class="ml-2 mr-1" data-target="tooltip_trigger" data-placement="top"><i class="ml-2 fa fa-pencil hover:scale-102 hover:text-slate-700"></i></a>
+              <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm" role="tooltip">
+                Changer de faction / classe
+                <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
+              </div> #}
+            </div>
+            <div class="mb-0 font-semibold leading-normal text-sm"><span class="font-extrabold">{{ character.getAvailableXp() }}</span>/{{ character.getGainedXp() }} PA <a href="#" id="info" data-target="tooltip_trigger" data-placement="top"><i class="fa fa-question-circle hover:text-slate-700 text-sm" aria-hidden="true"></i></a> 
+              <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm" role="tooltip">
+                PA gagnés lors des précédents opus et encore non utilisés
+                <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="w-full max-w-full px-3 mx-auto mt-4 sm:my-auto sm:mr-0 md:w-1/2 md:flex-none lg:w-4/12">
+          <div class="relative">
+            <ul class="relative flex flex-wrap p-1 list-none bg-transparent rounded-xl" nav-pills role="tablist">
+              <li class="z-30 flex-auto text-center">
+                <a class="z-30 block w-full px-0 py-1 mb-0 transition-colors border-0 rounded-lg ease-soft-in-out bg-inherit text-slate-700" nav-link href="javascript:hideBgTab();" role="tab" aria-selected="false">
+                  <svg class="text-slate-700" width="16px" height="16px" viewBox="0 0 40 40" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink">
+                    <title>settings</title>
+                    <g stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
+                      <g transform="translate(-2020.000000, -442.000000)" fill="#FFFFFF" fillRule="nonzero">
+                        <g transform="translate(1716.000000, 291.000000)">
+                          <g transform="translate(304.000000, 151.000000)">
+                            <polygon class="fill-slate-800" opacity="0.596981957" points="18.0883333 15.7316667 11.1783333 8.82166667 13.3333333 6.66666667 6.66666667 0 0 6.66666667 6.66666667 13.3333333 8.82166667 11.1783333 15.315 17.6716667"></polygon>
+                            <path class="fill-slate-800" d="M31.5666667,23.2333333 C31.0516667,23.2933333 30.53,23.3333333 30,23.3333333 C29.4916667,23.3333333 28.9866667,23.3033333 28.48,23.245 L22.4116667,30.7433333 L29.9416667,38.2733333 C32.2433333,40.575 35.9733333,40.575 38.275,38.2733333 L38.275,38.2733333 C40.5766667,35.9716667 40.5766667,32.2416667 38.275,29.94 L31.5666667,23.2333333 Z" opacity="0.596981957"></path>
+                            <path class="fill-slate-800" d="M33.785,11.285 L28.715,6.215 L34.0616667,0.868333333 C32.82,0.315 31.4483333,0 30,0 C24.4766667,0 20,4.47666667 20,10 C20,10.99 20.1483333,11.9433333 20.4166667,12.8466667 L2.435,27.3966667 C0.95,28.7083333 0.0633333333,30.595 0.00333333333,32.5733333 C-0.0583333333,34.5533333 0.71,36.4916667 2.11,37.89 C3.47,39.2516667 5.27833333,40 7.20166667,40 C9.26666667,40 11.2366667,39.1133333 12.6033333,37.565 L27.1533333,19.5833333 C28.0566667,19.8516667 29.01,20 30,20 C35.5233333,20 40,15.5233333 40,10 C40,8.55166667 39.685,7.18 39.1316667,5.93666667 L33.785,11.285 Z"></path>
+                          </g>
+                        </g>
+                      </g>
+                    </g>
+                  </svg>
+                  <span class="ml-1">Fiche personnage</span>
                 </a>
               </li>
-              <li class="z-30 flex-auto py-2 ml-2 bg-white/80 rounded-xl text-center text-xs font-semibold leading-tight text-slate-300 cursor-pointer hover:bg-white hover:scale-102 hover:text-slate-700 hover:underline">
-                <a href="{{ path('app_orga_player', {'id': character.user.id}) }}" class="z-30 block w-full px-0 py-1 mb-0 transition-all border-0 rounded-lg ease-soft-in-out text-slate-700">
-                  <span class="ml-1">Informations de lae joueureuse</span>
+              <li class="z-30 flex-auto text-center">
+                <a class="z-30 block w-full px-0 py-1 mb-0 transition-all border-0 rounded-lg ease-soft-in-out bg-inherit text-slate-700" nav-link href="javascript:hideCompTab();" role="tab" aria-selected="false">
+                  <svg class="text-slate-700" width="16px" height="16px" viewBox="0 0 40 44" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink">
+                    <title>document</title>
+                    <g stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
+                      <g transform="translate(-1870.000000, -591.000000)" fill="#FFFFFF" fillRule="nonzero">
+                        <g transform="translate(1716.000000, 291.000000)">
+                          <g transform="translate(154.000000, 300.000000)">
+                            <path class="fill-slate-800" d="M40,40 L36.3636364,40 L36.3636364,3.63636364 L5.45454545,3.63636364 L5.45454545,0 L38.1818182,0 C39.1854545,0 40,0.814545455 40,1.81818182 L40,40 Z" opacity="0.603585379"></path>
+                            <path class="fill-slate-800" d="M30.9090909,7.27272727 L1.81818182,7.27272727 C0.814545455,7.27272727 0,8.08727273 0,9.09090909 L0,41.8181818 C0,42.8218182 0.814545455,43.6363636 1.81818182,43.6363636 L30.9090909,43.6363636 C31.9127273,43.6363636 32.7272727,42.8218182 32.7272727,41.8181818 L32.7272727,9.09090909 C32.7272727,8.08727273 31.9127273,7.27272727 30.9090909,7.27272727 Z M18.1818182,34.5454545 L7.27272727,34.5454545 L7.27272727,30.9090909 L18.1818182,30.9090909 L18.1818182,34.5454545 Z M25.4545455,27.2727273 L7.27272727,27.2727273 L7.27272727,23.6363636 L25.4545455,23.6363636 L25.4545455,27.2727273 Z M25.4545455,20 L7.27272727,20 L7.27272727,16.3636364 L25.4545455,16.3636364 L25.4545455,20 Z"></path>
+                          </g>
+                        </g>
+                      </g>
+                    </g>
+                  </svg>
+                  <span class="ml-1">Background</span>
                 </a>
               </li>                  
             </ul>
+          </div>
         </div>
-
-        <div class="relative flex flex-col flex-auto min-w-0 p-4 overflow-hidden break-words border-0 shadow-blur rounded-2xl bg-white/80 bg-clip-border backdrop-blur-2xl backdrop-saturate-200">
-          <div class="flex flex-wrap -mx-3 px-6">
-            {# <div class="flex-none w-auto max-w-full px-3">
-              <div class="text-base ease-soft-in-out h-18.5 w-18.5 relative inline-flex items-center justify-center rounded-xl text-white transition-all duration-200">
-                <img src="../assets/img/bruce-mars.jpg" alt="profile_image" class="w-full shadow-soft-sm rounded-xl" />
-              </div>
-            </div> #}
-            <div class="flex-none w-auto max-w-full my-auto">
+      </div>
+    </div>
+  </div>
+  {% if character.isInValidation() %}
+  <div id="characterValidation" class="p-6 pb-0 mx-auto block">
+    <div class="text-sm text-center w-full max-w-full shadow-soft-xl rounded-xl py-4 bg-green-200 text-green-900 bg-opacity-70">
+    Ce personnage a besoin d'être validé ou débloqué, les boutons sont accessibles en bas de page.
+    </div>
+  </div>
+  {% endif %}
+  <div id="compTab" class="block p-6 mx-auto" active-tab>
+    <div class="flex flex-wrap -mx-3">
+      <!-- Compétences -->
+      <div class="flex-none w-full max-w-full px-3  mb-6">
+        <div class="relative flex flex-col min-w-0 pb-2 break-words bg-white border-0 border-transparent border-solid shadow-soft-xl rounded-2xl bg-clip-border">
+          <div class="flex flex-wrap mx-3 my-3">
+            <div class="flex-none w-auto max-w-full px-3 my-auto">
               <div class="h-full">
-                <div class="h-full flex items-center gap-2">
-                <h5 class="mb-1 py-1 text-xl text-slate-700 font-semibold bg-transparent border border-transparent">{{ character.name }}</h5>
-
-                </div>
-                <div class="mb-0 font-semibold leading-normal text-base"><span class="font-extrabold">{{ character.getFactionType().getLabel() }}</span> - {{ character.class }}
-                
-                {# <a href="#" class="ml-2 mr-1" data-target="tooltip_trigger" data-placement="top"><i class="ml-2 fa fa-pencil hover:scale-102 hover:text-slate-700"></i></a>
-                  <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm" role="tooltip">
-                    Changer de faction / classe
-                    <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
-                  </div> #}
-                </div>
-                <div class="mb-0 font-semibold leading-normal text-sm"><span class="font-extrabold">{{ character.getAvailableXp() }}</span>/{{ character.getGainedXp() }} PA <a href="#" id="info" data-target="tooltip_trigger" data-placement="top"><i class="fa fa-question-circle hover:text-slate-700 text-sm" aria-hidden="true"></i></a> 
-                  <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm" role="tooltip">
-                    PA gagnés lors des précédents opus et encore non utilisés
-                    <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
-                  </div>
-                </div>
+                <h5 class="mb-1">Compétences</h5>
               </div>
             </div>
-            <div class="w-full max-w-full px-3 mx-auto mt-4 sm:my-auto sm:mr-0 md:w-1/2 md:flex-none lg:w-4/12">
-              <div class="relative">
-                <ul class="relative flex flex-wrap p-1 list-none bg-transparent rounded-xl" nav-pills role="tablist">
-                  <li class="z-30 flex-auto text-center">
-                    <a class="z-30 block w-full px-0 py-1 mb-0 transition-colors border-0 rounded-lg ease-soft-in-out bg-inherit text-slate-700" nav-link href="javascript:hideBgTab();" role="tab" aria-selected="false">
-                      <svg class="text-slate-700" width="16px" height="16px" viewBox="0 0 40 40" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink">
-                        <title>settings</title>
-                        <g stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
-                          <g transform="translate(-2020.000000, -442.000000)" fill="#FFFFFF" fillRule="nonzero">
-                            <g transform="translate(1716.000000, 291.000000)">
-                              <g transform="translate(304.000000, 151.000000)">
-                                <polygon class="fill-slate-800" opacity="0.596981957" points="18.0883333 15.7316667 11.1783333 8.82166667 13.3333333 6.66666667 6.66666667 0 0 6.66666667 6.66666667 13.3333333 8.82166667 11.1783333 15.315 17.6716667"></polygon>
-                                <path class="fill-slate-800" d="M31.5666667,23.2333333 C31.0516667,23.2933333 30.53,23.3333333 30,23.3333333 C29.4916667,23.3333333 28.9866667,23.3033333 28.48,23.245 L22.4116667,30.7433333 L29.9416667,38.2733333 C32.2433333,40.575 35.9733333,40.575 38.275,38.2733333 L38.275,38.2733333 C40.5766667,35.9716667 40.5766667,32.2416667 38.275,29.94 L31.5666667,23.2333333 Z" opacity="0.596981957"></path>
-                                <path class="fill-slate-800" d="M33.785,11.285 L28.715,6.215 L34.0616667,0.868333333 C32.82,0.315 31.4483333,0 30,0 C24.4766667,0 20,4.47666667 20,10 C20,10.99 20.1483333,11.9433333 20.4166667,12.8466667 L2.435,27.3966667 C0.95,28.7083333 0.0633333333,30.595 0.00333333333,32.5733333 C-0.0583333333,34.5533333 0.71,36.4916667 2.11,37.89 C3.47,39.2516667 5.27833333,40 7.20166667,40 C9.26666667,40 11.2366667,39.1133333 12.6033333,37.565 L27.1533333,19.5833333 C28.0566667,19.8516667 29.01,20 30,20 C35.5233333,20 40,15.5233333 40,10 C40,8.55166667 39.685,7.18 39.1316667,5.93666667 L33.785,11.285 Z"></path>
-                              </g>
-                            </g>
-                          </g>
-                        </g>
-                      </svg>
-                      <span class="ml-1">Fiche personnage</span>
-                    </a>
-                  </li>
-                  <li class="z-30 flex-auto text-center">
-                    <a class="z-30 block w-full px-0 py-1 mb-0 transition-all border-0 rounded-lg ease-soft-in-out bg-inherit text-slate-700" nav-link href="javascript:hideCompTab();" role="tab" aria-selected="false">
-                      <svg class="text-slate-700" width="16px" height="16px" viewBox="0 0 40 44" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink">
-                        <title>document</title>
-                        <g stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
-                          <g transform="translate(-1870.000000, -591.000000)" fill="#FFFFFF" fillRule="nonzero">
-                            <g transform="translate(1716.000000, 291.000000)">
-                              <g transform="translate(154.000000, 300.000000)">
-                                <path class="fill-slate-800" d="M40,40 L36.3636364,40 L36.3636364,3.63636364 L5.45454545,3.63636364 L5.45454545,0 L38.1818182,0 C39.1854545,0 40,0.814545455 40,1.81818182 L40,40 Z" opacity="0.603585379"></path>
-                                <path class="fill-slate-800" d="M30.9090909,7.27272727 L1.81818182,7.27272727 C0.814545455,7.27272727 0,8.08727273 0,9.09090909 L0,41.8181818 C0,42.8218182 0.814545455,43.6363636 1.81818182,43.6363636 L30.9090909,43.6363636 C31.9127273,43.6363636 32.7272727,42.8218182 32.7272727,41.8181818 L32.7272727,9.09090909 C32.7272727,8.08727273 31.9127273,7.27272727 30.9090909,7.27272727 Z M18.1818182,34.5454545 L7.27272727,34.5454545 L7.27272727,30.9090909 L18.1818182,30.9090909 L18.1818182,34.5454545 Z M25.4545455,27.2727273 L7.27272727,27.2727273 L7.27272727,23.6363636 L25.4545455,23.6363636 L25.4545455,27.2727273 Z M25.4545455,20 L7.27272727,20 L7.27272727,16.3636364 L25.4545455,16.3636364 L25.4545455,20 Z"></path>
-                              </g>
-                            </g>
-                          </g>
-                        </g>
-                      </svg>
-                      <span class="ml-1">Background</span>
-                    </a>
-                  </li>                  
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      {% if character.isInValidation() %}
-      <div id="characterValidation" class="p-6 pb-0 mx-auto block">
-        <div class="text-sm text-center w-full max-w-full shadow-soft-xl rounded-xl py-4 bg-green-200 text-green-900 bg-opacity-70">
-        Ce personnage a besoin d'être validé ou débloqué, les boutons sont accessibles en bas de page.
-        </div>
-      </div>
-      {% endif %}
-      <div id="compTab" class="block p-6 mx-auto" active-tab>
-        <div class="flex flex-wrap -mx-3">
-          <!-- Compétences -->
-          <div class="flex-none w-full max-w-full px-3  mb-6">
-            <div class="relative flex flex-col min-w-0 pb-2 break-words bg-white border-0 border-transparent border-solid shadow-soft-xl rounded-2xl bg-clip-border">
-              <div class="flex flex-wrap mx-3 my-3">
-                <div class="flex-none w-auto max-w-full px-3 my-auto">
-                  <div class="h-full">
-                    <h5 class="mb-1">Compétences</h5>
-                  </div>
-                </div>
-                <div class="w-full max-w-full px-3 mx-auto mt-4 sm:my-auto sm:mr-0 sm:w-1/5 md:w-1/5 md:flex-none">
-                  <div class="relative right-0">
-                    <div class="h-full text-right">
-                      <h6 class="mb-1"><span class="text-slate-400">{{ character.getXpSkill() - character.getSkillsXpUsed() }}</span>/{{ character.getXpSkill() }} PA 
-                        {% if character.getAvailableXp() > 0 and character.isNotValidated() %}
-                          <button onclick="showAddSkillXpModal()" data-target="tooltip_trigger" data-placement="top" class="text-xs font-semibold leading-tight text-slate-300 cursor-pointer hover:scale-102 hover:text-slate-700 hover:underline">
-                            <i class="fa fa-plus-circle text-slate-400 hover:text-slate-700 text-sm" aria-hidden="true"></i>
-                          </button> 
-                          <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm" role="tooltip">
-                            Ajouter PA
-                            <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
-                          </div>
-                        {% endif %}
-                      </h5>
-                    </div> 
-                  </div>
-                </div>
-              </div>
-              <div class="flex-auto px-0 pt-0 pb-2">
-                <div class="p-0 mx-5">
-                  <table class="items-center w-full table-fixed border-separate border-spacing-2 mb-0 align-top border-gray-200 text-slate-500">
-                    <tbody>
-                        {% for skill in character.skills ?? [] %}
-                      <tr>
-                        <td class="p-2 align-middle bg-transparent border-b  shadow-transparent text-pretty">
-                          <div class="flex px-2 py-1">
-                            <div class="flex flex-col justify-center">
-                              <p class="text-sm leading-normal"><span class="font-extrabold underline text-slate-700">{{ skill.name }}</span> : {{ skill.description }}<br/>
-                                Coût : <span class="font-extrabold">{{ skill.cost }}PA</span>
-                              </p>
-                            </div>
-                          </div>
-                        </td>
-                        <td class="w-20 align-middle bg-slate-50  shadow-transparent p-2 rounded border border-dashed border-slate-200 hover:border-slate-500">
-                          <div class=" w-full text-center"><a href="javascript:editMatosModal()" data-target="tooltip_trigger" data-placement="top"><i class="ml-2 fa fa-pencil hover:scale-102 hover:text-slate-700"></i></a>
-                            <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm" role="tooltip">
-                              Editer / commenter
-                              <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
-                            </div>
-                          </div>
-                        </td>
-                        <td class="w-20 align-middle bg-slate-50  shadow-transparent p-2 rounded border border-dashed border-slate-200 hover:border-slate-500">
-                          <button onclick="confirmDelete('{{ path('api_character_skill_delete', {'id': character.id}) }}', { skillId: {{ skill.id }} })" class="w-full text-center"><i class="fa fa-trash cursor-pointer hover:text-slate-700" aria-hidden="true"  data-target="tooltip_trigger" data-placement="top"></i>
-                            <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm" role="tooltip">
-                              Supprimer la compétence
-                              <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
-                            </div>
-                          </button>
-                        </td>
-                      </tr>
-                      {% else %}
-                      <tr>
-                        <td class="mx-8 text-center shadow-transparent" colspan="3">
-                          Aucune compétence
-                        </td>
-                      </tr>
-                      {% endfor %}
-                      <tr>
-                        <td class="mx-8 text-center shadow-transparent" colspan="3">
-                          <div class="flex p-3 mt-3 text-center justify-center bg-slate-100 bg-opacity-40  border rounded border-dashed border-slate-300 hover:border-solid">
-                            <span onclick="showAddSkillModal()" class="text-xs font-semibold leading-tight text-slate-500 cursor-pointer hover:scale-102 hover:text-slate-900 hover:underline"><strong class="font-extrabold">+ </strong>Ajouter une compétence (<span data-target="skillsPaAvailable">{{ character.getXpSkill() - character.getSkillsXpUsed()}}</span> PA disponibles)</span>
-                          </div>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          </div>
-          <!-- Compétences spéciales-->
-          <div class="flex-none w-full max-w-full px-3  mb-6">
-            <div class="relative flex flex-col min-w-0 pb-2 break-words bg-white border-0 border-transparent border-solid shadow-soft-xl rounded-2xl bg-clip-border">
-              <div class="flex flex-wrap mx-3 my-3">
-                <div class="flex-none w-auto max-w-full px-3 my-auto">
-                  <div class="h-full">
-                    <h5 class="mb-1">Capacités spéciales <a href="#" id="info" data-target="tooltip_trigger" data-placement="top"><i class="fa fa-question-circle hover:text-slate-700 text-sm" aria-hidden="true"></i></a> 
+            <div class="w-full max-w-full px-3 mx-auto mt-4 sm:my-auto sm:mr-0 sm:w-1/5 md:w-1/5 md:flex-none">
+              <div class="relative right-0">
+                <div class="h-full text-right">
+                  <h6 class="mb-1"><span class="text-slate-400">{{ character.getXpSkill() - character.getSkillsXpUsed() }}</span>/{{ character.getXpSkill() }} PA 
+                    {% if character.getAvailableXp() > 0 and character.isNotValidated() %}
+                      <button onclick="showAddSkillXpModal()" data-target="tooltip_trigger" data-placement="top" class="text-xs font-semibold leading-tight text-slate-300 cursor-pointer hover:scale-102 hover:text-slate-700 hover:underline">
+                        <i class="fa fa-plus-circle text-slate-400 hover:text-slate-700 text-sm" aria-hidden="true"></i>
+                      </button> 
                       <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm" role="tooltip">
-                        Ces compétences sont renseignées et gérées par les orgas
+                        Ajouter PA
                         <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
-                      </div></h5>
-                  </div>
-                </div>
-              </div>
-              <div class="flex-auto px-0 pt-0 pb-2">
-                <div class="p-0 mx-5">
-                  <table class="items-center w-full table-fixed border-separate border-spacing-2 mb-0 align-top border-gray-200 text-slate-500">
-                    <tbody>
-                      {% for specialSkill in character.getSpecialSkills() ?? [] %}
-                      <tr>
-                        <td class="p-2 align-middle bg-transparent border-b  shadow-transparent text-pretty">
-                          <div class="flex px-2 py-1">
-                            <div class="flex flex-col justify-center">
-                              <p class="text-sm leading-normal"><span class="font-extrabold underline text-slate-700">{{ specialSkill.name }}</span> : {{ specialSkill.description }} {% if specialSkill.quote %}<span class="italic">"{{ specialSkill.quote }}"</span>{% endif %}<br/>
-                              {% if specialSkill.note %}
-                                <span class="text-sm leading-normal">{{ specialSkill.note }}</span>
-                              {% endif %}
-                              </p>
-                            </div>
-                          </div>
-                        </td>
-                        <td class="w-20 align-middle bg-slate-50  shadow-transparent p-2 rounded border border-dashed border-slate-200 hover:border-slate-500">
-                          <div class=" w-full text-center"><a href="javascript:editMatosModal()" data-target="tooltip_trigger" data-placement="top"><i class="ml-2 fa fa-pencil hover:scale-102 hover:text-slate-700"></i></a>
-                            <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm" role="tooltip">
-                              Editer / commenter
-                              <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
-                            </div>
-                          </div>
-                        </td>
-                        <td class="w-20 align-middle bg-slate-50  shadow-transparent p-2 rounded border border-dashed border-slate-200 hover:border-slate-500">
-                          <button onclick="confirmDelete('{{ path('api_character_asset_delete', {'characterAssetId': specialSkill.characterAssetId, 'assetType': 'capacity'}) }}')" class="w-full text-center"><i class="fa fa-trash cursor-pointer hover:text-slate-700" aria-hidden="true"  data-target="tooltip_trigger" data-placement="top"></i>
-                            <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm" role="tooltip">
-                              Supprimer la capacité spéciale
-                              <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
-                            </div>
-                          </button>
-                        </td>
-                      </tr>
-                      {% else %}
-                      <tr>
-                        <td class="p-2 align-middle bg-transparent border-b shadow-transparent text-center" colspan="3">
-                            Aucune capacité spéciale
-                        </td>
-                      </tr>
-                      {% endfor %}
-                      <tr>
-                        <td class="mx-8 text-center shadow-transparent" colspan="3">
-                          <div class="flex p-3 mt-3 text-center justify-center bg-slate-100 bg-opacity-40  border rounded border-dashed border-slate-300 hover:border-solid">
-                            <span onclick="showAddAssetModal('capacity')" class="text-xs font-semibold leading-tight text-slate-500 cursor-pointer hover:scale-102 hover:text-slate-900 hover:underline"><strong class="font-extrabold">+ </strong>Ajouter une capacité commune</span>
-                          </div>
-                          <div class="flex p-3 mt-3 text-center justify-center bg-slate-100 bg-opacity-40  border rounded border-dashed border-slate-300 hover:border-solid">
-                            <span onclick="showAddAssetModal('capacity', true)" class="text-xs font-semibold leading-tight text-slate-500 cursor-pointer hover:scale-102 hover:text-slate-900 hover:underline"><strong class="font-extrabold">+ </strong>Ajouter une capacité personnalisée</span>
-                          </div>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
+                      </div>
+                    {% endif %}
+                  </h5>
+                </div> 
               </div>
             </div>
           </div>
-          <!-- Matos -->
-          <div class="flex-none w-full max-w-full px-3 mb-3">
-            <div class="relative flex flex-col min-w-0 pb-2 break-words bg-white border-0 border-transparent border-solid shadow-soft-xl rounded-2xl bg-clip-border">
-              <div class="flex flex-wrap mx-3 my-3">
-                <div class="flex-none w-auto max-w-full px-3 my-auto">
-                  <div class="h-full">
-                    <h5 class="mb-1">Matériels et ressources</h5>
-                  </div>
-                </div>
-                <div class="w-full max-w-full px-3 mx-auto mt-4 sm:my-auto sm:mr-0 sm:w-1/5 md:w-1/5 md:flex-none">
-                  <div class="relative right-0">
-                    <div class="h-full text-right">
-                      <h6 class="mb-1"><span class="text-slate-400">{{ character.getXpGear() - character.getGearXpUsed() }}</span>/{{ character.getXpGear() }} PA 
-                        {% if character.getAvailableXp() > 0 and character.isNotValidated() %}
-                          <button onclick="showAddGearXpModal()" data-target="tooltip_trigger" data-placement="top" class="text-xs font-semibold leading-tight text-slate-300 cursor-pointer hover:scale-102 hover:text-slate-700 hover:underline">
-                            <i class="fa fa-plus-circle text-slate-400 hover:text-slate-700 text-sm" aria-hidden="true"></i>
-                          </button> 
-                          <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm" role="tooltip">
-                          Ajouter PA
+          <div class="flex-auto px-0 pt-0 pb-2">
+            <div class="p-0 mx-5">
+              <table class="items-center w-full table-fixed border-separate border-spacing-2 mb-0 align-top border-gray-200 text-slate-500">
+                <tbody>
+                    {% for skillLearned in character.getSkillsLearned() ?? [] %}
+                  <tr>
+                    <td class="p-2 align-middle bg-transparent border-b  shadow-transparent text-pretty">
+                      <div class="flex px-2 py-1">
+                        <div class="flex flex-col justify-center">
+                          <p class="text-sm leading-normal"><span data-skill-name class="font-extrabold underline text-slate-700">{{ skillLearned.skill.label }}</span> : <span data-skill-description>{{ skillLearned.skill.description }}</span><br/>
+                            Coût : <span data-skill-cost data-skill-base-cost="{{ skillLearned.skill.baseCost }}" class="font-extrabold">{{ skillLearned.cost }}</span>PA
+                            {% if skillLearned.note %}
+                              <br/>
+                              Note : <span data-skill-note class="text-sm leading-normal">{{ skillLearned.note }}</span>
+                            {% endif %}
+                            {% if skillLearned.noteOrga %}
+                              <br/>
+                              Note Orga : <span data-skill-note-orga class="text-sm leading-normal">{{ skillLearned.noteOrga }}</span>
+                            {% endif %}
+                          </p>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="w-20 align-middle bg-slate-50  shadow-transparent p-2 rounded border border-dashed border-slate-200 hover:border-slate-500">
+                      <button onclick="editSkillModal(event, '{{ character.id }}', '{{ skillLearned.skill.id }}')" class=" w-full text-center" data-target="tooltip_trigger" data-placement="top"><i class="ml-2 fa fa-pencil hover:scale-102 hover:text-slate-700"></i></button>
+                      <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm" role="tooltip">
+                        Editer / commenter
+                        <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
+                      </div>
+                    </td>
+                    <td class="w-20 align-middle bg-slate-50  shadow-transparent p-2 rounded border border-dashed border-slate-200 hover:border-slate-500">
+                      <button onclick="confirmDelete('{{ path('api_character_skill_delete', {'id': character.id}) }}', { skillId: {{ skillLearned.skill.id }} })" data-target="tooltip_trigger" data-placement="top" class="w-full text-center"><i class="fa fa-trash cursor-pointer hover:text-slate-700" aria-hidden="true"></i>
+                      </button>
+                      <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm" role="tooltip">
+                        Supprimer la compétence
+                        <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
+                      </div>
+                    </td>
+                  </tr>
+                  {% else %}
+                  <tr>
+                    <td class="mx-8 text-center shadow-transparent" colspan="3">
+                      Aucune compétence
+                    </td>
+                  </tr>
+                  {% endfor %}
+                  <tr>
+                    <td class="mx-8 text-center shadow-transparent" colspan="3">
+                      <div class="flex p-3 mt-3 text-center justify-center bg-slate-100 bg-opacity-40  border rounded border-dashed border-slate-300 hover:border-solid">
+                        <span onclick="showAddSkillModal()" class="text-xs font-semibold leading-tight text-slate-500 cursor-pointer hover:scale-102 hover:text-slate-900 hover:underline"><strong class="font-extrabold">+ </strong>Ajouter une compétence (<span data-target="skillsPaAvailable">{{ character.getXpSkill() - character.getSkillsXpUsed()}}</span> PA disponibles)</span>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Compétences spéciales-->
+      <div class="flex-none w-full max-w-full px-3  mb-6">
+        <div class="relative flex flex-col min-w-0 pb-2 break-words bg-white border-0 border-transparent border-solid shadow-soft-xl rounded-2xl bg-clip-border">
+          <div class="flex flex-wrap mx-3 my-3">
+            <div class="flex-none w-auto max-w-full px-3 my-auto">
+              <div class="h-full">
+                <h5 class="mb-1">Capacités spéciales <a href="#" id="info" data-target="tooltip_trigger" data-placement="top"><i class="fa fa-question-circle hover:text-slate-700 text-sm" aria-hidden="true"></i></a> 
+                  <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm" role="tooltip">
+                    Ces compétences sont renseignées et gérées par les orgas
+                    <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
+                  </div></h5>
+              </div>
+            </div>
+          </div>
+          <div class="flex-auto px-0 pt-0 pb-2">
+            <div class="p-0 mx-5">
+              <table class="items-center w-full table-fixed border-separate border-spacing-2 mb-0 align-top border-gray-200 text-slate-500">
+                <tbody>
+                  {% for specialSkill in character.getSpecialSkills() ?? [] %}
+                  <tr>
+                    <td class="p-2 align-middle bg-transparent border-b  shadow-transparent text-pretty">
+                      <div class="flex px-2 py-1">
+                        <div class="flex flex-col justify-center">
+                          <p class="text-sm leading-normal"><span data-asset-name class="font-extrabold underline text-slate-700">{{ specialSkill.name }}</span> : <span data-asset-description>{{ specialSkill.description }}</span> {% if specialSkill.quote %}<span class="italic">"{{ specialSkill.quote }}"</span>{% endif %}
+                          {% if specialSkill.note %}
+                            <br/>
+                            Note : <span data-asset-note class="text-sm leading-normal">{{ specialSkill.note }}</span>
+                          {% endif %}
+                          {% if specialSkill.noteOrga %}
+                            <br/>
+                            Note Orga : <span data-asset-note-orga class="text-sm leading-normal">{{ specialSkill.noteOrga }}</span>
+                          {% endif %}
+                          </p>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="w-20 align-middle bg-slate-50  shadow-transparent p-2 rounded border border-dashed border-slate-200 hover:border-slate-500">
+                      <button onclick="editAssetModal(event, '{{ specialSkill.characterAssetId }}', 'Capacity')" data-target="tooltip_trigger" data-placement="top" class=" w-full text-center"><i class="ml-2 fa fa-pencil hover:scale-102 hover:text-slate-700"></i></button>
+                        <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm" role="tooltip">
+                          Editer / commenter
                           <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
                         </div>
-                        {% endif %}
-                      </h5>
-                    </div> 
-                  </div>
-                </div>
-              </div>
-              <div class="flex-auto px-0 pt-0 pb-2">
-                <div class="p-0 mx-5">
-                  <table class="items-center w-full table-fixed border-separate border-spacing-2 mb-0 align-top border-gray-200 text-slate-500">
-                    <tbody>
-                        {% for possession in character.possessions %}
-                        <tr>
-                          <td class="p-2 align-middle bg-transparent shadow-transparent text-pretty">
-                              <div class="flex px-2 py-1">
-                                  <div class="flex flex-col justify-center">
-                                      <p class="text-sm leading-normal">
-                                          <span class="font-extrabold underline text-slate-700">{{ possession.gear.label }}</span> : {{ possession.gear.description }}
-                                          <br/>
-                                          Coût : <span class="font-extrabold">{{ possession.cost }}PA</span> 
-                                          {# <span class="italic">"{{ possession.gear.short }}"</span> #}
-                                      </p>
-                                  </div>
-                              </div>
-                          </td>
-                          <td class="w-20 align-middle bg-slate-50  shadow-transparent p-2 rounded border border-dashed border-slate-200 hover:border-slate-500">
-                            <div class=" w-full text-center"><a href="javascript:editMatosModal()" data-target="tooltip_trigger" data-placement="top"><i class="ml-2 fa fa-pencil hover:scale-102 hover:text-slate-700"></i></a>
-                              <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm" role="tooltip">
-                                Editer / commenter
-                                <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
-                              </div>
-                            </div>
-                          </td>
-                          <td class="w-20 align-middle bg-slate-50  shadow-transparent p-2 rounded border border-dashed border-slate-200 hover:border-slate-500">
-                            <div class="w-full text-center">
-                                <i class="fa fa-trash cursor-pointer hover:text-slate-700" 
-                                  onclick="confirmDelete('{{ path('api_character_gear_delete', {'id': character.id}) }}', { possessionId: {{ possession.id }} })" 
-                                  data-target="tooltip_trigger" 
-                                  data-placement="top"></i>
-                                  <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm" role="tooltip">
-                                    Supprimer
-                                    <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
-                                  </div>
-                              </div>
-                          </td>
-                        </tr>
-                        {% else %}
-                        <tr>
-                            <td class="p-2 align-middle bg-transparent border-b shadow-transparent text-center" colspan="3">
-                                Aucun équipement
-                            </td>
-                        </tr>
-                      {% endfor %}
-                      <tr>
-                        <td class="mx-8 text-center shadow-transparent" colspan="3">
-                          <div class="flex p-3 mt-3 text-center justify-center bg-slate-100 bg-opacity-40  border rounded border-dashed border-slate-300 hover:border-solid">
-                            <span onclick="showAddGearModal()" class="text-xs font-semibold leading-tight text-slate-500 cursor-pointer hover:scale-102 hover:text-slate-900 hover:underline"><strong class="font-extrabold">+ </strong>Ajouter du matériel ou une ressource ({{ character.getXpGear() - character.getGearXpUsed() }} PA disponibles)</span>
-                          </div>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
+                    </td>
+                    <td class="w-20 align-middle bg-slate-50  shadow-transparent p-2 rounded border border-dashed border-slate-200 hover:border-slate-500">
+                      <button onclick="confirmDelete('{{ path('api_character_asset_delete', {'characterAssetId': specialSkill.characterAssetId}) }}', { assetType: 'Capacity' })" data-target="tooltip_trigger" data-placement="top" class="w-full text-center"><i class="fa fa-trash cursor-pointer hover:text-slate-700" aria-hidden="true"></i>
+                      </button>
+                        <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm" role="tooltip">
+                          Supprimer la capacité spéciale
+                          <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
+                        </div>
+                    </td>
+                  </tr>
+                  {% else %}
+                  <tr>
+                    <td class="p-2 align-middle bg-transparent border-b shadow-transparent text-center" colspan="3">
+                        Aucune capacité spéciale
+                    </td>
+                  </tr>
+                  {% endfor %}
+                  <tr>
+                    <td class="mx-8 text-center shadow-transparent" colspan="3">
+                      <div class="flex p-3 mt-3 text-center justify-center bg-slate-100 bg-opacity-40  border rounded border-dashed border-slate-300 hover:border-solid">
+                        <span onclick="showAddAssetModal('Capacity')" class="text-xs font-semibold leading-tight text-slate-500 cursor-pointer hover:scale-102 hover:text-slate-900 hover:underline"><strong class="font-extrabold">+ </strong>Ajouter une capacité commune</span>
+                      </div>
+                      <div class="flex p-3 mt-3 text-center justify-center bg-slate-100 bg-opacity-40  border rounded border-dashed border-slate-300 hover:border-solid">
+                        <span onclick="showAddAssetModal('Capacity', true)" class="text-xs font-semibold leading-tight text-slate-500 cursor-pointer hover:scale-102 hover:text-slate-900 hover:underline"><strong class="font-extrabold">+ </strong>Ajouter une capacité personnalisée</span>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
-
-           <div class="flex-none w-full max-w-full px-3  mb-6">
-            <div class="relative flex flex-col min-w-0 pb-2 break-words bg-white border-0 border-transparent border-solid shadow-soft-xl rounded-2xl bg-clip-border">
-              <div class="flex flex-wrap mx-3 my-3">
-                <div class="flex-none w-auto max-w-full px-3 my-auto">
-                  <div class="h-full">
-                    <h5 class="mb-1">Mes posséssions <a href="#" id="info" data-target="tooltip_trigger" data-placement="top"><i class="fa fa-question-circle hover:text-slate-700 text-sm" aria-hidden="true"></i></a> 
+        </div>
+      </div>
+      <!-- Matos -->
+      <div class="flex-none w-full max-w-full px-3 mb-3">
+        <div class="relative flex flex-col min-w-0 pb-2 break-words bg-white border-0 border-transparent border-solid shadow-soft-xl rounded-2xl bg-clip-border">
+          <div class="flex flex-wrap mx-3 my-3">
+            <div class="flex-none w-auto max-w-full px-3 my-auto">
+              <div class="h-full">
+                <h5 class="mb-1">Matériels et ressources</h5>
+              </div>
+            </div>
+            <div class="w-full max-w-full px-3 mx-auto mt-4 sm:my-auto sm:mr-0 sm:w-1/5 md:w-1/5 md:flex-none">
+              <div class="relative right-0">
+                <div class="h-full text-right">
+                  <h6 class="mb-1"><span class="text-slate-400">{{ character.getXpGear() - character.getGearXpUsed() }}</span>/{{ character.getXpGear() }} PA 
+                    {% if character.getAvailableXp() > 0 and character.isNotValidated() %}
+                      <button onclick="showAddGearXpModal()" data-target="tooltip_trigger" data-placement="top" class="text-xs font-semibold leading-tight text-slate-300 cursor-pointer hover:scale-102 hover:text-slate-700 hover:underline">
+                        <i class="fa fa-plus-circle text-slate-400 hover:text-slate-700 text-sm" aria-hidden="true"></i>
+                      </button> 
                       <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm" role="tooltip">
-                        Les posséssions accumulées lors du précédent opus Dawn principal
-                        <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
-                      </div></h5>
-                  </div>
-                </div>
+                      Ajouter PA
+                      <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
+                    </div>
+                    {% endif %}
+                  </h5>
+                </div> 
               </div>
-              <div class="flex-auto px-0 pt-0 pb-2">
-                <div class="p-0 mx-5">
-                  <table class="items-center w-full table-fixed border-separate border-spacing-2 mb-0 align-top border-gray-200 text-slate-500">
-                    <tbody>
-                      {% for object in character.getObjects() ?? [] %}
-                      <tr>
-                        <td class="p-2 align-middle bg-transparent border-b  shadow-transparent text-pretty">
+            </div>
+          </div>
+          <div class="flex-auto px-0 pt-0 pb-2">
+            <div class="p-0 mx-5">
+              <table class="items-center w-full table-fixed border-separate border-spacing-2 mb-0 align-top border-gray-200 text-slate-500">
+                <tbody>
+                    {% for possession in character.possessions %}
+                    <tr>
+                      <td class="p-2 align-middle bg-transparent border-b shadow-transparent text-pretty">
                           <div class="flex px-2 py-1">
-                            <div class="flex flex-col justify-center">
-                              <p class="text-sm leading-normal"><span class="font-extrabold underline text-slate-700">{{ object.name }} {% if object.quantity > 1 %} ({{ object.quantity }}){% endif %}</span> : {{ object.description }} {% if object.quote %}<span class="italic">"{{ object.quote }}"</span>{% endif %}<br/>
-                              {% if object.note %}
-                                <span class="text-sm leading-normal">{{ object.note }}</span>
-                              {% endif %}
-                              </p>
-                            </div>
+                              <div class="flex flex-col justify-center">
+                                  <p class="text-sm leading-normal">
+                                      <span data-gear-name class="font-extrabold underline text-slate-700">{{ possession.gear.label }}</span> : <span data-gear-description>{{ possession.gear.description }}</span>
+                                      <br/>
+                                      Coût : <span data-gear-cost class="font-extrabold">{{ possession.cost }}</span>PA
+                                      {% if possession.note %}
+                                        <br/>
+                                        Note : <span data-gear-note class="text-sm leading-normal">{{ possession.note }}</span>
+                                      {% endif %}
+                                      {% if possession.noteOrga %}
+                                        <br/>
+                                        Note Orga : <span data-gear-note-orga class="text-sm leading-normal">{{ possession.noteOrga }}</span>
+                                      {% endif %}
+                                  </p>
+                              </div>
                           </div>
-                        </td>
-                        <td class="w-20 align-middle bg-slate-50  shadow-transparent p-2 rounded border border-dashed border-slate-200 hover:border-slate-500">
-                          <div class=" w-full text-center"><a href="javascript:editMatosModal()" data-target="tooltip_trigger" data-placement="top"><i class="ml-2 fa fa-pencil hover:scale-102 hover:text-slate-700"></i></a>
-                            <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm" role="tooltip">
-                              Editer / commenter
-                              <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
-                            </div>
-                          </div>
-                        </td>
-                        <td class="w-20 align-middle bg-slate-50  shadow-transparent p-2 rounded border border-dashed border-slate-200 hover:border-slate-500">
-                          <button onclick="confirmDelete('{{ path('api_character_asset_delete', {'characterAssetId': object.characterAssetId, 'assetType': 'object'}) }}')" class="w-full text-center"><i class="fa fa-trash cursor-pointer hover:text-slate-700" aria-hidden="true"  data-target="tooltip_trigger" data-placement="top"></i>
-                            <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm" role="tooltip">
-                              Supprimer le matériel
-                              <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
-                            </div>
-                          </button>
-                        </td>
-                      </tr>
-                      {% else %}
-                      <tr>
+                      </td>
+                      <td class="w-20 align-middle bg-slate-50  shadow-transparent p-2 rounded border border-dashed border-slate-200 hover:border-slate-500">
+                        <button onclick="editGearModal(event, '{{ possession.id }}')" class=" w-full text-center" data-target="tooltip_trigger" data-placement="top"><i class="ml-2 fa fa-pencil hover:scale-102 hover:text-slate-700"></i></button>
+                        <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm" role="tooltip">
+                          Editer / commenter
+                          <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
+                        </div>
+                      </td>
+                      <td class="w-20 align-middle bg-slate-50  shadow-transparent p-2 rounded border border-dashed border-slate-200 hover:border-slate-500">
+                        <button onclick="confirmDelete('{{ path('api_character_gear_delete', {'id': character.id}) }}', { possessionId: {{ possession.id }} })" class="w-full text-center" data-target="tooltip_trigger" data-placement="top">
+                          <i class="fa fa-trash cursor-pointer hover:text-slate-700"></i>
+                        </button>
+                        <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm" role="tooltip">
+                          Supprimer l'équipement
+                          <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
+                        </div>
+                      </td>
+                    </tr>
+                    {% else %}
+                    <tr>
                         <td class="p-2 align-middle bg-transparent border-b shadow-transparent text-center" colspan="3">
-                            Aucun matériel
+                            Aucun équipement
                         </td>
-                      </tr>
-                      {% endfor %}
-                      <tr>
-                        <td class="mx-8 text-center shadow-transparent" colspan="3">
-                          <div class="flex p-3 mt-3 text-center justify-center bg-slate-100 bg-opacity-40  border rounded border-dashed border-slate-300 hover:border-solid">
-                            <span onclick="showAddAssetModal('object')" class="text-xs font-semibold leading-tight text-slate-500 cursor-pointer hover:scale-102 hover:text-slate-900 hover:underline"><strong class="font-extrabold">+ </strong>Ajouter une posséssion commune</span>
-                          </div>
-                          <div class="flex p-3 mt-3 text-center justify-center bg-slate-100 bg-opacity-40  border rounded border-dashed border-slate-300 hover:border-solid">
-                            <span onclick="showAddAssetModal('object', true)" class="text-xs font-semibold leading-tight text-slate-500 cursor-pointer hover:scale-102 hover:text-slate-900 hover:underline"><strong class="font-extrabold">+ </strong>Ajouter une posséssion personnalisée</span>
-                          </div>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
+                    </tr>
+                  {% endfor %}
+                  <tr>
+                    <td class="mx-8 text-center shadow-transparent" colspan="3">
+                      <div class="flex p-3 mt-3 text-center justify-center bg-slate-100 bg-opacity-40  border rounded border-dashed border-slate-300 hover:border-solid">
+                        <span onclick="showAddGearModal()" class="text-xs font-semibold leading-tight text-slate-500 cursor-pointer hover:scale-102 hover:text-slate-900 hover:underline"><strong class="font-extrabold">+ </strong>Ajouter du matériel ou une ressource ({{ character.getXpGear() - character.getGearXpUsed() }} PA disponibles)</span>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
       </div>
 
-      <div id="bgTab" class="hidden w-full p-6 mx-auto">
-        <div class="flex flex-wrap -mx-3">
-          <!-- Compétences -->
-          <div class="flex-none w-full max-w-full px-3  mb-6">
-            <div class="relative flex flex-col min-w-0 pb-2 break-words bg-white border-0 border-transparent border-solid shadow-soft-xl rounded-2xl bg-clip-border">
-              <div class="flex flex-wrap mx-3 my-3">
-                <div class="flex-none w-full max-w-full px-3 my-auto">
-                  <div class="h-full">
-                    <h5 class="mb-1">Background de {{ character.name }}</h5>
-                  </div>
-                </div>
-                <div class="w-full px-0 pt-5 pb-2 my-auto {% if character.isNotValidated() == false %}hidden{% endif %}">
-                  <div id="editor" class="bg-white !text-sm">
-                    {{ character.background|raw }}
-                  </div>
-                </div>
-                <div class="w-full px-4 pb-2 my-auto {% if character.isNotValidated() %}hidden{% endif %}">
-                  <p class="bg-white !text-sm">
-                    {{ character.background|raw }}
-                  </p>
-                </div>
-                {% if character.isNotValidated() %}
-                <div class="w-full px-0 pb-2 my-auto text-right">
-                  <button onclick="saveBackground()" class="inline-block px-6 py-3 font-bold text-center text-white uppercase align-middle transition-all rounded-lg cursor-pointer bg-gradient-to-tl from-green-600 to-green-700 leading-pro text-xs ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 hover:scale-102 active:opacity-85 hover:text-lime-300 hover:shadow-soft-xs">Sauvegarder</button>
-                </div>
-                {% endif %}
+      <!-- Possessions -->
+      <div class="flex-none w-full max-w-full px-3  mb-6">
+        <div class="relative flex flex-col min-w-0 pb-2 break-words bg-white border-0 border-transparent border-solid shadow-soft-xl rounded-2xl bg-clip-border">
+          <div class="flex flex-wrap mx-3 my-3">
+            <div class="flex-none w-auto max-w-full px-3 my-auto">
+              <div class="h-full">
+                <h5 class="mb-1">Mes posséssions <a href="#" id="info" data-target="tooltip_trigger" data-placement="top"><i class="fa fa-question-circle hover:text-slate-700 text-sm" aria-hidden="true"></i></a> 
+                  <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm" role="tooltip">
+                    Les posséssions accumulées lors du précédent opus Dawn principal
+                    <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
+                  </div></h5>
               </div>
+            </div>
+          </div>
+          <div class="flex-auto px-0 pt-0 pb-2">
+            <div class="p-0 mx-5">
+              <table class="items-center w-full table-fixed border-separate border-spacing-2 mb-0 align-top border-gray-200 text-slate-500">
+                <tbody>
+                  {% for object in character.getObjects() ?? [] %}
+                  <tr>
+                    <td class="p-2 align-middle bg-transparent border-b  shadow-transparent text-pretty">
+                      <div class="flex px-2 py-1">
+                        <div class="flex flex-col justify-center">
+                          <p class="text-sm leading-normal"><span data-asset-name class="font-extrabold underline text-slate-700">{{ object.name }} {% if object.quantity > 1 %} (<span data-asset-quantity>{{ object.quantity }}</span>){% endif %}</span> : <span data-asset-description>{{ object.description }}</span> {% if object.quote %}<span class="italic">"{{ object.quote }}"</span>{% endif %}
+                          {% if object.note %}
+                            <br/>
+                            Note : <span data-asset-note class="text-sm leading-normal">{{ object.note }}</span>
+                          {% endif %}
+                          {% if object.noteOrga %}
+                            <br/>
+                            Note Orga : <span data-asset-note-orga class="text-sm leading-normal">{{ object.noteOrga }}</span>
+                          {% endif %}
+                          </p>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="w-20 align-middle bg-slate-50  shadow-transparent p-2 rounded border border-dashed border-slate-200 hover:border-slate-500">
+                      <button onclick="editAssetModal(event, '{{ object.characterAssetId }}', 'Object')" data-target="tooltip_trigger" data-placement="top" class=" w-full text-center"><i class="ml-2 fa fa-pencil hover:scale-102 hover:text-slate-700"></i></button>
+                      </div>
+                        <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm" role="tooltip">
+                          Editer / commenter
+                          <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
+                        </div>
+                    </td>
+                    <td class="w-20 align-middle bg-slate-50  shadow-transparent p-2 rounded border border-dashed border-slate-200 hover:border-slate-500">
+                      <button onclick="confirmDelete('{{ path('api_character_asset_delete', {'characterAssetId': object.characterAssetId}) }}', { assetType: 'Object' })" data-target="tooltip_trigger" data-placement="top" class="w-full text-center"><i class="fa fa-trash cursor-pointer hover:text-slate-700" aria-hidden="true"></i>
+                      </button>
+                        <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm" role="tooltip">
+                          Supprimer le matériel
+                          <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
+                        </div>
+                    </td>
+                  </tr>
+                  {% else %}
+                  <tr>
+                    <td class="p-2 align-middle bg-transparent border-b shadow-transparent text-center" colspan="3">
+                        Aucun matériel
+                    </td>
+                  </tr>
+                  {% endfor %}
+                  <tr>
+                    <td class="mx-8 text-center shadow-transparent" colspan="3">
+                      <div class="flex p-3 mt-3 text-center justify-center bg-slate-100 bg-opacity-40  border rounded border-dashed border-slate-300 hover:border-solid">
+                        <span onclick="showAddAssetModal('Object')" class="text-xs font-semibold leading-tight text-slate-500 cursor-pointer hover:scale-102 hover:text-slate-900 hover:underline"><strong class="font-extrabold">+ </strong>Ajouter une posséssion commune</span>
+                      </div>
+                      <div class="flex p-3 mt-3 text-center justify-center bg-slate-100 bg-opacity-40  border rounded border-dashed border-slate-300 hover:border-solid">
+                        <span onclick="showAddAssetModal('Object', true)" class="text-xs font-semibold leading-tight text-slate-500 cursor-pointer hover:scale-102 hover:text-slate-900 hover:underline"><strong class="font-extrabold">+ </strong>Ajouter une posséssion personnalisée</span>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
       </div>
+    </div>
+  </div>
 
-        <div class="w-full px-6 mx-auto text-right mb-4">
-            {# <a href="#" 
-               onclick="confirmDelete('{{ path('character_delete', {'id': character.id}) }}')" 
-               class="inline-block px-6 py-3 font-bold text-center text-red-700 bg-transparent uppercase align-middle transition-all leading-pro text-xs ease-soft-in tracking-tight-soft hover:scale-102 hover:underline active:opacity-85">Supprimer</a> 
-            
-            {% if (character.isMain() or character.isSecondary()) and character.isNotValidated() %}
-                <a href="#" onclick="confirmSubmit('{{ path('character_submit', {'id': character.id}) }}')" class="inline-block px-6 py-3 font-bold text-center text-white uppercase align-middle transition-all rounded-lg cursor-pointer bg-gradient-to-tl from-cyan-300 to-cyan-600 leading-pro text-xs ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 hover:scale-102 active:opacity-85 hover:shadow-soft-xs hover:text-cyan-100">Soumettre ce personnage aux orgas</a>
-            {% elseif not character.getUser().hasMainCharacter() %}
-                <a href="#" onclick="confirmSetType('{{ path('character_set_type', {'id': character.id, 'type': 'main'}) }}', 'principal')" class="inline-block px-6 py-3 font-bold text-center text-white uppercase align-middle transition-all rounded-lg cursor-pointer bg-gradient-to-tl from-cyan-300 to-cyan-600 leading-pro text-xs ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 hover:scale-102 active:opacity-85 hover:shadow-soft-xs hover:text-cyan-100">Définir comme personnage principal</a>
-            {% elseif not character.getUser().hasSecondaryCharacter() %}
-                <a href="#" onclick="confirmSetType('{{ path('character_set_type', {'id': character.id, 'type': 'secondary'}) }}', 'reroll')" class="inline-block px-6 py-3 font-bold text-center text-white uppercase align-middle transition-all rounded-lg cursor-pointer bg-gradient-to-tl from-cyan-300 to-cyan-600 leading-pro text-xs ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 hover:scale-102 active:opacity-85 hover:shadow-soft-xs hover:text-cyan-100">Définir comme personnage reroll</a>
-            {% endif %}#}
-
-          {% if character.isInValidation() %}
-          <button type="button" onclick="confirmUnlockCharacter()" class="inline-block px-6 py-3 font-bold text-center text-white uppercase align-middle transition-all rounded-lg cursor-pointer bg-gradient-to-tl from-cyan-300 to-cyan-600 leading-pro text-xs ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 hover:scale-102 active:opacity-85 hover:shadow-soft-xs hover:text-cyan-100" data-target="tooltip_trigger" data-placement="top">Débloquer le personnage</button>
-          <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-cyan-600 rounded-lg text-sm" role="tooltip">
-            Débloquer le personnage, lae joueureuse peut à nouveau le modifier
-            <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
-          </div>          
-          <button type="button" onclick="confirmValidateCharacter()" class="inline-block px-6 py-3 font-bold text-center text-white uppercase align-middle transition-all rounded-lg cursor-pointer bg-gradient-to-tl from-green-600 to-green-700 leading-pro text-xs ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 hover:scale-102 active:opacity-85 hover:text-lime-300 hover:shadow-soft-xs" data-target="tooltip_trigger" data-placement="top">Valider ce personnage</button>
-          <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-green-700 rounded-lg text-sm" role="tooltip">
-            Permet à lae joueureuse d'imprimer sa fiche
-            <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
-          </div> 
-          {% endif %}
+  <div id="bgTab" class="hidden w-full p-6 mx-auto">
+    <div class="flex flex-wrap -mx-3">
+      <!-- Compétences -->
+      <div class="flex-none w-full max-w-full px-3  mb-6">
+        <div class="relative flex flex-col min-w-0 pb-2 break-words bg-white border-0 border-transparent border-solid shadow-soft-xl rounded-2xl bg-clip-border">
+          <div class="flex flex-wrap mx-3 my-3">
+            <div class="flex-none w-full max-w-full px-3 my-auto">
+              <div class="h-full">
+                <h5 class="mb-1">Background de {{ character.name }}</h5>
+              </div>
+            </div>
+            <div class="w-full px-0 pt-5 pb-2 my-auto {% if character.isNotValidated() == false %}hidden{% endif %}">
+              <div id="editor" class="bg-white !text-sm">
+                {{ character.background|raw }}
+              </div>
+            </div>
+            <div class="w-full px-4 pb-2 my-auto {% if character.isNotValidated() %}hidden{% endif %}">
+              <p class="bg-white !text-sm">
+                {{ character.background|raw }}
+              </p>
+            </div>
+            {% if character.isNotValidated() %}
+            <div class="w-full px-0 pb-2 my-auto text-right">
+              <button onclick="saveBackground()" class="inline-block px-6 py-3 font-bold text-center text-white uppercase align-middle transition-all rounded-lg cursor-pointer bg-gradient-to-tl from-green-600 to-green-700 leading-pro text-xs ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 hover:scale-102 active:opacity-85 hover:text-lime-300 hover:shadow-soft-xs">Sauvegarder</button>
+            </div>
+            {% endif %}
+          </div>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="w-full px-6 mx-auto text-right mb-4">
+      {# <a href="#" 
+          onclick="confirmDelete('{{ path('character_delete', {'id': character.id}) }}')" 
+          class="inline-block px-6 py-3 font-bold text-center text-red-700 bg-transparent uppercase align-middle transition-all leading-pro text-xs ease-soft-in tracking-tight-soft hover:scale-102 hover:underline active:opacity-85">Supprimer</a> 
+      
+      {% if (character.isMain() or character.isSecondary()) and character.isNotValidated() %}
+          <a href="#" onclick="confirmSubmit('{{ path('character_submit', {'id': character.id}) }}')" class="inline-block px-6 py-3 font-bold text-center text-white uppercase align-middle transition-all rounded-lg cursor-pointer bg-gradient-to-tl from-cyan-300 to-cyan-600 leading-pro text-xs ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 hover:scale-102 active:opacity-85 hover:shadow-soft-xs hover:text-cyan-100">Soumettre ce personnage aux orgas</a>
+      {% elseif not character.getUser().hasMainCharacter() %}
+          <a href="#" onclick="confirmSetType('{{ path('character_set_type', {'id': character.id, 'type': 'main'}) }}', 'principal')" class="inline-block px-6 py-3 font-bold text-center text-white uppercase align-middle transition-all rounded-lg cursor-pointer bg-gradient-to-tl from-cyan-300 to-cyan-600 leading-pro text-xs ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 hover:scale-102 active:opacity-85 hover:shadow-soft-xs hover:text-cyan-100">Définir comme personnage principal</a>
+      {% elseif not character.getUser().hasSecondaryCharacter() %}
+          <a href="#" onclick="confirmSetType('{{ path('character_set_type', {'id': character.id, 'type': 'secondary'}) }}', 'reroll')" class="inline-block px-6 py-3 font-bold text-center text-white uppercase align-middle transition-all rounded-lg cursor-pointer bg-gradient-to-tl from-cyan-300 to-cyan-600 leading-pro text-xs ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 hover:scale-102 active:opacity-85 hover:shadow-soft-xs hover:text-cyan-100">Définir comme personnage reroll</a>
+      {% endif %}#}
+
+    {% if character.isInValidation() %}
+    <button type="button" onclick="confirmUnlockCharacter()" class="inline-block px-6 py-3 font-bold text-center text-white uppercase align-middle transition-all rounded-lg cursor-pointer bg-gradient-to-tl from-cyan-300 to-cyan-600 leading-pro text-xs ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 hover:scale-102 active:opacity-85 hover:shadow-soft-xs hover:text-cyan-100" data-target="tooltip_trigger" data-placement="top">Débloquer le personnage</button>
+    <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-cyan-600 rounded-lg text-sm" role="tooltip">
+      Débloquer le personnage, lae joueureuse peut à nouveau le modifier
+      <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
+    </div>          
+    <button type="button" onclick="confirmValidateCharacter()" class="inline-block px-6 py-3 font-bold text-center text-white uppercase align-middle transition-all rounded-lg cursor-pointer bg-gradient-to-tl from-green-600 to-green-700 leading-pro text-xs ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 hover:scale-102 active:opacity-85 hover:text-lime-300 hover:shadow-soft-xs" data-target="tooltip_trigger" data-placement="top">Valider ce personnage</button>
+    <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-green-700 rounded-lg text-sm" role="tooltip">
+      Permet à lae joueureuse d'imprimer sa fiche
+      <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
+    </div> 
+    {% endif %}
+  </div>
 
   <script>
-  let quill; // Déclarer quill comme variable globale
-  
-  document.addEventListener('DOMContentLoaded', function() {
-    const compTab = document.getElementById("compTab");
-    const bgTab = document.getElementById("bgTab");
+    let quill; // Déclarer quill comme variable globale
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      const compTab = document.getElementById("compTab");
+      const bgTab = document.getElementById("bgTab");
 
-    quill = new Quill('#editor', {
-        theme: 'snow'
+      quill = new Quill('#editor', {
+          theme: 'snow'
+      });
+
     });
 
-    const nameInput = document.getElementById('characterName');
-    const saveNameBtn = document.getElementById('saveNameBtn');
-    const originalName = nameInput.value;
-
-    nameInput.addEventListener('input', function() {
-      console.log(this.value);
-        if (this.value !== originalName) {
-            saveNameBtn.classList.remove('hidden');
-        } else {
-            saveNameBtn.classList.add('hidden');
-        }
-    });
-  });
-    function hideCompTab()
-    {
+    function hideCompTab() {
         if(compTab.classList.contains = 'block')
         {
         compTab.classList.remove("block");
@@ -512,8 +520,7 @@
         }
     } 
 
-    function hideBgTab()
-    {
+    function hideBgTab() {
         if(bgTab.classList.contains = 'block')
         {
         bgTab.classList.remove("block");
@@ -550,6 +557,13 @@
         });
     }
 
+    function escapeHtml(unsafe) {
+        if (unsafe === undefined || unsafe === null) {
+            return '';
+        }
+        return unsafe.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
+
     function showAddSkillModal() {
         fetch('{{ path('api_character_available_skills', {'id': character.id}) }}')
             .then(response => {
@@ -573,8 +587,14 @@
                                 <select id="skill" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 mt-1 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow">
                                     <option value="">-- Sélectionnez une compétence --</option>
                                     ${skills.map(skill => `
-                                        <option value="${skill.id}" data-cost="${skill.baseCost}" data-description="${skill.description}" data-short="${skill.short}" data-label="${skill.label}">
-                                            ${skill.label} - ${skill.baseCost}PA
+                                        <option value="${skill.id}" 
+                                                data-cost="${skill.baseCost}" 
+                                                data-description="${escapeHtml(skill.description)}" 
+                                                data-short="${escapeHtml(skill.short)}" 
+                                                data-note="${escapeHtml(skill.baseNote)}" 
+                                                data-note-orga="${escapeHtml(skill.baseNoteOrga)}" 
+                                                data-label="${escapeHtml(skill.label)}">
+                                            ${escapeHtml(skill.label)} - ${skill.baseCost}PA
                                         </option>
                                     `).join('')}
                                 </select>
@@ -582,13 +602,24 @@
                             <div id="skillDescription" class="mb-4 text-sm leading-normal hidden">
                                 <p class="text-sm leading-normal">
                                     <span class="font-extrabold text-slate-700"></span> : <span class="description"></span><br/>
-                                    Coût : <span class="font-extrabold text-red-700 cost"></span>
                                 </p>
+                                <p class="text-sm leading-normal">              
+                                  <strong class="font-extrabold text-slate-700"> <span>Coût de la compétence (base <span id="skillBaseCost">0</span>PA)</span> :</strong> <input type="number" id="skillCost" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 mt-1 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow">
+                                </p>
+                                <div class="mb-6">
+                                  <textarea id="skillNote" rows="3" cols="20" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow" placeholder="Commentaire visible par lae joueureuse" required></textarea>
+                                </div>
+                                <div class="mb-6">
+                                  <textarea id="skillNoteOrga" rows="3" cols="20" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow" placeholder="Commentaire seulement visible par les orgas" required></textarea>
+                                </div>
                             </div>
                         </form>
                     `,
                     getData: () => ({
                         skillId: document.getElementById("skill").value,
+                        skillCost: document.getElementById("skillCost").value,
+                        skillNote: document.getElementById("skillNote").value,
+                        skillNoteOrga: document.getElementById("skillNoteOrga").value,
                     }),
                     validate: (data) => data.skillId,
                     url: "{{ path('api_character_skill_add', {'id': character.id}) }}",
@@ -606,7 +637,10 @@
                                 skillDescription.classList.remove("hidden");
                                 skillDescription.querySelector(".font-extrabold").textContent = selectedOption.dataset.label;
                                 skillDescription.querySelector(".description").textContent = selectedOption.dataset.description;
-                                skillDescription.querySelector(".cost").textContent = selectedOption.dataset.cost + "PA";
+                                skillDescription.querySelector("#skillBaseCost").textContent = selectedOption.dataset.cost;
+                                skillDescription.querySelector("#skillCost").value = selectedOption.dataset.cost;
+                                skillDescription.querySelector("#skillNote").value = selectedOption.dataset.note;
+                                skillDescription.querySelector("#skillNoteOrga").value = selectedOption.dataset.noteOrga;
                             } else {
                                 skillDescription.classList.add("hidden");
                             }
@@ -732,8 +766,15 @@
                                 <select id="gear" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 mt-1 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow">
                                     <option value="">-- Sélectionnez un équipement --</option>
                                     ${gear.map(item => `
-                                        <option value="${item.id}" data-cost="${item.baseCost}" data-description="${item.description}" data-short="${item.short}" data-label="${item.label}">
-                                            ${item.label} - ${item.baseCost}PA
+                                        <option 
+                                            value="${item.id}" 
+                                            data-cost="${item.baseCost}" 
+                                            data-description="${escapeHtml(item.description)}" 
+                                            data-short="${escapeHtml(item.short)}" 
+                                            data-label="${escapeHtml(item.label)}"
+                                            data-note="${escapeHtml(item.baseNote)}"
+                                            data-note-orga="${escapeHtml(item.baseNoteOrga)}">
+                                            ${escapeHtml(item.label)} - ${item.baseCost}PA
                                         </option>
                                     `).join('')}
                                 </select>
@@ -741,13 +782,24 @@
                             <div id="gearDescription" class="mb-4 text-sm leading-normal hidden">
                                 <p class="text-sm leading-normal">
                                     <span class="font-extrabold text-slate-700"></span> : <span class="description"></span><br/>
-                                    Coût : <span class="font-extrabold text-red-700 cost"></span>
                                 </p>
+                                <p class="text-sm leading-normal">              
+                                  <strong class="font-extrabold text-slate-700"> <span>Coût de l'équipement (base <span id="gearBaseCost">0</span>PA)</span> :</strong> <input type="number" id="gearCost" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 mt-1 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow">
+                                </p>
+                                <div class="mb-6">
+                                  <textarea id="gearNote" rows="3" cols="20" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow" placeholder="Commentaire visible par lae joueureuse" required></textarea>
+                                </div>
+                                <div class="mb-6">
+                                  <textarea id="gearNoteOrga" rows="3" cols="20" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow" placeholder="Commentaire seulement visible par les orgas" required></textarea>
+                                </div>
                             </div>
                         </form>
                     `,
                     getData: () => ({
                         gearId: document.getElementById("gear").value,
+                        gearCost: document.getElementById("gearCost").value,
+                        gearNote: document.getElementById("gearNote").value,
+                        gearNoteOrga: document.getElementById("gearNoteOrga").value,
                     }),
                     validate: (data) => data.gearId,
                     url: "{{ path('api_character_gear_add', {'id': character.id}) }}",
@@ -757,7 +809,11 @@
                     didOpen: () => {
                         const gearSelect = document.getElementById("gear");
                         const gearDescription = document.getElementById("gearDescription");
-                        
+                        const gearBaseCost = document.getElementById("gearBaseCost");
+                        const gearCost = document.getElementById("gearCost");
+                        const gearNote = document.getElementById("gearNote");
+                        const gearNoteOrga = document.getElementById("gearNoteOrga");
+
                         gearSelect.addEventListener("change", function() {
                             const selectedOption = this.options[this.selectedIndex];
                             
@@ -765,7 +821,11 @@
                                 gearDescription.classList.remove("hidden");
                                 gearDescription.querySelector(".font-extrabold").textContent = selectedOption.dataset.label;
                                 gearDescription.querySelector(".description").textContent = selectedOption.dataset.description;
-                                gearDescription.querySelector(".cost").textContent = selectedOption.dataset.cost + "PA";
+                                gearBaseCost.textContent = selectedOption.dataset.cost;
+                                gearCost.value = selectedOption.dataset.cost;
+                                gearNote.value = selectedOption.dataset.note;
+                                gearNoteOrga.value = selectedOption.dataset.noteOrga;
+
                             } else {
                                 gearDescription.classList.add("hidden");
                             }
@@ -881,6 +941,298 @@
             successMessage: "Le personnage a été débloqué avec succès."
         });
     }
+
+    window.assetsModal = {
+        Capacity: {
+          label: "Capacité spéciale",
+          labels: "Capacités spéciales",
+          title: "Ajouter une capacité spéciale",
+          successTitle: "Capacité spéciale ajoutée !",
+          successMessage: "La capacité spéciale a été ajoutée avec succès.",
+          editTitle: "Editer une capacité spéciale",
+          editSuccessTitle: "Capacité spéciale modifiée !",
+          editSuccessMessage: "La capacité spéciale a été modifiée avec succès."
+        },
+        Object: {
+          label: "possession",
+          labels: "possessions",
+          title: "Ajouter une posséssion",
+          successTitle: "Possession ajoutée !",
+          successMessage: "La possession a été ajoutée avec succès.",
+          editTitle: "Editer une possession",
+          editSuccessTitle: "Possession modifiée !",
+          editSuccessMessage: "La possession a été modifiée avec succès."
+        }
+    }
+
+    function showAddAssetModal(assetType, isCustom = false) {
+      fetch('{{ path('api_character_available_assets', {'id': character.id}) }}')
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Erreur lors du chargement des actifs disponibles.');
+          }
+          return response.json();
+        })
+        .then(data => {
+          if (data.error) {
+            showErrorAlert({ message: data.error });
+            return;
+          }
+          var assets = data.assets.filter(asset => asset.type == assetType);
+          createModal({
+            title: assetsModal[assetType].title,
+            html: `
+                <form id="addAssetForm" class="text-left">
+                  ${isCustom ? `
+                    <div class="mb-4">
+                        <label class="block text-sm font-extrabold text-slate-700">Nom de la ${assetsModal[assetType].label}</label>
+                        <input type="text" id="assetName" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 mt-1 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow">
+                        <p class="text-sm leading-normal">
+                          <strong class="font-extrabold text-slate-700"> <span>Description</span> :</strong> <textarea id="assetDescription" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 mt-1 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow"></textarea>
+                        </p>
+                        <p class="text-sm leading-normal">
+                          <strong class="font-extrabold text-slate-700"> <span>Déscription courte</span> :</strong> <input type="text" id="assetShort" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 mt-1 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow">
+                        </p>
+                    </div>
+                  ` : `
+                  <div class="mb-4">
+                      <label class="block text-sm font-medium text-gray-700">Liste des ${assetsModal[assetType].labels} :</label>
+                      <select id="asset" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 mt-1 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow">
+                          <option value="">-- Sélectionnez une ${assetsModal[assetType].label} --</option>
+                          ${assets.map(asset => `
+                              <option value="${asset.id}" 
+                                      data-description="${escapeHtml(asset.description)}" 
+                                      data-short="${escapeHtml(asset.short)}" 
+                                      data-note="${escapeHtml(asset.baseNote)}" 
+                                      data-note-orga="${escapeHtml(asset.baseNoteOrga)}" 
+                                      data-label="${escapeHtml(asset.label)}">
+                                  ${escapeHtml(asset.label)}
+                              </option>
+                          `).join('')}
+                      </select>
+                  </div>
+                  `}
+                  <div id="assetDescription" class="mb-4 text-sm leading-normal ${isCustom ? '' : 'hidden'}">
+                      <p class="text-sm leading-normal ${isCustom ? 'hidden' : ''}">
+                          <span class="font-extrabold text-slate-700"></span> : <span class="description"></span><br/>
+                      </p>
+                      ${assetType == 'Object' ? `
+                      <p class="text-sm leading-normal">              
+                        <strong class="font-extrabold text-slate-700"> <span>Quantité</span> :</strong> <input type="number" value="1" id="assetQuantity" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 mt-1 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow">
+                      </p>
+                      ` : ``}
+                      <div class="mb-6">
+                        <textarea id="assetNote" rows="3" cols="20" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow" placeholder="Commentaire visible par lae joueureuse" required></textarea>
+                      </div>
+                      <div class="mb-6">
+                        <textarea id="assetNoteOrga" rows="3" cols="20" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow" placeholder="Commentaire seulement visible par les orgas" required></textarea>
+                      </div>
+                  </div>
+                </form>
+            `,
+            getData: () => ({
+                assetType: assetType,
+                isCustom: isCustom,
+                assetQuantity: document.getElementById("assetQuantity") ? document.getElementById("assetQuantity").value : 1,
+                assetNote: document.getElementById("assetNote").value,
+                assetNoteOrga: document.getElementById("assetNoteOrga").value,
+                assetName: document.getElementById("assetName") ? document.getElementById("assetName").value : null,
+                assetId: document.getElementById("asset") ? document.getElementById("asset").value : null,
+                assetShort: document.getElementById("assetShort") ? document.getElementById("assetShort").value : null,
+                assetDescription: document.getElementById("assetDescription") ? document.getElementById("assetDescription").value : null,
+            }),
+            didOpen: () => {
+              const assetSelect = document.getElementById("asset");
+              const assetDescription = document.getElementById("assetDescription");
+              
+              if(assetSelect) {
+                assetSelect.addEventListener("change", function() {
+                  const selectedOption = this.options[this.selectedIndex];
+                  
+                  if (this.value) {
+                      assetDescription.classList.remove("hidden");
+                      assetDescription.querySelector(".font-extrabold").textContent = selectedOption.dataset.label;
+                      assetDescription.querySelector(".description").textContent = selectedOption.dataset.description;
+                      assetDescription.querySelector("#assetNote").value = selectedOption.dataset.note;
+                      assetDescription.querySelector("#assetNoteOrga").value = selectedOption.dataset.noteOrga;
+                  } else {
+                      assetDescription.classList.add("hidden");
+                    }
+                });
+              }
+            },
+            validate: (data) => data.assetId || (isCustom && data.assetName),
+            url: "{{ path('api_character_asset_add', {'id': character.id}) }}",
+            confirmButtonText: "Ajouter",
+            successTitle: assetsModal[assetType].successTitle,
+            successMessage: assetsModal[assetType].successMessage
+        });
+      })
+      .catch(error => {
+        showErrorAlert({ message: "Une erreur est survenue lors de l'ajout de l'actif." });
+      });
+    }
+
+    function editSkillModal(event, characterId, skillId) {
+        $this = $(event.target);
+        createModal({
+            title: "Editer une compétence",
+            html: `
+                <form id="editSkillForm" class="text-left">
+                    <div class="mb-6 text-left">
+                      <p class="text-sm leading-normal">              
+                        <strong class="font-extrabold text-slate-700"> <span id="skillName">Nom de la compétence</span> :</strong> <span id="skillDescription">Description de la compétence</span><br/> 
+                      </p>
+                    </div>
+                    <div class="mb-6 text-left">
+                      <p class="text-sm leading-normal">              
+                        <strong class="font-extrabold text-slate-700"> <span>Coût de la compétence (base <span id="skillBaseCost">0</span>PA)</span> :</strong> <input type="number" id="skillCost" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 mt-1 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow">
+                      </p>
+                    </div>
+                    <div class="mb-6">
+                      <textarea id="skillNote" rows="3" cols="20" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow" placeholder="Commentaire visible par lae joueureuse" required></textarea>
+                    </div>
+                    <div class="mb-6">
+                      <textarea id="skillNoteOrga" rows="3" cols="20" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow" placeholder="Commentaire seulement visible par les orgas" required></textarea>
+                    </div>
+                </form>
+            `,
+            didOpen: () => {
+                const skillName = $this.parents('tr').find('[data-skill-name]').text();
+                const skillDescription = $this.parents('tr').find('[data-skill-description]').text();
+                const skillCost = $this.parents('tr').find('[data-skill-cost]').text();
+                const skillBaseCost = $this.parents('tr').find('[data-skill-base-cost]').data('skill-base-cost');
+                const skillNote = $this.parents('tr').find('[data-skill-note]').text();
+                const skillNoteOrga = $this.parents('tr').find('[data-skill-note-orga]').text();
+                $('#skillName').text(skillName);
+                $('#skillDescription').text(skillDescription);
+                $('#skillCost').val(skillCost);
+                $('#skillBaseCost').text(skillBaseCost);
+                $('#skillNote').val(skillNote);
+                $('#skillNoteOrga').val(skillNoteOrga);
+                console.log($this.parents('tr'), skillName, skillDescription, skillCost, skillNote, skillNoteOrga);
+            },
+            getData: () => ({
+                characterId: characterId,
+                skillId: skillId,
+                cost: $('#skillCost').val(),
+                note: $('#skillNote').val(),
+                noteOrga: $('#skillNoteOrga').val(),
+            }),
+            validate: () => true,
+            url: "{{ path('api_character_skill_edit', {'id': character.id}) }}",
+            successTitle: "Compétence modifiée !",
+            successMessage: "La compétence a été modifiée avec succès."
+        });
+    }
+
+    function editGearModal(event, possessionId) {
+        $this = $(event.target);
+        createModal({
+            title: "Editer un équipement",
+            html: `
+                <form id="editGearForm" class="text-left">
+                    <div class="mb-6 text-left">
+                      <p class="text-sm leading-normal">              
+                        <strong class="font-extrabold text-slate-700"> <span id="gearName">Nom de l'équipement</span> :</strong> <span id="gearDescription">Description de l'équipement</span><br/> 
+                      </p>
+                    </div>
+                    <div class="mb-6 text-left">
+                      <p class="text-sm leading-normal">              
+                        <strong class="font-extrabold text-slate-700"> <span>Coût de l'équipement (base <span id="gearBaseCost">0</span>PA)</span> :</strong> <input type="number" id="gearCost" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 mt-1 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow">
+                      </p>
+                    </div>
+                    <div class="mb-6">
+                      <textarea id="gearNote" rows="3" cols="20" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow" placeholder="Commentaire visible par lae joueureuse" required></textarea>
+                    </div>
+                    <div class="mb-6">
+                      <textarea id="gearNoteOrga" rows="3" cols="20" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow" placeholder="Commentaire seulement visible par les orgas" required></textarea>
+                    </div>
+                </form>
+            `,
+            didOpen: () => {
+                const gearName = $this.parents('tr').find('[data-gear-name]').text();
+                const gearDescription = $this.parents('tr').find('[data-gear-description]').text();
+                const gearCost = $this.parents('tr').find('[data-gear-cost]').text();
+                const gearBaseCost = $this.parents('tr').find('[data-gear-base-cost]').data('gear-base-cost');
+                const gearNote = $this.parents('tr').find('[data-gear-note]').text();
+                const gearNoteOrga = $this.parents('tr').find('[data-gear-note-orga]').text();
+                $('#gearName').text(gearName);
+                $('#gearDescription').text(gearDescription);
+                $('#gearCost').val(gearCost);
+                $('#gearBaseCost').text(gearBaseCost);
+                $('#gearNote').val(gearNote);
+                $('#gearNoteOrga').val(gearNoteOrga);
+                console.log($this.parents('tr'), gearName, gearDescription, gearCost, gearNote, gearNoteOrga);
+            },
+            getData: () => ({
+                possessionId: possessionId,
+                cost: $('#gearCost').val(),
+                note: $('#gearNote').val(),
+                noteOrga: $('#gearNoteOrga').val(),
+
+            }),
+            validate: () => true,
+            url: "{{ path('api_character_gear_edit', {'id': character.id}) }}",
+            successTitle: "Équipement modifié !",
+            successMessage: "L'équipement a été modifié avec succès."
+        });
+    }
+
+    function editAssetModal(event, characterAssetId, assetType) {
+        $this = $(event.target);
+        createModal({
+            title: assetsModal[assetType].editTitle,
+            html: `
+                <form id="editAssetForm" class="text-left">
+                    <div class="mb-6 text-left">
+                      <p class="text-sm leading-normal">              
+                        <strong class="font-extrabold text-slate-700"> <span id="assetName">Nom de l'équipement</span> :</strong> <span id="assetDescription">Description de l'équipement</span><br/> 
+                      </p>
+                    </div>
+                    ${assetType == 'Object' ? `
+                    <div class="mb-6 text-left">
+                      <p class="text-sm leading-normal">              
+                        <strong class="font-extrabold text-slate-700"> <span>Quantité :</strong> <input type="number" id="assetQuantity" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 mt-1 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow">
+                      </p>
+                    </div>
+                    ` : ``}
+                    <div class="mb-6">
+                      <textarea id="assetNote" rows="3" cols="20" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow" placeholder="Commentaire visible par lae joueureuse" required></textarea>
+                    </div>
+                    <div class="mb-6">
+                      <textarea id="assetNoteOrga" rows="3" cols="20" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow" placeholder="Commentaire seulement visible par les orgas" required></textarea>
+                    </div>
+                </form>
+            `,
+            getData: () => ({
+                characterAssetId: characterAssetId,
+                note: $('#assetNote').val(),
+                noteOrga: $('#assetNoteOrga').val(),
+                assetQuantity: $('#assetQuantity') ? $('#assetQuantity').val() : 1,
+            }),
+            didOpen: () => {
+                const assetName = $this.parents('tr').find('[data-asset-name]').text();
+                const assetDescription = $this.parents('tr').find('[data-asset-description]').text();
+                const assetQuantity = $this.parents('tr').find('[data-asset-quantity]').text();
+                const assetNote = $this.parents('tr').find('[data-asset-note]').text();
+                const assetNoteOrga = $this.parents('tr').find('[data-asset-note-orga]').text();
+                $('#assetName').text(assetName);
+                $('#assetDescription').text(assetDescription);
+                if (assetQuantity) {
+                    $('#assetQuantity').val(assetQuantity);
+                }
+                $('#assetNote').val(assetNote);
+                $('#assetNoteOrga').val(assetNoteOrga);
+            },
+            validate: () => true,
+            url: "{{ path('api_character_asset_edit', {'id': character.id}) }}",
+            successTitle: assetsModal[assetType].editSuccessTitle,
+            successMessage: assetsModal[assetType].editSuccessMessage
+        });
+    }
+    
+    
   </script>
 
 {% endblock %}

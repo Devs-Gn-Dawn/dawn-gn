@@ -345,7 +345,8 @@
                     `,
                     getData: () => ({
                         event: document.getElementById('registration-event').value,
-                        ticket: document.getElementById('registration-ticket').value
+                        ticket: document.getElementById('registration-ticket').value,
+                        userId: {{ user.id }}
                     }),
                     validate: (data) => data.event && data.ticket,
                     url: id 

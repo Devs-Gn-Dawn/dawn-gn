@@ -20,6 +20,12 @@ use App\Entity\User;
 use App\Entity\EventType;
 use App\Entity\CharacterType;
 use App\Entity\CharacterAsset;
+use App\Entity\Asset;
+use App\Entity\Skill;
+use App\Entity\SkillLearned;
+use App\Entity\Possession;
+use App\Entity\RarityType;
+use App\Entity\AssetType;
 
 #[IsGranted(RoleType::ROLE_ORGA)]
 class OrgaController extends AbstractController
@@ -199,9 +205,164 @@ class OrgaController extends AbstractController
     }
 
     #[Route('/api/character/asset/{characterAssetId}/delete', name: 'api_character_asset_delete', methods: ['POST'])]
-    public function deleteAsset(CharacterAsset $characterAsset): JsonResponse
+    public function deleteAsset(Request $request, $characterAssetId): JsonResponse
     {
+        $characterAsset = $this->entityManager->getRepository(CharacterAsset::class)->find($characterAssetId);
+        if (!$characterAsset) {
+            return $this->json(['error' => 'Équipement non trouvé'], 400);
+        }
         $this->entityManager->remove($characterAsset);
+        $this->entityManager->flush();
+
+        return $this->json(['success' => true]);
+    }
+
+    #[Route('/api/character/{id}/asset/add', name: 'api_character_asset_add', methods: ['POST'])]
+    public function addAsset(Request $request, Character $character): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+
+        if (empty($data['assetId']) && (!$data['isCustom'] || empty($data['assetName']))) {
+            return $this->json(['error' => 'Tous les champs sont obligatoires'], 400);
+        }
+
+        if ($data['isCustom']) {
+            // create custom asset
+            $customAsset = new Asset();
+            $customAsset->setLabel($data['assetName']);
+            $customAsset->setIsCatalog(false);
+            $customAsset->setBaseCost(0);
+            $customAsset->setQuote('');
+            $customAsset->setRequiredClasses(['']);
+            $customAsset->setRequiredFactions(['']);
+            $customAsset->setVisibility(true);
+            $customAsset->setBaseNote($data['assetNote']);
+            $customAsset->setBaseNoteOrga($data['assetNoteOrga']);
+            $customAsset->setDescription($data['assetDescription']);
+            $customAsset->setType(AssetType::fromString($data['assetType']));
+            $customAsset->setShort($data['assetShort']);
+            $customAsset->setRarity(RarityType::UNIQUE);
+
+            $this->entityManager->persist($customAsset);
+            $this->entityManager->flush();
+
+            $asset = $customAsset;
+        } else {
+            $asset = $this->entityManager->getRepository(Asset::class)->find($data['assetId']);
+            if (!$asset) {
+                return $this->json(['error' => 'Assets non trouvé'], 400);
+            }
+        }
+
+        $characterAsset = new CharacterAsset();
+        $characterAsset->setCharacter($character);
+        $characterAsset->setAsset($asset);
+        $characterAsset->setCost(0);
+        $characterAsset->setQuantity($data['assetQuantity'] ?? 1);
+        $characterAsset->setNote($data['assetNote'] ?? '');
+        $characterAsset->setNoteOrga($data['assetNoteOrga'] ?? '');
+
+        $this->entityManager->persist($characterAsset);
+        $this->entityManager->flush();
+
+        return $this->json(['success' => true]);
+    }
+
+    #[Route('/api/character/{id}/skill/edit', name: 'api_character_skill_edit', methods: ['POST'])]
+    public function editSkill(Request $request, Character $character): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+
+        if (empty($data['skillId'])) {
+            return $this->json(['error' => 'Tous les champs sont obligatoires'], 400);
+        }
+
+        $skill = $this->entityManager->getRepository(Skill::class)->find($data['skillId']);
+        if (!$skill) {
+            return $this->json(['error' => 'Compétence non trouvée'], 400);
+        }
+
+        $skillLearned = $this->entityManager->getRepository(SkillLearned::class)->findOneBy(['character' => $character, 'skill' => $skill]);
+        if (!$skillLearned) {
+            return $this->json(['error' => 'Compétence non trouvée'], 400);
+        }
+
+        $skillLearned->setCost($data['cost']);
+        $skillLearned->setNote($data['note']);
+        $skillLearned->setNoteOrga($data['noteOrga']);
+
+        $this->entityManager->flush();
+
+        return $this->json(['success' => true]);
+    }
+
+    #[Route('/api/character/{id}/gear/edit', name: 'api_character_gear_edit', methods: ['POST'])]
+    public function editGear(Request $request, Character $character): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+
+        if (empty($data['possessionId'])) {
+            return $this->json(['error' => 'Tous les champs sont obligatoires'], 400);
+        }
+
+        $possession = $this->entityManager->getRepository(Possession::class)->find($data['possessionId']);
+        if (!$possession) {
+            return $this->json(['error' => 'Équipement non trouvé'], 400);
+        }
+
+        $possession->setCost($data['cost']);
+        $possession->setNote($data['note']);
+        $possession->setNoteOrga($data['noteOrga']);
+
+        $this->entityManager->flush();
+
+        return $this->json(['success' => true]);
+    }
+
+    #[Route('/api/character/{id}/assets', name: 'api_character_available_assets', methods: ['GET'])]
+    public function getAvailableAssets(Character $character): JsonResponse
+    {
+        $assetsInCatalog = $this->entityManager->getRepository(Asset::class)->findBy(['is_catalog' => true]);
+        $availableAssets = [];
+        foreach ($assetsInCatalog as $asset) {
+            $availableAssets[] = [
+                'id' => $asset->getId(),
+                'label' => $asset->getLabel(),
+                'description' => $asset->getDescription(),
+                'short' => $asset->getShort(),
+                'type' => $asset->getType(),
+                'baseNote' => $asset->getBaseNote(),
+                'baseNoteOrga' => $asset->getBaseNoteOrga(),
+            ];
+        }
+        usort($availableAssets, function ($a, $b) {
+            return strcmp($a['label'], $b['label']);
+        });
+        return $this->json(['success' => true, 'assets' => $availableAssets]);
+    }
+
+    #[Route('/api/character/{id}/asset/edit', name: 'api_character_asset_edit', methods: ['POST'])]
+    public function editAsset(Request $request, Character $character): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+
+        if (empty($data['characterAssetId'])) {
+            return $this->json(['error' => 'Tous les champs sont obligatoires'], 400);
+        }
+
+        $characterAsset = $this->entityManager->getRepository(CharacterAsset::class)->find($data['characterAssetId']);
+        if (!$characterAsset) {
+            return $this->json(['error' => 'Asset non trouvé'], 400);
+        }
+
+        $characterAsset->setNote($data['note']);
+        $characterAsset->setNoteOrga($data['noteOrga']);
+
+        $asset = $characterAsset->getAsset();
+        if ($asset->getType() == AssetType::OBJECT) {
+            $characterAsset->setQuantity($data['assetQuantity']);
+        }
+
         $this->entityManager->flush();
 
         return $this->json(['success' => true]);

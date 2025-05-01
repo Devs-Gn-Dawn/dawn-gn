@@ -55,6 +55,9 @@ class Asset
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $base_note_orga = null;
 
+    #[ORM\Column(type: 'string', enumType: RarityType::class)]
+    private ?RarityType $rarity = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -137,14 +140,37 @@ class Asset
         return $this;
     }
 
+    public function getRarity(): ?RarityType
+    {
+        return $this->rarity;
+    }
+
+    public function setRarity(RarityType $rarity): static
+    {
+        $this->rarity = $rarity;
+        return $this;
+    }
+
     public function getRequiredClasses(): array
     {
         return array_values(array_filter($this->required_classes, fn($value) => trim($value) !== ''));
     }
 
+    public function setRequiredClasses(array $required_classes): static
+    {
+        $this->required_classes = $required_classes;
+        return $this;
+    }
+
     public function getRequiredFactions(): array
     {
         return array_values(array_filter($this->required_factions, fn($value) => trim($value) !== ''));
+    }
+
+    public function setRequiredFactions(array $required_factions): static
+    {
+        $this->required_factions = $required_factions;
+        return $this;
     }
 
     public function getRequiredSkill(): ?Skill

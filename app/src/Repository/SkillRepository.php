@@ -21,32 +21,16 @@ class SkillRepository extends ServiceEntityRepository
         parent::__construct($registry, Skill::class);
     }
 
-    public function isSkillAvailableForCharacter(Skill $skill, Character $character): bool
+    public function isSkillAvailableForCharacter(Skill $skill, Character $character, ?int $cost = null): bool
     {
-        $requiredClasses = $skill->getRequiredClasses();
-        $requiredFactions = $skill->getRequiredFactions();
-
-        if ($skill->getBaseCost() > $character->getAvailableSkillsXp()) {
+        $skillCost = $cost ?? $skill->getBaseCost();
+        if ($skillCost > $character->getAvailableSkillsXp()) {
             throw new \Exception('XP insufisant');
         }
 
-        if (!empty($requiredClasses) && !in_array($character->getClass(), $requiredClasses)) {
-            throw new \Exception('Classe invalide ' . $character->getClass() . ' ' . json_encode($requiredClasses));
-        }
-
-        if (!empty($requiredFactions) && in_array($character->getFaction(), $requiredFactions) === false) {
-            throw new \Exception('Faction invalide ' . $character->getFaction() . ' ' . json_encode($requiredFactions));
-        }
-
-        // check required skills
-        $requiredSkills = $skill->getRequiredSkills();
-        foreach ($requiredSkills as $requiredSkill) {
-            $skillLearned = $character->getSkillsLearned()->filter(
-                fn($skillLearned) => $skillLearned->getSkill()->getId() === $requiredSkill->getId()
-            )->first();
-            if ($skillLearned === null) {
-                throw new \Exception('Compétence requise manquante');
-            }
+        $availableSkills = $this->findAvailableSkillsForCharacter($character);
+        if (in_array($skill, $availableSkills) === false) {
+            throw new \Exception('Compétence invalide');
         }
 
         return true;
