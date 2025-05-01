@@ -355,6 +355,9 @@ class Character
                 'locked' => $skillLearned->isLocked()
             ];
         }
+        usort($skills, function ($a, $b) {
+            return $a['name'] <=> $b['name'];
+        });
         return $skills;
     }
 
@@ -377,6 +380,9 @@ class Character
                 'locked' => $asset->isLocked()
             ];
         }
+        usort($specialSkills, function ($a, $b) {
+            return $a['name'] <=> $b['name'];
+        });
         return $specialSkills;
     }
 
@@ -399,6 +405,9 @@ class Character
                 'locked' => $asset->isLocked()
             ];
         }
+        usort($objects, function ($a, $b) {
+            return $a['name'] <=> $b['name'];
+        });
         return $objects;
     }
     public function getEquipment($withPossession = true): array
@@ -417,6 +426,9 @@ class Character
                 ];
             }
         }
+        usort($equipment, function ($a, $b) {
+            return $a['name'] <=> $b['name'];
+        });
         return $equipment;
     }
 
