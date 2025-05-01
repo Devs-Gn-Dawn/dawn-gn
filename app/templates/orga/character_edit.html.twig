@@ -386,7 +386,14 @@
                     <td class="p-2 align-middle bg-transparent border-b  shadow-transparent text-pretty">
                       <div class="flex px-2 py-1">
                         <div class="flex flex-col justify-center">
-                          <p class="text-sm leading-normal"><span data-asset-name class="font-extrabold underline text-slate-700">{{ object.name }} {% if object.quantity > 1 %} (<span data-asset-quantity>{{ object.quantity }}</span>){% endif %}</span> : <span data-asset-description>{{ object.description }}</span> {% if object.quote %}<span class="italic">"{{ object.quote }}"</span>{% endif %}
+                          <p class="text-sm leading-normal">
+                          <span data-asset-name class="{% if object.description is not empty or object.quote is not empty or object.note is not empty or object.noteOrga is not empty %}font-extrabold underline {% endif %}text-slate-700">{{ object.name }} 
+                            {% if object.quantity > 1 %} (<span data-asset-quantity>{{ object.quantity }}</span>){% endif %}
+                          </span>
+                          {% if object.description is not empty or object.quote is not empty or object.note is not empty or object.noteOrga is not empty %}
+                            :
+                          {% endif %}
+                          <span data-asset-description>{{ object.description }}</span> {% if object.quote %}<span class="italic">"{{ object.quote }}"</span>{% endif %}
                           {% if object.note %}
                             <br/>
                             Note : <span data-asset-note class="text-sm leading-normal">{{ object.note }}</span>

@@ -290,7 +290,7 @@
                         </tr>
                         {% else %}
                         <tr>
-                            <td class="p-2 align-middle bg-transparent border-b shadow-transparent text-center">
+                            <td class="p-2 align-middle bg-transparent border-b shadow-transparent text-center" colspan="2">
                                 Aucun équipement
                             </td>
                         </tr>
@@ -330,10 +330,13 @@
                     <ul class="list-square list-inside ml-5">
                         {% for object in character.getObjects() %}
                         <li>
-                          <span class="font-extrabold underline text-slate-700">
+                          <span class="{% if object['description'] is not empty or object['quote'] is not empty or object['note'] is not empty %}font-extrabold underline {% endif %}text-slate-700">
                             {{ object['name'] }} 
                             {% if object['quantity'] > 1 %}
                               ({{ object['quantity'] }})
+                            {% endif %}
+                            {% if object['description'] is not empty or object['quote'] is not empty or object['note'] is not empty %}
+                              :
                             {% endif %}
                           </span> 
                           {% if object['description'] %}<span class="leading-normal">{{ object['description'] }}</span>{% endif %} 
