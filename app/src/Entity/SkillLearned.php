@@ -23,6 +23,9 @@ class SkillLearned
     #[ORM\Column(type: Types::TEXT)]
     private ?string $note_orga = '';
 
+    #[ORM\Column(type: Types::BOOLEAN)]
+    private bool $locked = false;
+
     #[ORM\ManyToOne(inversedBy: 'skillsLearned', cascade: ['persist'])]
     #[ORM\JoinColumn(name: 'fk_character', referencedColumnName: 'id')]
     private ?Character $character = null;
@@ -98,6 +101,17 @@ class SkillLearned
     public function setSkill(?Skill $skill): static
     {
         $this->skill = $skill;
+        return $this;
+    }
+
+    public function isLocked(): bool
+    {
+        return $this->locked;
+    }
+
+    public function setLocked(bool $locked): static
+    {
+        $this->locked = $locked;
         return $this;
     }
 }

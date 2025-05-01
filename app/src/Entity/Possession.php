@@ -23,6 +23,9 @@ class Possession
     #[ORM\Column(type: Types::TEXT)]
     private ?string $note_orga = null;
 
+    #[ORM\Column(type: Types::BOOLEAN)]
+    private bool $locked = false;
+
     #[ORM\ManyToOne(targetEntity: Character::class, inversedBy: 'possessions')]
     #[ORM\JoinColumn(name: 'fk_character', referencedColumnName: 'id', nullable: false)]
     private ?Character $character = null;
@@ -98,6 +101,17 @@ class Possession
     public function setGear(?Gear $gear): static
     {
         $this->gear = $gear;
+        return $this;
+    }
+
+    public function isLocked(): bool
+    {
+        return $this->locked;
+    }
+
+    public function setLocked(bool $locked): static
+    {
+        $this->locked = $locked;
         return $this;
     }
 

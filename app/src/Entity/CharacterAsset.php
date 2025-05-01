@@ -26,6 +26,9 @@ class CharacterAsset
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $note_orga = null;
 
+    #[ORM\Column(type: Types::BOOLEAN)]
+    private bool $locked = false;
+
     #[ORM\ManyToOne(targetEntity: Character::class)]
     #[ORM\JoinColumn(name: 'fk_character', referencedColumnName: 'id', nullable: false)]
     private ?Character $character = null;
@@ -102,6 +105,17 @@ class CharacterAsset
     public function setAsset(?Asset $asset): static
     {
         $this->asset = $asset;
+        return $this;
+    }
+
+    public function isLocked(): bool
+    {
+        return $this->locked;
+    }
+
+    public function setLocked(bool $locked): static
+    {
+        $this->locked = $locked;
         return $this;
     }
 }
