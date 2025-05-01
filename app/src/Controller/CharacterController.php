@@ -297,8 +297,8 @@ class CharacterController extends AbstractController
         try {
             $this->checkCharacterAccess($character);
 
-            if ($this->entityManager->getRepository(Skill::class)->isSkillAvailableForCharacter($skill, $character, $isOrga ? $data['skillCost'] : null)) {
-                $character->addSkill($skill, $isOrga ? $data['skillCost'] : null, $isOrga ? $data['skillNote'] : null, $isOrga ? $data['skillNoteOrga'] : null);
+            if ($this->entityManager->getRepository(Skill::class)->isSkillAvailableForCharacter($skill, $character, $isOrga ? $data['skillCost'] ?? null : null)) {
+                $character->addSkill($skill, $isOrga ? $data['skillCost'] ?? null : null, $isOrga ? $data['skillNote'] ?? null : null, $isOrga ? $data['skillNoteOrga'] ?? null : null);
                 $this->entityManager->flush();
             } else {
                 throw new \Exception('Cette compétence n\'est pas disponible pour ce personnage');

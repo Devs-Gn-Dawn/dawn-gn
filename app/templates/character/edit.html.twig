@@ -137,7 +137,7 @@
                 <div class="p-0 mx-5">
                   <table class="items-center w-full table-fixed border-separate border-spacing-2 mb-0 align-top border-gray-200 text-slate-500">
                     <tbody>
-                      <tr class="hidden">
+                      <tr class="">
                         <td></td>
                         <td class="w-20"></td>
                       </tr>
@@ -263,7 +263,7 @@
                 <div class="p-0 mx-5">
                   <table class="items-center w-full table-fixed border-separate border-spacing-2 mb-0 align-top border-gray-200 text-slate-500">
                     <tbody>
-                        <tr class="hidden">
+                        <tr class="">
                           <td></td>
                           <td class="w-20"></td>
                         </tr>
@@ -482,6 +482,13 @@
         });
     }
 
+    function escapeHtml(unsafe) {
+        if (unsafe === undefined || unsafe === null) {
+            return '';
+        }
+        return unsafe.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
+
     function showAddSkillModal() {
         fetch('{{ path('api_character_available_skills', {'id': character.id}) }}')
             .then(response => {
@@ -505,8 +512,13 @@
                                 <select id="skill" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 mt-1 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow">
                                     <option value="">-- Sélectionnez une compétence --</option>
                                     ${skills.map(skill => `
-                                        <option value="${skill.id}" data-cost="${skill.baseCost}" data-description="${skill.description}" data-short="${skill.short}" data-label="${skill.label}">
-                                            ${skill.label} - ${skill.baseCost}PA
+                                        <option value="${skill.id}" 
+                                            data-cost="${skill.baseCost}" 
+                                            data-description="${escapeHtml(skill.description)}" 
+                                            data-short="${escapeHtml(skill.short)}" 
+                                            data-label="${escapeHtml(skill.label)}"
+                                            data-locked="${skill.locked}">
+                                            ${escapeHtml(skill.label)} - ${skill.baseCost}PA
                                         </option>
                                     `).join('')}
                                 </select>
@@ -664,8 +676,14 @@
                                 <select id="gear" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 mt-1 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow">
                                     <option value="">-- Sélectionnez un équipement --</option>
                                     ${gear.map(item => `
-                                        <option value="${item.id}" data-cost="${item.baseCost}" data-description="${item.description}" data-short="${item.short}" data-label="${item.label}">
-                                            ${item.label} - ${item.baseCost}PA
+                                        <option 
+                                            value="${item.id}" 
+                                            data-cost="${item.baseCost}" 
+                                            data-description="${escapeHtml(item.description)}" 
+                                            data-short="${escapeHtml(item.short)}" 
+                                            data-label="${escapeHtml(item.label)}"
+                                            data-locked="${item.locked}">
+                                            ${escapeHtml(item.label)} - ${item.baseCost}PA
                                         </option>
                                     `).join('')}
                                 </select>

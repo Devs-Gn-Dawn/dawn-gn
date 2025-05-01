@@ -412,7 +412,8 @@ class Character
                     'quote' => '',
                     'note' => $possession->getNote(),
                     'noteOrga' => $possession->getNoteOrga(),
-                    'type' => 'possession'
+                    'type' => 'possession',
+                    'locked' => $possession->isLocked()
                 ];
             }
         }
