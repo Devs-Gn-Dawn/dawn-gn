@@ -2230,6 +2230,13 @@ h6 {
   --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
 }
 
+.from-gray-600 {
+  --tw-gradient-from: #6c757d var(--tw-gradient-from-position);
+  --tw-gradient-to: rgb(108 117 125 / 0) var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+
+
 .from-gray-900 {
   --tw-gradient-from: #141727 var(--tw-gradient-from-position);
   --tw-gradient-to: rgb(20 23 39 / 0) var(--tw-gradient-to-position);
@@ -2304,6 +2311,10 @@ h6 {
 .via-white {
   --tw-gradient-to: rgb(255 255 255 / 0)  var(--tw-gradient-to-position);
   --tw-gradient-stops: var(--tw-gradient-from), #fff var(--tw-gradient-via-position), var(--tw-gradient-to);
+}
+
+.to-gray-200 {
+  --tw-gradient-to: #e9ecef var(--tw-gradient-to-position);
 }
 
 .to-cyan-400 {
