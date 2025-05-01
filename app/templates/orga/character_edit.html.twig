@@ -19,7 +19,12 @@
             <a href="{{ path('app_orga_player', {'id': character.user.id}) }}" class="z-30 block w-full px-0 py-1 mb-0 transition-all border-0 rounded-lg ease-soft-in-out text-slate-700">
               <span class="ml-1">Informations de lae joueureuse</span>
             </a>
-          </li>                  
+          </li>
+          <li class="z-30 flex-auto py-2 ml-2 bg-white/80 rounded-xl text-center text-xs font-semibold leading-tight text-slate-300 cursor-pointer hover:bg-white hover:scale-102 hover:text-slate-700 hover:underline">
+            <a href="{{ path('app_pdf', {'id': character.id}) }}" target="_blank" class="z-30 block w-full px-0 py-1 mb-0 transition-all border-0 rounded-lg ease-soft-in-out text-slate-700">
+              <span class="ml-1">Fiche personnage</span>
+            </a>
+          </li>
         </ul>
     </div>
 

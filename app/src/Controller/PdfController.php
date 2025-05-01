@@ -68,12 +68,14 @@ class PdfController extends AbstractController
             throw $this->createNotFoundException('Personnage non trouvé');
         }
 
-        if ($character->getUser() !== $user) {
-            throw $this->createAccessDeniedException('Accès refusé');
-        }
+        if (!$user->isOrga()) {
+            if ($character->getUser() !== $user) {
+                throw $this->createAccessDeniedException('Accès refusé');
+            }
 
-        if (!$character->isValidated()) {
-            throw $this->createAccessDeniedException('Personnage non validé');
+            if (!$character->isValidated()) {
+                throw $this->createAccessDeniedException('Personnage non validé');
+            }
         }
 
         // Création du QR code
