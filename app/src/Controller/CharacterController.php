@@ -21,6 +21,8 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Psr\Log\LoggerInterface;
 use App\Entity\CharacterType;
 use App\Entity\ValidationType;
+use App\DTO\CreateCharacterDTO;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 #[Route('/characters')]
 #[IsGranted('ROLE_USER')]
@@ -46,38 +48,66 @@ class CharacterController extends AbstractController
     }
 
     #[Route('/new', name: 'app_character_new', methods: ['GET', 'POST'])]
-    public function new(Request $request): Response
+    public function new(Request $request, ValidatorInterface $validator): Response
     {
         if ($request->isMethod('POST')) {
-            // Récupérer les données soit du formulaire, soit du JSON
-            $data = $request->getContent() ? json_decode($request->getContent(), true) : $request->request->all();
+            try {
+                // Récupérer les données soit du formulaire, soit du JSON
+                $data = $request->getContent() ? json_decode($request->getContent(), true) : $request->request->all();
+                if (!$data) {
+                    throw new \Exception('Données invalides');
+                }
 
-            if (empty($data['character_name']) || empty($data['faction']) || empty($data['class'])) {
-                return $this->json(['error' => 'Tous les champs sont obligatoires'], 400);
+                $dto = new CreateCharacterDTO();
+                $dto->setCharacterName($data['character_name'] ?? '');
+                $dto->setFaction($data['faction'] ?? '');
+                $dto->setClass($data['class'] ?? '');
+                $dto->setUserId($this->getUser()->getId());
+                $dto->setBackground($data['background'] ?? null);
+
+                $errors = $validator->validate($dto);
+                if (count($errors) > 0) {
+                    $errorMessages = [];
+                    foreach ($errors as $error) {
+                        $errorMessages[] = $error->getMessage();
+                    }
+                    throw new \Exception(implode(', ', $errorMessages));
+                }
+
+                // Validation des valeurs de faction et classe
+                if (!in_array($dto->getFaction(), FactionType::getChoices())) {
+                    throw new \Exception('Faction invalide');
+                }
+
+                $character = new Character();
+                $character->setUser($this->getUser());
+                $character->setName(htmlspecialchars($dto->getCharacterName(), ENT_QUOTES, 'UTF-8'));
+                $character->setFaction($dto->getFaction());
+                $character->setClass($dto->getClass());
+                $character->setBackground($dto->getBackground() ? htmlspecialchars($dto->getBackground(), ENT_QUOTES, 'UTF-8') : '');
+                $character->setDescription('');
+                $character->setNoteOrga('');
+                $character->setXpSkill(20);
+                $character->setXpGear(10);
+                $character->setType(CharacterType::DRAFT);
+                $character->setValidationType(ValidationType::NON_VALIDE);
+
+                $this->entityManager->persist($character);
+                $this->entityManager->flush();
+
+                if ($request->getContent()) {
+                    return $this->json(['success' => true]);
+                }
+
+                $this->addFlash('success', 'Votre personnage a été créé avec succès.');
+                return $this->redirectToRoute('app_character_index');
+            } catch (\Exception $e) {
+                if ($request->getContent()) {
+                    return $this->json(['error' => $e->getMessage()], 400);
+                }
+                $this->addFlash('error', $e->getMessage());
+                return $this->redirectToRoute('app_character_new');
             }
-
-            $character = new Character();
-            $character->setUser($this->getUser());
-            $character->setName($data['character_name']);
-            $character->setFaction($data['faction']);
-            $character->setClass($data['class']);
-            $character->setBackground($data['background'] ?? '');
-            $character->setDescription(''); // Description vide par défaut
-            $character->setNoteOrga(''); // Note orga vide par défaut
-            $character->setXpSkill(20);
-            $character->setXpGear(10);
-            $character->setType(CharacterType::DRAFT);
-            $character->setValidationType(ValidationType::NON_VALIDE);
-
-            $this->entityManager->persist($character);
-            $this->entityManager->flush();
-
-            if ($request->getContent()) {
-                return $this->json(['success' => true]);
-            }
-
-            $this->addFlash('success', 'Votre personnage a été créé avec succès.');
-            return $this->redirectToRoute('app_character_index');
         }
 
         return $this->render('character/new.html.twig', [

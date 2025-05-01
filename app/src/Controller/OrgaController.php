@@ -26,6 +26,8 @@ use App\Entity\SkillLearned;
 use App\Entity\Possession;
 use App\Entity\RarityType;
 use App\Entity\AssetType;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use App\DTO\CreateCharacterDTO;
 
 #[IsGranted(RoleType::ROLE_ORGA)]
 class OrgaController extends AbstractController
@@ -170,38 +172,60 @@ class OrgaController extends AbstractController
     }
 
     #[Route('/api/create_character', name: 'app_orga_character_create', methods: ['POST'])]
-    public function createCharacter(Request $request): JsonResponse
+    public function createCharacter(Request $request, ValidatorInterface $validator): JsonResponse
     {
-        $data = json_decode($request->getContent(), true);
+        try {
+            $data = json_decode($request->getContent(), true);
+            if (!$data) {
+                throw new \Exception('Données JSON invalides');
+            }
 
-        $data = $request->getContent() ? json_decode($request->getContent(), true) : $request->request->all();
+            $dto = new CreateCharacterDTO();
+            $dto->setCharacterName($data['character_name'] ?? '');
+            $dto->setFaction($data['faction'] ?? '');
+            $dto->setClass($data['class'] ?? '');
+            $dto->setUserId((int)($data['userId'] ?? 0));
+            $dto->setBackground($data['background'] ?? null);
 
-        if (empty($data['character_name']) || empty($data['faction']) || empty($data['class'])) {
-            return $this->json(['error' => 'Tous les champs sont obligatoires'], 400);
+            $errors = $validator->validate($dto);
+            if (count($errors) > 0) {
+                $errorMessages = [];
+                foreach ($errors as $error) {
+                    $errorMessages[] = $error->getMessage();
+                }
+                throw new \Exception(implode(', ', $errorMessages));
+            }
+
+            $user = $this->entityManager->getRepository(User::class)->find($dto->getUserId());
+            if (!$user) {
+                throw new \Exception('Utilisateur non trouvé');
+            }
+
+            // Validation des valeurs de faction et classe
+            if (!in_array($dto->getFaction(), FactionType::getChoices())) {
+                throw new \Exception('Faction invalide');
+            }
+
+            $character = new Character();
+            $character->setUser($user);
+            $character->setName(htmlspecialchars($dto->getCharacterName(), ENT_QUOTES, 'UTF-8'));
+            $character->setFaction($dto->getFaction());
+            $character->setClass($dto->getClass());
+            $character->setBackground($dto->getBackground() ? htmlspecialchars($dto->getBackground(), ENT_QUOTES, 'UTF-8') : '');
+            $character->setDescription('');
+            $character->setNoteOrga('');
+            $character->setXpSkill(20);
+            $character->setXpGear(10);
+            $character->setType(CharacterType::DRAFT);
+            $character->setValidationType(ValidationType::NON_VALIDE);
+
+            $this->entityManager->persist($character);
+            $this->entityManager->flush();
+
+            return $this->json(['success' => true]);
+        } catch (\Exception $e) {
+            return $this->json(['error' => $e->getMessage()], 500);
         }
-
-        $user = $this->entityManager->getRepository(User::class)->find($data['userId']);
-        if (!$user) {
-            return $this->json(['error' => 'Utilisateur non trouvé'], 400);
-        }
-
-        $character = new Character();
-        $character->setUser($user);
-        $character->setName($data['character_name']);
-        $character->setFaction($data['faction']);
-        $character->setClass($data['class']);
-        $character->setBackground($data['background'] ?? '');
-        $character->setDescription(''); // Description vide par défaut
-        $character->setNoteOrga(''); // Note orga vide par défaut
-        $character->setXpSkill(20);
-        $character->setXpGear(10);
-        $character->setType(CharacterType::DRAFT);
-        $character->setValidationType(ValidationType::NON_VALIDE);
-
-        $this->entityManager->persist($character);
-        $this->entityManager->flush();
-
-        return $this->json(['success' => true]);
     }
 
     #[Route('/api/character/asset/{characterAssetId}/delete', name: 'api_character_asset_delete', methods: ['POST'])]
