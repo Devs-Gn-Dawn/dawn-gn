@@ -7,6 +7,7 @@ enum ClassType: string
     case RUNNERS = 'Runners';
     case RAIDERS = 'Raiders';
     case SHAMANS = 'Shamans';
+    case RADIATIONISTE = 'Radiationiste';
     case LEGIONNAIRE = 'Légionnaire';
     case FACONNEUR = 'Façonneur';
     case MECANISTE = 'Mécaniste';
@@ -17,12 +18,14 @@ enum ClassType: string
     case ANNULAIRE_COLLECTEURS = 'L\'annulaire (collecteurs)';
     case AURICULAIRE_POLITICIENS = 'L\'auriculaire (Politiciens)';
     case NEOCUBA = 'Néo-cubanais';
+
     public function getLabel(): string
     {
         return match ($this) {
             self::RUNNERS => 'Runners',
             self::RAIDERS => 'Raiders',
             self::SHAMANS => 'Shamans',
+            self::RADIATIONISTE => 'Radiationiste',
             self::LEGIONNAIRE => 'Légionnaire',
             self::FACONNEUR => 'Façonneur',
             self::MECANISTE => 'Mécaniste',
@@ -42,6 +45,7 @@ enum ClassType: string
             self::RUNNERS => FactionType::NOMADS,
             self::RAIDERS => FactionType::NOMADS,
             self::SHAMANS => FactionType::NOMADS,
+            self::RADIATIONISTE => FactionType::NOMADS,
             self::LEGIONNAIRE => FactionType::TECHERS,
             self::FACONNEUR => FactionType::TECHERS,
             self::MECANISTE => FactionType::TECHERS,
