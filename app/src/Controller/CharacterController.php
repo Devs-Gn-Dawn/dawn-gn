@@ -329,6 +329,10 @@ class CharacterController extends AbstractController
             if (!$skillLearned) {
                 throw new \Exception('Cette compétence n\'est pas apprise par ce personnage');
             }
+
+            if ($skillLearned->isLocked() && !$this->getUser()->isOrga()) {
+                throw new \Exception('Cette compétence est verrouillée et ne peut pas être supprimée');
+            }
         } catch (\Exception $e) {
             return $this->json(['error' => $e->getMessage()], 400);
         }
@@ -398,6 +402,10 @@ class CharacterController extends AbstractController
             $possession = $this->entityManager->getRepository(Possession::class)->find($possessionId);
             if (!$possession) {
                 throw new \Exception('Équipement non trouvé.');
+            }
+
+            if ($possession->isLocked() && !$this->getUser()->isOrga()) {
+                throw new \Exception('Cet équipement est verrouillé et ne peut pas être supprimé');
             }
         } catch (\Exception $e) {
             return $this->json(['error' => $e->getMessage()], 400);

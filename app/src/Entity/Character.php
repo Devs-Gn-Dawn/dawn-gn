@@ -351,7 +351,8 @@ class Character
                 'required_factions' => $skill->getRequiredFactions(),
                 'required_skills' => $skill->getRequiredSkills()->toArray(),
                 'cost' => $skillLearned->getCost(),
-                'quote' => $skillLearned->getNote()
+                'quote' => $skillLearned->getNote(),
+                'locked' => $skillLearned->isLocked()
             ];
         }
         return $skills;
@@ -372,7 +373,8 @@ class Character
                 'quote' => $asset->getAsset()->getQuote(),
                 'note' => $asset->getNote(),
                 'noteOrga' => $asset->getNoteOrga(),
-                'characterAssetId' => $asset->getId()
+                'characterAssetId' => $asset->getId(),
+                'locked' => $asset->isLocked()
             ];
         }
         return $specialSkills;
@@ -393,7 +395,8 @@ class Character
                 'note' => $asset->getNote(),
                 'noteOrga' => $asset->getNoteOrga(),
                 'quantity' => $asset->getQuantity(),
-                'characterAssetId' => $asset->getId()
+                'characterAssetId' => $asset->getId(),
+                'locked' => $asset->isLocked()
             ];
         }
         return $objects;
