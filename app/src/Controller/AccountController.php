@@ -208,7 +208,7 @@ class AccountController extends AbstractController
         }
 
         try {
-            if ($this->getUser()->isOrga()) {
+            if ($this->getUser()->isOrga() && $this->getUser()->getId() != $data['userId']) {
                 $user = $entityManager->getRepository(User::class)->find($data['userId']);
             } else {
                 $user = $this->getUser();
