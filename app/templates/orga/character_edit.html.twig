@@ -150,6 +150,14 @@
                           </div>
                         </td>
                         <td class="w-20 align-middle bg-slate-50  shadow-transparent p-2 rounded border border-dashed border-slate-200 hover:border-slate-500">
+                          <div class=" w-full text-center"><a href="javascript:editMatosModal()" data-target="tooltip_trigger" data-placement="top"><i class="ml-2 fa fa-pencil hover:scale-102 hover:text-slate-700"></i></a>
+                            <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm" role="tooltip">
+                              Editer / commenter
+                              <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
+                            </div>
+                          </div>
+                        </td>
+                        <td class="w-20 align-middle bg-slate-50  shadow-transparent p-2 rounded border border-dashed border-slate-200 hover:border-slate-500">
                           <button onclick="confirmDelete('{{ path('api_character_skill_delete', {'id': character.id}) }}', { skillId: {{ skill.id }} })" class="w-full text-center"><i class="fa fa-trash cursor-pointer hover:text-slate-700" aria-hidden="true"  data-target="tooltip_trigger" data-placement="top"></i>
                             <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm" role="tooltip">
                               Supprimer la compétence
@@ -160,13 +168,13 @@
                       </tr>
                       {% else %}
                       <tr>
-                        <td class="mx-8 text-center shadow-transparent" colspan="2">
+                        <td class="mx-8 text-center shadow-transparent" colspan="3">
                           Aucune compétence
                         </td>
                       </tr>
                       {% endfor %}
                       <tr>
-                        <td class="mx-8 text-center shadow-transparent" colspan="2">
+                        <td class="mx-8 text-center shadow-transparent" colspan="3">
                           <div class="flex p-3 mt-3 text-center justify-center bg-slate-100 bg-opacity-40  border rounded border-dashed border-slate-300 hover:border-solid">
                             <span onclick="showAddSkillModal()" class="text-xs font-semibold leading-tight text-slate-500 cursor-pointer hover:scale-102 hover:text-slate-900 hover:underline"><strong class="font-extrabold">+ </strong>Ajouter une compétence (<span data-target="skillsPaAvailable">{{ character.getXpSkill() - character.getSkillsXpUsed()}}</span> PA disponibles)</span>
                           </div>
@@ -209,14 +217,40 @@
                             </div>
                           </div>
                         </td>
+                        <td class="w-20 align-middle bg-slate-50  shadow-transparent p-2 rounded border border-dashed border-slate-200 hover:border-slate-500">
+                          <div class=" w-full text-center"><a href="javascript:editMatosModal()" data-target="tooltip_trigger" data-placement="top"><i class="ml-2 fa fa-pencil hover:scale-102 hover:text-slate-700"></i></a>
+                            <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm" role="tooltip">
+                              Editer / commenter
+                              <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
+                            </div>
+                          </div>
+                        </td>
+                        <td class="w-20 align-middle bg-slate-50  shadow-transparent p-2 rounded border border-dashed border-slate-200 hover:border-slate-500">
+                          <button onclick="confirmDelete('{{ path('api_character_asset_delete', {'characterAssetId': specialSkill.characterAssetId, 'assetType': 'capacity'}) }}')" class="w-full text-center"><i class="fa fa-trash cursor-pointer hover:text-slate-700" aria-hidden="true"  data-target="tooltip_trigger" data-placement="top"></i>
+                            <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm" role="tooltip">
+                              Supprimer la capacité spéciale
+                              <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
+                            </div>
+                          </button>
+                        </td>
                       </tr>
                       {% else %}
                       <tr>
-                        <td class="p-2 align-middle bg-transparent border-b shadow-transparent text-center">
+                        <td class="p-2 align-middle bg-transparent border-b shadow-transparent text-center" colspan="3">
                             Aucune capacité spéciale
                         </td>
                       </tr>
                       {% endfor %}
+                      <tr>
+                        <td class="mx-8 text-center shadow-transparent" colspan="3">
+                          <div class="flex p-3 mt-3 text-center justify-center bg-slate-100 bg-opacity-40  border rounded border-dashed border-slate-300 hover:border-solid">
+                            <span onclick="showAddAssetModal('capacity')" class="text-xs font-semibold leading-tight text-slate-500 cursor-pointer hover:scale-102 hover:text-slate-900 hover:underline"><strong class="font-extrabold">+ </strong>Ajouter une capacité commune</span>
+                          </div>
+                          <div class="flex p-3 mt-3 text-center justify-center bg-slate-100 bg-opacity-40  border rounded border-dashed border-slate-300 hover:border-solid">
+                            <span onclick="showAddAssetModal('capacity', true)" class="text-xs font-semibold leading-tight text-slate-500 cursor-pointer hover:scale-102 hover:text-slate-900 hover:underline"><strong class="font-extrabold">+ </strong>Ajouter une capacité personnalisée</span>
+                          </div>
+                        </td>
+                      </tr>
                     </tbody>
                   </table>
                 </div>
@@ -256,40 +290,48 @@
                     <tbody>
                         {% for possession in character.possessions %}
                         <tr>
-                            <td class="p-2 align-middle bg-transparent shadow-transparent text-pretty">
-                                <div class="flex px-2 py-1">
-                                    <div class="flex flex-col justify-center">
-                                        <p class="text-sm leading-normal">
-                                            <span class="font-extrabold underline text-slate-700">{{ possession.gear.label }}</span> : {{ possession.gear.description }}
-                                            <br/>
-                                            Coût : <span class="font-extrabold">{{ possession.cost }}PA</span> 
-                                            {# <span class="italic">"{{ possession.gear.short }}"</span> #}
-                                        </p>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="w-20 align-middle bg-slate-50  shadow-transparent p-2 rounded border border-dashed border-slate-200 hover:border-slate-500">
+                          <td class="p-2 align-middle bg-transparent shadow-transparent text-pretty">
+                              <div class="flex px-2 py-1">
+                                  <div class="flex flex-col justify-center">
+                                      <p class="text-sm leading-normal">
+                                          <span class="font-extrabold underline text-slate-700">{{ possession.gear.label }}</span> : {{ possession.gear.description }}
+                                          <br/>
+                                          Coût : <span class="font-extrabold">{{ possession.cost }}PA</span> 
+                                          {# <span class="italic">"{{ possession.gear.short }}"</span> #}
+                                      </p>
+                                  </div>
+                              </div>
+                          </td>
+                          <td class="w-20 align-middle bg-slate-50  shadow-transparent p-2 rounded border border-dashed border-slate-200 hover:border-slate-500">
+                            <div class=" w-full text-center"><a href="javascript:editMatosModal()" data-target="tooltip_trigger" data-placement="top"><i class="ml-2 fa fa-pencil hover:scale-102 hover:text-slate-700"></i></a>
+                              <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm" role="tooltip">
+                                Editer / commenter
+                                <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
+                              </div>
+                            </div>
+                          </td>
+                          <td class="w-20 align-middle bg-slate-50  shadow-transparent p-2 rounded border border-dashed border-slate-200 hover:border-slate-500">
                             <div class="w-full text-center">
                                 <i class="fa fa-trash cursor-pointer hover:text-slate-700" 
-                                   onclick="confirmDelete('{{ path('api_character_gear_delete', {'id': character.id}) }}', { possessionId: {{ possession.id }} })" 
-                                   data-target="tooltip_trigger" 
-                                   data-placement="top"></i>
-                                <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm" role="tooltip">
-                                Supprimer
-                                <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
-                                    </div>
-                                </div>
-                            </td>
+                                  onclick="confirmDelete('{{ path('api_character_gear_delete', {'id': character.id}) }}', { possessionId: {{ possession.id }} })" 
+                                  data-target="tooltip_trigger" 
+                                  data-placement="top"></i>
+                                  <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm" role="tooltip">
+                                    Supprimer
+                                    <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
+                                  </div>
+                              </div>
+                          </td>
                         </tr>
                         {% else %}
                         <tr>
-                            <td class="p-2 align-middle bg-transparent border-b shadow-transparent text-center" colspan="2">
+                            <td class="p-2 align-middle bg-transparent border-b shadow-transparent text-center" colspan="3">
                                 Aucun équipement
                             </td>
                         </tr>
                       {% endfor %}
                       <tr>
-                        <td class="mx-8 text-center shadow-transparent" colspan="2">
+                        <td class="mx-8 text-center shadow-transparent" colspan="3">
                           <div class="flex p-3 mt-3 text-center justify-center bg-slate-100 bg-opacity-40  border rounded border-dashed border-slate-300 hover:border-solid">
                             <span onclick="showAddGearModal()" class="text-xs font-semibold leading-tight text-slate-500 cursor-pointer hover:scale-102 hover:text-slate-900 hover:underline"><strong class="font-extrabold">+ </strong>Ajouter du matériel ou une ressource ({{ character.getXpGear() - character.getGearXpUsed() }} PA disponibles)</span>
                           </div>
@@ -317,21 +359,57 @@
               </div>
               <div class="flex-auto px-0 pt-0 pb-2">
                 <div class="p-0 mx-5">
-                    <ul class="list-square list-inside ml-5">
-                        {% for object in character.getObjects() %}
-                        <li>
-                          <span class="font-extrabold underline text-slate-700">
-                            {{ object['name'] }} 
-                            {% if object['quantity'] > 1 %}
-                              ({{ object['quantity'] }})
-                            {% endif %}
-                          </span> 
-                          {% if object['description'] %}<span class="leading-normal">{{ object['description'] }}</span>{% endif %} 
-                          {% if object['quote'] %}<span class="italic">"{{ object['quote'] }}"</span>{% endif %}
-                          {% if object['note'] %}<br/><span class="text-sm leading-normal">{{ object['note'] }}</span>{% endif %}
-                        </li>
-                        {% endfor %}
-                    </ul>
+                  <table class="items-center w-full table-fixed border-separate border-spacing-2 mb-0 align-top border-gray-200 text-slate-500">
+                    <tbody>
+                      {% for object in character.getObjects() ?? [] %}
+                      <tr>
+                        <td class="p-2 align-middle bg-transparent border-b  shadow-transparent text-pretty">
+                          <div class="flex px-2 py-1">
+                            <div class="flex flex-col justify-center">
+                              <p class="text-sm leading-normal"><span class="font-extrabold underline text-slate-700">{{ object.name }} {% if object.quantity > 1 %} ({{ object.quantity }}){% endif %}</span> : {{ object.description }} {% if object.quote %}<span class="italic">"{{ object.quote }}"</span>{% endif %}<br/>
+                              {% if object.note %}
+                                <span class="text-sm leading-normal">{{ object.note }}</span>
+                              {% endif %}
+                              </p>
+                            </div>
+                          </div>
+                        </td>
+                        <td class="w-20 align-middle bg-slate-50  shadow-transparent p-2 rounded border border-dashed border-slate-200 hover:border-slate-500">
+                          <div class=" w-full text-center"><a href="javascript:editMatosModal()" data-target="tooltip_trigger" data-placement="top"><i class="ml-2 fa fa-pencil hover:scale-102 hover:text-slate-700"></i></a>
+                            <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm" role="tooltip">
+                              Editer / commenter
+                              <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
+                            </div>
+                          </div>
+                        </td>
+                        <td class="w-20 align-middle bg-slate-50  shadow-transparent p-2 rounded border border-dashed border-slate-200 hover:border-slate-500">
+                          <button onclick="confirmDelete('{{ path('api_character_asset_delete', {'characterAssetId': object.characterAssetId, 'assetType': 'object'}) }}')" class="w-full text-center"><i class="fa fa-trash cursor-pointer hover:text-slate-700" aria-hidden="true"  data-target="tooltip_trigger" data-placement="top"></i>
+                            <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm" role="tooltip">
+                              Supprimer le matériel
+                              <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
+                            </div>
+                          </button>
+                        </td>
+                      </tr>
+                      {% else %}
+                      <tr>
+                        <td class="p-2 align-middle bg-transparent border-b shadow-transparent text-center" colspan="3">
+                            Aucun matériel
+                        </td>
+                      </tr>
+                      {% endfor %}
+                      <tr>
+                        <td class="mx-8 text-center shadow-transparent" colspan="3">
+                          <div class="flex p-3 mt-3 text-center justify-center bg-slate-100 bg-opacity-40  border rounded border-dashed border-slate-300 hover:border-solid">
+                            <span onclick="showAddAssetModal('object')" class="text-xs font-semibold leading-tight text-slate-500 cursor-pointer hover:scale-102 hover:text-slate-900 hover:underline"><strong class="font-extrabold">+ </strong>Ajouter une posséssion commune</span>
+                          </div>
+                          <div class="flex p-3 mt-3 text-center justify-center bg-slate-100 bg-opacity-40  border rounded border-dashed border-slate-300 hover:border-solid">
+                            <span onclick="showAddAssetModal('object', true)" class="text-xs font-semibold leading-tight text-slate-500 cursor-pointer hover:scale-102 hover:text-slate-900 hover:underline"><strong class="font-extrabold">+ </strong>Ajouter une posséssion personnalisée</span>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
               </div>
             </div>

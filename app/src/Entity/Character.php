@@ -370,7 +370,8 @@ class Character
                 'name' => $asset->getAsset()->getLabel(),
                 'description' => $asset->getAsset()->getDescription(),
                 'quote' => $asset->getAsset()->getQuote(),
-                'note' => $asset->getNote()
+                'note' => $asset->getNote(),
+                'characterAssetId' => $asset->getId()
             ];
         }
         return $specialSkills;
@@ -389,7 +390,8 @@ class Character
                 'description' => $asset->getAsset()->getDescription(),
                 'quote' => $asset->getAsset()->getQuote(),
                 'note' => $asset->getNote(),
-                'quantity' => $asset->getQuantity()
+                'quantity' => $asset->getQuantity(),
+                'characterAssetId' => $asset->getId()
             ];
         }
         return $objects;

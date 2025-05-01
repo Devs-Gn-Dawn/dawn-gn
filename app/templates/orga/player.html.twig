@@ -14,6 +14,84 @@
                 return text.substr(0, maxLength) + '...';
             }
 
+            window.factions = {{ factions|json_encode|raw }};
+
+            window.createCharacterModal = function() {
+                createModal({
+                    title: "Créer un personnage",
+                    html: `
+                    <form id="newCharacterForm" class="text-left">
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700">Nom du personnage</label>
+                            <input type="text" id="character_name" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 mt-1 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow" required>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700">Faction</label>
+                            <select id="faction-select" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 mt-1 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow" required>
+                                <option value="">Choisir une faction</option>
+                                ${Object.entries(window.factions).map(([label, value]) => 
+                                    `<option value="${value}">${label}</option>`
+                                ).join('')}
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label id="class-label" class="block text-sm font-medium text-gray-700">Classe</label>
+                            <select id="class-select" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 mt-1 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow" required disabled>
+                                <option value="">Choisir une classe</option>
+                            </select>
+                        </div>
+                    </form>
+                    `,
+                    didOpen: () => {
+                        const factionSelect = document.getElementById('faction-select');
+                        const classSelect = document.getElementById('class-select');
+                        const classLabel = document.getElementById('class-label');
+
+                        factionSelect.addEventListener('change', async function() {
+                            const selectedFaction = this.value;
+                            classSelect.innerHTML = '<option value="">Choisir une classe</option>';
+                            
+                            if (!selectedFaction) {
+                                classSelect.disabled = true;
+                                classLabel.textContent = 'Classe (Sélectionnez d\'abord une faction)';
+                                return;
+                            }
+
+                            try {
+                                const response = await fetch(`/characters/api/classes/${selectedFaction}`);
+                                const classes = await response.json();
+                                
+                                Object.entries(classes).forEach(([label, value]) => {
+                                    const option = document.createElement('option');
+                                    option.value = value;
+                                    option.textContent = label;
+                                    classSelect.appendChild(option);
+                                });
+                                
+                                classSelect.disabled = false;
+                                classLabel.textContent = 'Classe';
+                            } catch (error) {
+                                console.error('Erreur lors du chargement des classes:', error);
+                                classSelect.disabled = true;
+                                classLabel.textContent = 'Classe (Erreur de chargement)';
+                            }
+                        });
+                        factionSelect.dispatchEvent(new Event('change'));
+                    },
+                    getData: () => ({
+                        character_name: document.getElementById('character_name').value,
+                        faction: document.getElementById('faction-select').value,
+                        class: document.getElementById('class-select').value,
+                        userId: {{ user.id }}
+                    }),
+                    validate: (data) => data.character_name && data.faction && data.class && data.userId,
+                    url: "{{ path('app_orga_character_create') }}",
+                    confirmButtonText: "Créer",
+                    successTitle: "Personnage créé !",
+                    successMessage: "Le personnage a été créé avec succès.",
+                });
+            }
+
             window.showContactPlayerModal = function() {
                 createModal({
                     title: "Contacter lae joueureuse",
@@ -621,6 +699,11 @@
         <div class="flex flex-wrap -mx-3">
             <div class="flex items-center w-full max-w-full px-3 shrink-0 md:w-8/12 md:flex-none">
                 <h6 class="mb-0">Liste des personnages</h6>
+            </div>
+            <div class="flex items-center w-full max-w-full px-3 shrink-0 md:w-4/12 md:flex-none">
+                <a onclick="createCharacterModal()" class="inline-block mx-auto sm:mr-0 px-2 py-1 font-bold text-right text-white uppercase align-middle transition-all rounded-lg cursor-pointer bg-gradient-to-tl from-cyan-300 to-cyan-600 leading-pro text-xs ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 hover:scale-102 active:opacity-85 hover:shadow-soft-xs hover:text-cyan-100">
+                    Ajouter un personnage
+                </a>
             </div>
         </div>
         <div class="flex-auto p-4">

@@ -18,6 +18,8 @@ use Symfony\Component\Mime\Address;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use App\Entity\User;
 use App\Entity\EventType;
+use App\Entity\CharacterType;
+use App\Entity\CharacterAsset;
 
 #[IsGranted(RoleType::ROLE_ORGA)]
 class OrgaController extends AbstractController
@@ -79,6 +81,7 @@ class OrgaController extends AbstractController
             'user' => $player,
             'eventTypes' => EventType::getChoices(),
             'breadcrumb' => ['/orga' => 'Organisation', '/orga/players' => 'Liste des joueureuses', '/orga/player/' . $player->getId() => $player->getFullName()],
+            'factions' => FactionType::getChoices(),
         ]);
     }
 
@@ -158,5 +161,49 @@ class OrgaController extends AbstractController
         } catch (\Exception $e) {
             return new JsonResponse(['error' => $e->getMessage()], 500);
         }
+    }
+
+    #[Route('/api/create_character', name: 'app_orga_character_create', methods: ['POST'])]
+    public function createCharacter(Request $request): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+
+        $data = $request->getContent() ? json_decode($request->getContent(), true) : $request->request->all();
+
+        if (empty($data['character_name']) || empty($data['faction']) || empty($data['class'])) {
+            return $this->json(['error' => 'Tous les champs sont obligatoires'], 400);
+        }
+
+        $user = $this->entityManager->getRepository(User::class)->find($data['userId']);
+        if (!$user) {
+            return $this->json(['error' => 'Utilisateur non trouvé'], 400);
+        }
+
+        $character = new Character();
+        $character->setUser($user);
+        $character->setName($data['character_name']);
+        $character->setFaction($data['faction']);
+        $character->setClass($data['class']);
+        $character->setBackground($data['background'] ?? '');
+        $character->setDescription(''); // Description vide par défaut
+        $character->setNoteOrga(''); // Note orga vide par défaut
+        $character->setXpSkill(20);
+        $character->setXpGear(10);
+        $character->setType(CharacterType::DRAFT);
+        $character->setValidationType(ValidationType::NON_VALIDE);
+
+        $this->entityManager->persist($character);
+        $this->entityManager->flush();
+
+        return $this->json(['success' => true]);
+    }
+
+    #[Route('/api/character/asset/{characterAssetId}/delete', name: 'api_character_asset_delete', methods: ['POST'])]
+    public function deleteAsset(CharacterAsset $characterAsset): JsonResponse
+    {
+        $this->entityManager->remove($characterAsset);
+        $this->entityManager->flush();
+
+        return $this->json(['success' => true]);
     }
 }
