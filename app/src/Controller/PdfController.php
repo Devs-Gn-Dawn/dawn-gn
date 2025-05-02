@@ -171,9 +171,10 @@ class PdfController extends AbstractController
 
         // objects
         foreach ($character->getCharacterAssetsByType(AssetType::OBJECT) as $object) {
+            $asShortOrNote = $object->getAsset()->getShort() || $object->getNote();
             $pdf->SetX(75);
             $pdf->SetFont('Arial', 'B', 9);
-            $this->mbWrite($pdf, $object->getAsset()->getLabel() . ($object->getQuantity() > 1 ? ' (' . $object->getQuantity() . ')' : '') . ' :', 8);
+            $this->mbWrite($pdf, $object->getAsset()->getLabel() . ($object->getQuantity() > 1 ? ' (' . $object->getQuantity() . ')' : '') . ($asShortOrNote ? ' :' : ''), 8);
             $pdf->SetFont('Arial', '', 9);
             $this->mbWrite($pdf, ' ' . $object->getAsset()->getShort(), 8);
             if ($object->getNote()) {

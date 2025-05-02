@@ -506,6 +506,11 @@ class Character
                 $offset += 2;
             }
         }
+        foreach ($this->characterAssets as $characterAsset) {
+            if ($characterAsset->getAsset()->getId() === 137) {
+                $offset += 3;
+            }
+        }
         return $offset;
     }
 }
