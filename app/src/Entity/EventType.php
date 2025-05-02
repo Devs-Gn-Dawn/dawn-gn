@@ -6,6 +6,7 @@ use Psr\Log\LoggerInterface;
 
 enum EventType: string
 {
+    case DAWN31 = self::EVENTS[10];
     case DAWN32 = self::EVENTS[0];
     case DAWN33 = self::EVENTS[1];
     case DAWN34 = self::EVENTS[2];
@@ -33,6 +34,7 @@ enum EventType: string
         'dawn39',
         'dawn40',
         'other',
+        'dawn31',
     ];
 
     const EVENT_STATUS = [
@@ -46,6 +48,7 @@ enum EventType: string
         self::EVENTS[7] => self::STATUS_HIDDEN,
         self::EVENTS[8] => self::STATUS_HIDDEN,
         self::EVENTS[9] => self::STATUS_HIDDEN,
+        self::EVENTS[10] => self::STATUS_CLOSED,
     ];
 
     public function getLabel(): string
@@ -62,6 +65,7 @@ enum EventType: string
             self::EVENTS[7] => 'Dawn 39',
             self::EVENTS[8] => 'Dawn 40',
             self::EVENTS[9] => 'Autre',
+            self::EVENTS[10] => 'Dawn 31',
             default => 'Inconnu',
         };
         return $label;
@@ -80,6 +84,7 @@ enum EventType: string
             self::EVENTS[7] => 'Dawn 39',
             self::EVENTS[8] => 'Dawn 40',
             self::EVENTS[9] => 'Autre',
+            self::EVENTS[10] => 'Dawn 31',
         };
     }
 
