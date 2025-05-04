@@ -120,6 +120,7 @@
       </li>
       {% endif %}
 
+      {% if !is_granted('ROLE_ORGA') %}
       <li class="mt-0.5 w-full">
         {% set active = app.request.get('_route') == 'app_contact' %}
         <a onclick="showContactForm()" class="py-2.7 text-sm ease-nav-brand my-0 mx-4 flex items-center whitespace-nowrap px-4 transition-colors hover:scale-102 cursor-pointer {% if active %}shadow-soft-xl rounded-lg bg-white font-semibold text-slate-700{% endif %}">
@@ -129,7 +130,8 @@
           <span class="ml-1 duration-300 opacity-100 pointer-events-none ease-soft">Contacter mon orga</span>
         </a>
       </li>
-
+      {% endif %}
+      
       {% if is_granted('ROLE_ADMIN') %}
       <li class="mt-0.5 w-full">
         {% set active = app.request.get('_route') starts with 'app_admin' %}
