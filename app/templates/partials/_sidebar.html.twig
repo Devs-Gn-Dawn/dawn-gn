@@ -120,7 +120,7 @@
       </li>
       {% endif %}
 
-      {% if !is_granted('ROLE_ORGA') %}
+      {% if not app.user.hasRole('ROLE_ORGA') %}
       <li class="mt-0.5 w-full">
         {% set active = app.request.get('_route') == 'app_contact' %}
         <a onclick="showContactForm()" target="_blank" class="py-2.7 text-sm ease-nav-brand my-0 mx-4 flex items-center whitespace-nowrap px-4 transition-colors hover:scale-102 cursor-pointer {% if active %}shadow-soft-xl rounded-lg bg-white font-semibold text-slate-700{% endif %}">
