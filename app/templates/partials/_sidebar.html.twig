@@ -123,7 +123,7 @@
       {% if !is_granted('ROLE_ORGA') %}
       <li class="mt-0.5 w-full">
         {% set active = app.request.get('_route') == 'app_contact' %}
-        <a onclick="showContactForm()" class="py-2.7 text-sm ease-nav-brand my-0 mx-4 flex items-center whitespace-nowrap px-4 transition-colors hover:scale-102 cursor-pointer {% if active %}shadow-soft-xl rounded-lg bg-white font-semibold text-slate-700{% endif %}">
+        <a onclick="showContactForm()" target="_blank" class="py-2.7 text-sm ease-nav-brand my-0 mx-4 flex items-center whitespace-nowrap px-4 transition-colors hover:scale-102 cursor-pointer {% if active %}shadow-soft-xl rounded-lg bg-white font-semibold text-slate-700{% endif %}">
           <div class="{% if active %}bg-gradient-to-tl from-gray-900 to-slate-800{% endif %} shadow-soft-2xl mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-white bg-center stroke-0 text-center xl:p-2.5">
             <i class="ni ni-email-83 {% if active %}text-white{% endif %}" aria-hidden="true"></i>
           </div>
@@ -131,7 +131,7 @@
         </a>
       </li>
       {% endif %}
-      
+
       {% if is_granted('ROLE_ADMIN') %}
       <li class="mt-0.5 w-full">
         {% set active = app.request.get('_route') starts with 'app_admin' %}
