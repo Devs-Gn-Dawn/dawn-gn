@@ -12,6 +12,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\User;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use App\Entity\FactionType;
 
 #[IsGranted(RoleType::ROLE_ADMIN)]
 class AdminController extends AbstractController
@@ -54,6 +55,7 @@ class AdminController extends AbstractController
                 '/admin' => 'Administration',
                 '/admin/users' => 'Gestion des utilisateurs',
             ],
+            'factions' => FactionType::getChoices(),
             'users' => $users,
             'currentFilter' => [
                 'role' => $role
@@ -77,6 +79,7 @@ class AdminController extends AbstractController
         $user->setPhone($data['phone']);
         $user->setRoles($data['roles']);
         $user->setSocial('');
+        $user->setFaction(empty($data['faction']) ? null : FactionType::from($data['faction']));
 
         // Hashage du mot de passe
         $hashedPassword = $passwordHasher->hashPassword($user, $data['password']);
@@ -108,10 +111,11 @@ class AdminController extends AbstractController
         $user->setEmail($data['email']);
         $user->setPhone($data['phone']);
         $user->setRoles($data['roles']);
+        $user->setFaction(empty($data['faction']) ? null : FactionType::from($data['faction']));
 
         $this->entityManager->flush();
 
-        return new JsonResponse(['success' => true]);
+        return new JsonResponse(['success' => true, 'data' => $data]);
     }
 
     #[Route('/api/user/{id}/delete', name: 'api_user_delete', methods: ['POST', 'DELETE'])]
