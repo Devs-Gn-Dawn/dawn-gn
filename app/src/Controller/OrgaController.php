@@ -203,7 +203,7 @@ class OrgaController extends AbstractController
             $dto = new CreateCharacterDTO();
             $dto->setCharacterName($data['character_name'] ?? '');
             $dto->setFaction($data['faction'] ?? '');
-            $dto->setClass($data['class'] ?? '');
+            $dto->setClassFromLabel($data['class'] ?? '');
             $dto->setUserId((int)($data['userId'] ?? 0));
             $dto->setBackground($data['background'] ?? null);
 

@@ -51,6 +51,12 @@ class CreateCharacterDTO
         return ClassType::from($this->class);
     }
 
+    public function setClassFromLabel(string $classLabel): self
+    {
+        $this->class = ClassType::from($classLabel)->value;
+        return $this;
+    }
+
     public function setClass(ClassType $class): self
     {
         $this->class = $class->value;
