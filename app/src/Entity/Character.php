@@ -478,7 +478,7 @@ class Character
 
     public function getPvMax(): int
     {
-        $pvMax = 3;
+        $pvMax = 4;
         foreach ($this->skillsLearned as $skillLearned) {
             if (str_contains($skillLearned->getSkill()->getLabel(), 'Constitution')) {
                 $pvMax += 1;
