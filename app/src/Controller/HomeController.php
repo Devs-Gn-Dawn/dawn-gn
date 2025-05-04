@@ -19,6 +19,6 @@ class HomeController extends AbstractController
             return $this->redirectToRoute('app_orga_characters');
         }
 
-        return $this->redirectToRoute('app_character_create');
+        return $this->redirectToRoute('app_character_index');
     }
 }
