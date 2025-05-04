@@ -399,6 +399,14 @@ class OrgaController extends AbstractController
             return $this->json(['error' => 'Asset non trouvé'], 400);
         }
 
+        if ($characterAsset->getAsset()->isIsCatalog()) {
+            $asset = $characterAsset->getAsset();
+            $asset->setLabel($data['assetName']);
+            $asset->setDescription($data['assetDescription']);
+            $asset->setShort($data['assetShort']);
+            $this->entityManager->flush();
+        }
+
         $characterAsset->setNote($data['note']);
         $characterAsset->setNoteOrga($data['noteOrga']);
 

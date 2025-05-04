@@ -361,42 +361,16 @@ class Character
         return $skills;
     }
 
-    public function getSpecialSkills(): array
+    private function mapAssets(Collection $assets): array
     {
-        // get assets with type Capacity from character_asset table
-        $assets = $this->characterAssets->filter(function (CharacterAsset $characterAsset) {
-            return $characterAsset->getAsset()->getType() === AssetType::CAPACITY;
-        });
-        $specialSkills = [];
+        $mappedAssets = [];
         foreach ($assets as $asset) {
-            $specialSkills[] = [
+            $mappedAssets[] = [
                 'id' => $asset->getAsset()->getId(),
                 'name' => $asset->getAsset()->getLabel(),
                 'description' => $asset->getAsset()->getDescription(),
-                'quote' => $asset->getAsset()->getQuote(),
-                'note' => $asset->getNote(),
-                'noteOrga' => $asset->getNoteOrga(),
-                'characterAssetId' => $asset->getId(),
-                'locked' => $asset->isLocked()
-            ];
-        }
-        usort($specialSkills, function ($a, $b) {
-            return $a['name'] <=> $b['name'];
-        });
-        return $specialSkills;
-    }
-
-    public function getObjects(): array
-    {
-        $assets = $this->characterAssets->filter(function (CharacterAsset $characterAsset) {
-            return $characterAsset->getAsset()->getType() === AssetType::OBJECT;
-        });
-        $objects = [];
-        foreach ($assets as $asset) {
-            $objects[] = [
-                'id' => $asset->getAsset()->getId(),
-                'name' => $asset->getAsset()->getLabel(),
-                'description' => $asset->getAsset()->getDescription(),
+                'short' => $asset->getAsset()->getShort(),
+                'isCatalog' => $asset->getAsset()->isIsCatalog(),
                 'quote' => $asset->getAsset()->getQuote(),
                 'note' => $asset->getNote(),
                 'noteOrga' => $asset->getNoteOrga(),
@@ -405,11 +379,29 @@ class Character
                 'locked' => $asset->isLocked()
             ];
         }
-        usort($objects, function ($a, $b) {
+        usort($mappedAssets, function ($a, $b) {
             return $a['name'] <=> $b['name'];
         });
-        return $objects;
+        return $mappedAssets;
     }
+
+    public function getSpecialSkills(): array
+    {
+        // get assets with type Capacity from character_asset table
+        $assets = $this->characterAssets->filter(function (CharacterAsset $characterAsset) {
+            return $characterAsset->getAsset()->getType() === AssetType::CAPACITY;
+        });
+        return $this->mapAssets($assets);
+    }
+
+    public function getObjects(): array
+    {
+        $assets = $this->characterAssets->filter(function (CharacterAsset $characterAsset) {
+            return $characterAsset->getAsset()->getType() === AssetType::OBJECT;
+        });
+        return $this->mapAssets($assets);
+    }
+
     public function getEquipment($withPossession = true): array
     {
         $equipment = [];

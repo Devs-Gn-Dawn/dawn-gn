@@ -221,7 +221,7 @@
                     <td class="p-2 align-middle bg-transparent border-b  shadow-transparent text-pretty">
                       <div class="flex px-2 py-1">
                         <div class="flex flex-col justify-center">
-                          <p class="text-sm leading-normal"><span data-asset-name class="font-extrabold underline text-slate-700">{{ specialSkill.name }}</span> : <span data-asset-description>{{ specialSkill.description }}</span> {% if specialSkill.quote %}<span class="italic">"{{ specialSkill.quote }}"</span>{% endif %}
+                          <p class="text-sm leading-normal"><span data-asset-name="{{ specialSkill.name }}" class="font-extrabold underline text-slate-700">{{ specialSkill.name }}</span> : <span data-asset-short="{{ specialSkill.short }}" data-asset-description>{{ specialSkill.description }}</span> {% if specialSkill.quote %}<span class="italic">"{{ specialSkill.quote }}"</span>{% endif %}
                           {% if specialSkill.note %}
                             <br/>
                             Note : <span data-asset-note class="text-sm leading-normal">{{ specialSkill.note }}</span>
@@ -235,7 +235,7 @@
                       </div>
                     </td>
                     <td class="w-20 align-middle bg-slate-50  shadow-transparent p-2 rounded border border-dashed border-slate-200 hover:border-slate-500">
-                      <button onclick="editAssetModal(event, '{{ specialSkill.characterAssetId }}', 'Capacity')" data-target="tooltip_trigger" data-placement="top" class=" w-full text-center"><i class="ml-2 fa fa-pencil hover:scale-102 hover:text-slate-700"></i></button>
+                      <button onclick="editAssetModal(event, '{{ specialSkill.characterAssetId }}', 'Capacity', '{{ specialSkill.isCatalog }}')" data-target="tooltip_trigger" data-placement="top" class=" w-full text-center"><i class="ml-2 fa fa-pencil hover:scale-102 hover:text-slate-700"></i></button>
                         <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm" role="tooltip">
                           Editer / commenter
                           <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
@@ -387,13 +387,13 @@
                       <div class="flex px-2 py-1">
                         <div class="flex flex-col justify-center">
                           <p class="text-sm leading-normal">
-                          <span data-asset-name class="{% if object.description is not empty or object.quote is not empty or object.note is not empty or object.noteOrga is not empty %}font-extrabold underline {% endif %}text-slate-700">{{ object.name }} 
+                          <span data-asset-name="{{ object.name }}" class="{% if object.description is not empty or object.quote is not empty or object.note is not empty or object.noteOrga is not empty %}font-extrabold underline {% endif %}text-slate-700">{{ object.name }} 
                             {% if object.quantity > 1 %} (<span data-asset-quantity>{{ object.quantity }}</span>){% endif %}
                           </span>
                           {% if object.description is not empty or object.quote is not empty or object.note is not empty or object.noteOrga is not empty %}
                             :
                           {% endif %}
-                          <span data-asset-description>{{ object.description }}</span> {% if object.quote %}<span class="italic">"{{ object.quote }}"</span>{% endif %}
+                          <span data-asset-short="{{ object.short }}" data-asset-description>{{ object.description }}</span> {% if object.quote %}<span class="italic">"{{ object.quote }}"</span>{% endif %}
                           {% if object.note %}
                             <br/>
                             Note : <span data-asset-note class="text-sm leading-normal">{{ object.note }}</span>
@@ -407,7 +407,7 @@
                       </div>
                     </td>
                     <td class="w-20 align-middle bg-slate-50  shadow-transparent p-2 rounded border border-dashed border-slate-200 hover:border-slate-500">
-                      <button onclick="editAssetModal(event, '{{ object.characterAssetId }}', 'Object')" data-target="tooltip_trigger" data-placement="top" class=" w-full text-center"><i class="ml-2 fa fa-pencil hover:scale-102 hover:text-slate-700"></i></button>
+                      <button onclick="editAssetModal(event, '{{ object.characterAssetId }}', 'Object', '{{ object.isCatalog }}')" data-target="tooltip_trigger" data-placement="top" class=" w-full text-center"><i class="ml-2 fa fa-pencil hover:scale-102 hover:text-slate-700"></i></button>
                       </div>
                         <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm" role="tooltip">
                           Editer / commenter
@@ -1191,17 +1191,30 @@
         });
     }
 
-    function editAssetModal(event, characterAssetId, assetType) {
+    function editAssetModal(event, characterAssetId, assetType, isCatalog = false) {
         $this = $(event.target);
         createModal({
             title: assetsModal[assetType].editTitle,
             html: `
                 <form id="editAssetForm" class="text-left">
+                  ${isCatalog ? `
+                    <div class="mb-6 text-left">
+                      <label class="block text-sm font-extrabold text-slate-700">Nom de la ${assetsModal[assetType].label}</label>
+                      <input type="text" id="assetName" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 mt-1 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow">
+                      <p class="text-sm leading-normal">
+                        <strong class="font-extrabold text-slate-700"> <span>Description</span> :</strong> <textarea id="assetDescription" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 mt-1 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow"></textarea>
+                      </p>
+                      <p class="text-sm leading-normal">
+                        <strong class="font-extrabold text-slate-700"> <span>Déscription courte</span> :</strong> <input type="text" id="assetShort" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 mt-1 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow">
+                      </p>
+                    </div>
+                  ` : `
                     <div class="mb-6 text-left">
                       <p class="text-sm leading-normal">              
                         <strong class="font-extrabold text-slate-700"> <span id="assetName">Nom de l'équipement</span> :</strong> <span id="assetDescription">Description de l'équipement</span><br/> 
                       </p>
                     </div>
+                    `}
                     ${assetType == 'Object' ? `
                     <div class="mb-6 text-left">
                       <p class="text-sm leading-normal">              
@@ -1222,15 +1235,24 @@
                 note: $('#assetNote').val(),
                 noteOrga: $('#assetNoteOrga').val(),
                 assetQuantity: $('#assetQuantity') ? $('#assetQuantity').val() : 1,
+                assetName: $('#assetName').is('input') ? $('#assetName').val() : $('#assetName').text(),
+                assetDescription: $('#assetDescription').is('textarea') ? $('#assetDescription').val() : $('#assetDescription').text(),
+                assetShort: $('#assetShort').is('input') ? $('#assetShort').val() : $('#assetShort').text(),
             }),
             didOpen: () => {
-                const assetName = $this.parents('tr').find('[data-asset-name]').text();
+                const assetName = $this.parents('tr').find('[data-asset-name]').data('asset-name');
                 const assetDescription = $this.parents('tr').find('[data-asset-description]').text();
+                const assetShort = $this.parents('tr').find('[data-asset-short]').data('asset-short');
                 const assetQuantity = $this.parents('tr').find('[data-asset-quantity]').text();
                 const assetNote = $this.parents('tr').find('[data-asset-note]').text();
                 const assetNoteOrga = $this.parents('tr').find('[data-asset-note-orga]').text();
-                $('#assetName').text(assetName);
+                if($('#assetName').is('input')) {
+                    $('#assetName').val(assetName);
+                } else {
+                    $('#assetName').text(assetName);
+                }
                 $('#assetDescription').text(assetDescription);
+                $('#assetShort').val(assetShort);
                 if (assetQuantity) {
                     $('#assetQuantity').val(assetQuantity);
                 }
