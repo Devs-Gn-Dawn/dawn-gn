@@ -42,7 +42,7 @@ class SkillRepository extends ServiceEntityRepository
             ->where('s.visibility = true')
             ->andWhere('s.required_classes LIKE :class OR s.required_classes = :emptyArray')
             ->andWhere('s.required_factions LIKE :faction OR s.required_factions = :emptyArray')
-            ->setParameter('class', '%' . $character->getClass() . '%')
+            ->setParameter('class', '%' . $character->getClass()->value . '%')
             ->setParameter('faction', '%' . $character->getFaction() . '%')
             ->setParameter('emptyArray', '');
 

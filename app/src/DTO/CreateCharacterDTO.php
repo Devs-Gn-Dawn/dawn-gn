@@ -2,6 +2,7 @@
 
 namespace App\DTO;
 
+use App\Entity\ClassType;
 use Symfony\Component\Validator\Constraints as Assert;
 
 class CreateCharacterDTO
@@ -45,14 +46,14 @@ class CreateCharacterDTO
         return $this;
     }
 
-    public function getClass(): string
+    public function getClass(): ClassType
     {
-        return $this->class;
+        return ClassType::from($this->class);
     }
 
-    public function setClass(string $class): self
+    public function setClass(ClassType $class): self
     {
-        $this->class = $class;
+        $this->class = $class->value;
         return $this;
     }
 
