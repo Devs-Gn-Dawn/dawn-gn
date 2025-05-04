@@ -110,7 +110,7 @@ class OrgaController extends AbstractController
 
             $this->sendEmail(
                 $character->getUser(),
-                'Votre personnage a été validé. Vous pouvez le retrouver à l\'adresse suivante : ' . $this->generateUrl('app_character_sheet', ['id' => $character->getId()]),
+                'Votre personnage a été validé. Vous pouvez le retrouver à l\'adresse suivante : ' . $this->generateUrl('app_character_edit', ['id' => $character->getId()]),
                 'Personnage validé'
             );
 
@@ -129,7 +129,7 @@ class OrgaController extends AbstractController
 
             $this->sendEmail(
                 $character->getUser(),
-                'Votre personnage n\'a pas été validé. Vous pouvez le retrouver à l\'adresse suivante : ' . $this->generateUrl('app_character_sheet', ['id' => $character->getId()]),
+                'Votre personnage n\'a pas été validé. Vous pouvez le retrouver à l\'adresse suivante : ' . $this->generateUrl('app_character_edit', ['id' => $character->getId()]),
                 'Personnage non validé'
             );
 
