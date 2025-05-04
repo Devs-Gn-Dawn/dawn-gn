@@ -118,14 +118,19 @@ class Character
         return $this;
     }
 
-    public function getClass(): ?string
+    public function getClass(): ?ClassType
     {
-        return $this->class;
+        return ClassType::from($this->class);
     }
 
-    public function setClass(string $class): static
+    public function getClassLabel(): string
     {
-        $this->class = $class;
+        return $this->getClass()->getLabel();
+    }
+
+    public function setClass(ClassType $class): static
+    {
+        $this->class = $class->value;
 
         return $this;
     }

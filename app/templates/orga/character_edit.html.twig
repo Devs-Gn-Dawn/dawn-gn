@@ -41,7 +41,7 @@
             <h5 class="mb-1 py-1 text-xl text-slate-700 font-semibold bg-transparent border border-transparent">{{ character.name|raw }}</h5>
 
             </div>
-            <div class="mb-0 font-semibold leading-normal text-base"><span class="font-extrabold">{{ character.getFactionType().getLabel() }}</span> - {{ character.class }}
+            <div class="mb-0 font-semibold leading-normal text-base"><span class="font-extrabold">{{ character.getFactionType().getLabel() }}</span> - {{ character.getClassLabel() }}
             
             {# <a href="#" class="ml-2 mr-1" data-target="tooltip_trigger" data-placement="top"><i class="ml-2 fa fa-pencil hover:scale-102 hover:text-slate-700"></i></a>
               <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm" role="tooltip">

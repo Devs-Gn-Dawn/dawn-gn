@@ -22,9 +22,9 @@ enum ClassType: string
     public function getLabel(): string
     {
         return match ($this) {
-            self::RUNNERS => 'Runners',
-            self::RAIDERS => 'Raiders',
-            self::SHAMANS => 'Shamans',
+            self::RUNNERS => 'Runner',
+            self::RAIDERS => 'Raider',
+            self::SHAMANS => 'Shaman',
             self::RADIATIONISTE => 'Radiationiste',
             self::LEGIONNAIRE => 'Légionnaire',
             self::FACONNEUR => 'Façonneur',
