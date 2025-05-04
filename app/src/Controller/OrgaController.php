@@ -95,7 +95,7 @@ class OrgaController extends AbstractController
     {
         return $this->render('orga/player.html.twig', [
             'user' => $player,
-            'eventTypes' => EventType::getChoices(),
+            'eventTypes' => EventType::getChoices(EventType::STATUS_OPEN),
             'breadcrumb' => ['/orga' => 'Organisation', '/orga/players' => 'Liste des joueureuses', '/orga/player/' . $player->getId() => $player->getFullName()],
             'factions' => FactionType::getChoices(),
         ]);
