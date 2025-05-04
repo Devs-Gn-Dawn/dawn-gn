@@ -42,6 +42,16 @@
                                     <input type="password" name="confirmPassword" id="confirmPassword" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow" placeholder="Confirmer le mot de passe" required>
                                 </div>
 
+                                {% if userIsNew %}
+                                <div class="mb-4">
+                                    <label class="flex items-center">
+                                        <input type="checkbox" name="rgpd" id="inputRgpd" class="form-checkbox h-4 w-4 text-rose-600" required>
+                                        <span class="ml-2 text-sm text-gray-600">
+                                            En vous inscrivant, vous acceptez que le site Dawn GN conserve certaines de vos informations personnelles pour la gestion de votre compte et l'organisation de l'événement. Ces données ne seront pas partagées avec des tiers.
+                                        </span>
+                                    </label>
+                                </div>
+                                {% endif %}
                                 <div class="text-center">
                                     <button type="submit" class="inline-block w-full px-6 py-3 mt-6 mb-2 font-bold text-center text-white uppercase align-middle transition-all bg-transparent border-0 rounded-lg cursor-pointer active:opacity-85 hover:scale-102 hover:shadow-soft-xs leading-pro text-xs ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 bg-gradient-to-tl from-gray-900 to-slate-800 hover:border-slate-700 hover:bg-slate-700 hover:text-white">Réinitialiser le mot de passe</button>
                                 </div>

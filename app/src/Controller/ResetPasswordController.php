@@ -122,7 +122,9 @@ class ResetPasswordController extends AbstractController
             return $this->redirectToRoute('app_login');
         }
 
-        return $this->render('security/reset_password/reset.html.twig');
+        return $this->render('security/reset_password/reset.html.twig', [
+            'userIsNew' => empty($user->getPassword()),
+        ]);
     }
 
     private function getExpiresAtDiffForHumans(ResetPasswordToken $resetToken): string
