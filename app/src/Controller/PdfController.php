@@ -115,14 +115,13 @@ class PdfController extends AbstractController
         // user class
         $pdf->SetFont('Arial', '', 12);
         $pdf->SetTextColor(51, 51, 51);
-        $this->mbCell($pdf, 73, 17.6, $character->getClass(), 11, 80);
 
         // Configuration de la police
         $pdf->SetFont('Arial', 'B', 16);
         $this->mbCell($pdf, 73, 11, $character->getName(), 14, 80);
 
         $pdf->SetFont('Arial', '', 12);
-        $this->mbCell($pdf, 73, 17.6, $character->getClass(), 11, 80);
+        $this->mbCell($pdf, 73, 17.6, $character->getClass()->getLabel(), 11, 80);
 
         $this->mbCell($pdf, 75.2, 32, $character->getPvMax(), 16, 7, 'C');
         //($pdf, $x, $y, $text, $size = 12, $width = 0, $align = '')
@@ -137,6 +136,12 @@ class PdfController extends AbstractController
             $this->mbWrite($pdf, $skillLearned->getSkill()->getLabel() . ' :', 8);
             $pdf->SetFont('Arial', '', 9);
             $this->mbWrite($pdf, ' ' . $skillLearned->getSkill()->getShort(), 8);
+            if ($skillLearned->getNote()) {
+                $pdf->SetLeftMargin(77);
+                $pdf->Ln(3);
+                $pdf->SetFont('Arial', '', 8);
+                $this->mbWrite($pdf, $skillLearned->getNote(), 8);
+            }
             $pdf->Ln(4);
         }
 
@@ -166,6 +171,12 @@ class PdfController extends AbstractController
             $this->mbWrite($pdf, $possession->getGear()->getLabel() . ' :', 8);
             $pdf->SetFont('Arial', '', 9);
             $this->mbWrite($pdf, ' ' . $possession->getGear()->getShort(), 8);
+            if ($possession->getNote()) {
+                $pdf->SetLeftMargin(77);
+                $pdf->Ln(3);
+                $pdf->SetFont('Arial', '', 8);
+                $this->mbWrite($pdf, $possession->getNote(), 8);
+            }
             $pdf->Ln(4);
         }
 
