@@ -148,6 +148,10 @@
                             <div class="flex flex-col justify-center">
                               <p class="text-sm leading-normal"><span class="font-extrabold underline text-slate-700">{{ skill.name }}</span> : {{ skill.description }}<br/>
                                 Coût : <span class="font-extrabold">{{ skill.cost }}PA</span>
+                                {% if skill.note %}
+                                  <br/>
+                                  <span class="text-sm leading-normal">{{ skill.note }}</span>
+                                {% endif %}
                               </p>
                             </div>
                           </div>
@@ -209,8 +213,9 @@
                         <td class="p-2 align-middle bg-transparent border-b  shadow-transparent text-pretty">
                           <div class="flex px-2 py-1">
                             <div class="flex flex-col justify-center">
-                              <p class="text-sm leading-normal"><span class="font-extrabold underline text-slate-700">{{ specialSkill.name }}</span> : {{ specialSkill.description }} {% if specialSkill.quote %}<span class="italic">"{{ specialSkill.quote }}"</span>{% endif %}<br/>
+                              <p class="text-sm leading-normal"><span class="font-extrabold underline text-slate-700">{{ specialSkill.name }}</span> : {{ specialSkill.description }} {% if specialSkill.quote %}<span class="italic">"{{ specialSkill.quote }}"</span>{% endif %}
                               {% if specialSkill.note %}
+                                <br/>
                                 <span class="text-sm leading-normal">{{ specialSkill.note }}</span>
                               {% endif %}
                               </p>
@@ -276,7 +281,10 @@
                                             <span class="font-extrabold underline text-slate-700">{{ possession.gear.label }}</span> : {{ possession.gear.description }}
                                             <br/>
                                             Coût : <span class="font-extrabold">{{ possession.cost }}PA</span> 
-                                            {# <span class="italic">"{{ possession.gear.short }}"</span> #}
+                                            {% if possession.note %}
+                                              <br/>
+                                              <span class="text-sm leading-normal">{{ possession.note }}</span>
+                                            {% endif %}
                                         </p>
                                     </div>
                                 </div>

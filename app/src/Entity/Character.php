@@ -356,7 +356,8 @@ class Character
                 'required_factions' => $skill->getRequiredFactions(),
                 'required_skills' => $skill->getRequiredSkills()->toArray(),
                 'cost' => $skillLearned->getCost(),
-                'quote' => $skillLearned->getNote(),
+                'quote' => '',
+                'note' => $skillLearned->getNote(),
                 'locked' => $skillLearned->isLocked()
             ];
         }
