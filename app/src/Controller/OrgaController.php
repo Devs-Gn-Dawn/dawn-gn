@@ -28,6 +28,7 @@ use App\Entity\RarityType;
 use App\Entity\AssetType;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use App\DTO\CreateCharacterDTO;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 #[IsGranted(RoleType::ROLE_ORGA)]
 class OrgaController extends AbstractController
@@ -110,7 +111,8 @@ class OrgaController extends AbstractController
 
             $this->sendEmail(
                 $character->getUser(),
-                'Votre personnage a été validé. Vous pouvez le retrouver à l\'adresse suivante : ' . $this->generateUrl('app_character_edit', ['id' => $character->getId()]),
+                'Votre personnage a été validé. Vous pouvez le retrouver à l\'adresse suivante : ' .
+                    $this->generateUrl('app_character_edit', ['id' => $character->getId()], UrlGeneratorInterface::ABSOLUTE_URL),
                 'Personnage validé'
             );
 
@@ -129,7 +131,8 @@ class OrgaController extends AbstractController
 
             $this->sendEmail(
                 $character->getUser(),
-                'Votre personnage n\'a pas été validé. Vous pouvez le retrouver à l\'adresse suivante : ' . $this->generateUrl('app_character_edit', ['id' => $character->getId()]),
+                'Votre personnage n\'a pas été validé. Vous pouvez le retrouver à l\'adresse suivante : ' .
+                    $this->generateUrl('app_character_edit', ['id' => $character->getId()], UrlGeneratorInterface::ABSOLUTE_URL),
                 'Personnage non validé'
             );
 
