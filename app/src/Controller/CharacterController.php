@@ -200,6 +200,11 @@ class CharacterController extends AbstractController
             $this->entityManager->remove($skillLearned);
         }
 
+        // Supprimer les assets
+        foreach ($character->getCharacterAssets() as $characterAsset) {
+            $this->entityManager->remove($characterAsset);
+        }
+
         // Supprimer le personnage
         $this->entityManager->remove($character);
         $this->entityManager->flush();
