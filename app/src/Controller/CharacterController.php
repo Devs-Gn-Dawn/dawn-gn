@@ -501,6 +501,7 @@ class CharacterController extends AbstractController
     #[Route('/api/character/{id}/gear/add', name: 'api_character_gear_add', methods: ['POST'])]
     public function addGearApi(Character $character, Request $request): JsonResponse
     {
+        $isOrga = $this->getUser()->isOrga();
         // Vérifier que le personnage n'est pas déjà validé
         try {
             $this->checkCharacterAccess($character);
@@ -519,31 +520,10 @@ class CharacterController extends AbstractController
                 throw new \Exception('Équipement non trouvé.');
             }
 
-            // Vérifier si le personnage a assez d'XP
-            if ($gear->getBaseCost() > ($character->getXpGear() - $character->getGearXpUsed())) {
-                throw new \Exception('Points d\'XP insuffisants.');
-            }
-        } catch (\Exception $e) {
-            return $this->json(['error' => $e->getMessage()], 400);
-        }
-
-        $isOrga = $this->getUser()->isOrga();
-
-        try {
-            // Créer la nouvelle possession
-            $possession = new Possession();
-            $possession->setCharacter($character);
-            $possession->setGear($gear);
-            $possession->setCost($isOrga ? $data['gearCost'] : $gear->getBaseCost());
-            $possession->setNote($isOrga ? $data['gearNote'] : '');
-            $possession->setNoteOrga($isOrga ? $data['gearNoteOrga'] : '');
-
-            $this->entityManager->persist($possession);
-            $this->entityManager->flush();
-
+            $character->addGear($gear, $isOrga ? $data['gearCost'] : $gear->getBaseCost(), $isOrga ? $data['gearNote'] : '', $isOrga ? $data['gearNoteOrga'] : '');
             return $this->json(['success' => true]);
         } catch (\Exception $e) {
-            return $this->json(['error' => 'Erreur lors de l\'ajout de l\'équipement.', 'message' => $e->getMessage()], 500);
+            return $this->json(['error' => $e->getMessage()], 400);
         }
     }
 

@@ -474,6 +474,39 @@ class Character
         return $this;
     }
 
+    public function addGear(Gear $gear, ?int $cost = null, ?string $note = null, ?string $noteOrga = null): static
+    {
+        if ($this->getAvailableGearXp() < ($cost ?? $gear->getBaseCost())) {
+            throw new \Exception("Points insuffisants");
+        }
+
+        $possession = new Possession();
+        $possession->setGear($gear);
+        $possession->setCost($cost ?? $gear->getBaseCost());
+        $possession->setNote($note ?? '');
+        $possession->setNoteOrga($noteOrga ?? '');
+        $possession->setCharacter($this);
+
+        $this->possessions->add($possession);
+
+        return $this;
+    }
+
+    public function addAsset(Asset $asset, int $quantity = 1, ?string $note = null, ?string $noteOrga = null): static
+    {
+        $characterAsset = new CharacterAsset();
+        $characterAsset->setAsset($asset);
+        $characterAsset->setCost(0);
+        $characterAsset->setQuantity($quantity);
+        $characterAsset->setNote($note ?? '');
+        $characterAsset->setNoteOrga($noteOrga ?? '');
+        $characterAsset->setCharacter($this);
+
+        $this->characterAssets->add($characterAsset);
+
+        return $this;
+    }
+
     public function getPvMax(): int
     {
         $pvMax = 4;
