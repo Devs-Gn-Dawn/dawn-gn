@@ -235,7 +235,7 @@
                       </div>
                     </td>
                     <td class="w-20 align-middle bg-slate-50  shadow-transparent p-2 rounded border border-dashed border-slate-200 hover:border-slate-500">
-                      <button onclick="editAssetModal(event, '{{ specialSkill.characterAssetId }}', 'Capacity', '{{ specialSkill.isCatalog }}')" data-target="tooltip_trigger" data-placement="top" class=" w-full text-center"><i class="ml-2 fa fa-pencil hover:scale-102 hover:text-slate-700"></i></button>
+                      <button onclick="editAssetModal(event, '{{ specialSkill.characterAssetId }}', 'Capacity', '{{ specialSkill.isCatalog ? '1' : '0' }}')" data-target="tooltip_trigger" data-placement="top" class=" w-full text-center"><i class="ml-2 fa fa-pencil hover:scale-102 hover:text-slate-700"></i></button>
                         <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm" role="tooltip">
                           Editer / commenter
                           <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
@@ -407,7 +407,7 @@
                       </div>
                     </td>
                     <td class="w-20 align-middle bg-slate-50  shadow-transparent p-2 rounded border border-dashed border-slate-200 hover:border-slate-500">
-                      <button onclick="editAssetModal(event, '{{ object.characterAssetId }}', 'Object', '{{ object.isCatalog }}')" data-target="tooltip_trigger" data-placement="top" class=" w-full text-center"><i class="ml-2 fa fa-pencil hover:scale-102 hover:text-slate-700"></i></button>
+                      <button onclick="editAssetModal(event, '{{ object.characterAssetId }}', 'Object', '{{ object.isCatalog ? '1' : '0' }}')" data-target="tooltip_trigger" data-placement="top" class=" w-full text-center"><i class="ml-2 fa fa-pencil hover:scale-102 hover:text-slate-700"></i></button>
                       </div>
                         <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm" role="tooltip">
                           Editer / commenter
@@ -1197,7 +1197,7 @@
             title: assetsModal[assetType].editTitle,
             html: `
                 <form id="editAssetForm" class="text-left">
-                  ${isCatalog ? `
+                  ${isCatalog == '0' ? `
                     <div class="mb-6 text-left">
                       <label class="block text-sm font-extrabold text-slate-700">Nom de la ${assetsModal[assetType].label}</label>
                       <input type="text" id="assetName" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 mt-1 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow">
@@ -1234,7 +1234,7 @@
                 characterAssetId: characterAssetId,
                 note: $('#assetNote').val(),
                 noteOrga: $('#assetNoteOrga').val(),
-                assetQuantity: $('#assetQuantity') ? $('#assetQuantity').val() : 1,
+                assetQuantity: $('#assetQuantity') ? parseInt($('#assetQuantity').val()) : 1,
                 assetName: $('#assetName').is('input') ? $('#assetName').val() : $('#assetName').text(),
                 assetDescription: $('#assetDescription').is('textarea') ? $('#assetDescription').val() : $('#assetDescription').text(),
                 assetShort: $('#assetShort').is('input') ? $('#assetShort').val() : $('#assetShort').text(),
@@ -1253,9 +1253,7 @@
                 }
                 $('#assetDescription').text(assetDescription);
                 $('#assetShort').val(assetShort);
-                if (assetQuantity) {
-                    $('#assetQuantity').val(assetQuantity);
-                }
+                $('#assetQuantity').val(assetQuantity ? assetQuantity : 1);
                 $('#assetNote').val(assetNote);
                 $('#assetNoteOrga').val(assetNoteOrga);
             },
