@@ -2406,6 +2406,10 @@ h6 {
   background-position: right;
 }
 
+.bg-top-right {
+  background-position: top right;
+}
+
 .bg-x-25 {
   background-position: 25% 0;
 }
@@ -2887,6 +2891,26 @@ h6 {
 .text-fuchsia-500 {
   --tw-text-opacity: 1;
   color: rgb(203 12 159 / var(--tw-text-opacity));
+}
+
+.text-green-600 {
+  --tw-text-opacity: 1;
+  color: rgb(23 173 55 / var(--tw-text-opacity));
+}
+
+.text-green-700 {
+  --tw-text-opacity: 1;
+  color: rgb(21 128 61 / var(--tw-text-opacity));
+}
+
+.text-green-800 {
+  --tw-text-opacity: 1;
+  color: rgb(22 101 52 / var(--tw-text-opacity));
+}
+
+.text-green-900 {
+  --tw-text-opacity: 1;
+  color: rgb(20 83 45 / var(--tw-text-opacity));
 }
 
 .text-gray-700 {

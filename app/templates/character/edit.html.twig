@@ -121,9 +121,9 @@
                       <h6 class="mb-1"><span class="text-slate-400">{{ character.getXpSkill() - character.getSkillsXpUsed() }}</span>/{{ character.getXpSkill() }} PA 
                         {% if character.getAvailableXp() > 0 and character.isNotValidated() %}
                           <button onclick="showAddSkillXpModal()" data-target="tooltip_trigger" data-placement="top" class="text-xs font-semibold leading-tight text-slate-300 cursor-pointer hover:scale-102 hover:text-slate-700 hover:underline">
-                            <i class="fa fa-plus-circle text-slate-400 hover:text-slate-700 text-sm" aria-hidden="true"></i>
+                            <i class="fa fa-plus-circle text-green-600 hover:text-green-900 text-sm" aria-hidden="true"></i>
                           </button> 
-                          <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm" role="tooltip">
+                          <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-green-600 rounded-lg text-sm" role="tooltip">
                             Ajouter PA
                             <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
                           </div>
@@ -252,9 +252,9 @@
                       <h6 class="mb-1"><span class="text-slate-400">{{ character.getXpGear() - character.getGearXpUsed() }}</span>/{{ character.getXpGear() }} PA 
                         {% if character.getAvailableXp() > 0 and character.isNotValidated() %}
                           <button onclick="showAddGearXpModal()" data-target="tooltip_trigger" data-placement="top" class="text-xs font-semibold leading-tight text-slate-300 cursor-pointer hover:scale-102 hover:text-slate-700 hover:underline">
-                            <i class="fa fa-plus-circle text-slate-400 hover:text-slate-700 text-sm" aria-hidden="true"></i>
+                             <i class="fa fa-plus-circle text-green-600 hover:text-green-900 text-sm" aria-hidden="true"></i>
                           </button> 
-                          <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-slate-700 rounded-lg text-sm" role="tooltip">
+                          <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-green-600 rounded-lg text-sm" role="tooltip">
                           Ajouter PA
                           <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
                         </div>
