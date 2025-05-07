@@ -94,6 +94,7 @@ class PdfController extends AbstractController
         // Création du PDF
         $pdf = new FPDF();
         $pdf->AddPage();
+        $pdf->SetAutoPageBreak(true, 8);
         $pdf->Image($imagePath, 0, 0, 210, 297, 'JPG');
 
         // Ajout du QR code
@@ -163,6 +164,16 @@ class PdfController extends AbstractController
             $pdf->Ln(4);
         }
 
+        // radiations levels
+        $y = 184.6;
+        $radOffset = $character->getRadiationsOffset();
+        for ($radiationLevel = 1; $radiationLevel <= 10; $radiationLevel++) {
+            $displayRad = $radiationLevel == 1 && $radOffset > 0 ? '1-' . ($radOffset + 1) : $radOffset + $radiationLevel;
+            $pdf->SetFont('Arial', '', 10);
+            $this->mbCell($pdf, 11, $y, $displayRad, 10, 7, 'C');
+            $y += 5.04;
+        }
+
         // possessions
         $pdf->SetY(206);
         foreach ($character->getPossessions() as $possession) {
@@ -196,16 +207,6 @@ class PdfController extends AbstractController
             }
             $pdf->SetLeftMargin(75);
             $pdf->Ln(4);
-        }
-
-        // radiations levels
-        $y = 184.6;
-        $radOffset = $character->getRadiationsOffset();
-        for ($radiationLevel = 1; $radiationLevel <= 10; $radiationLevel++) {
-            $displayRad = $radiationLevel == 1 && $radOffset > 0 ? '1-' . ($radOffset + 1) : $radOffset + $radiationLevel;
-            $pdf->SetFont('Arial', '', 10);
-            $this->mbCell($pdf, 11, $y, $displayRad, 10, 7, 'C');
-            $y += 5.04;
         }
 
         // Génération du PDF
