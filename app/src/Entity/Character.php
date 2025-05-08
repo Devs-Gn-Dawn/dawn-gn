@@ -479,16 +479,13 @@ class Character
         if ($this->getAvailableGearXp() < ($cost ?? $gear->getBaseCost())) {
             throw new \Exception("Points insuffisants");
         }
-
         $possession = new Possession();
         $possession->setGear($gear);
         $possession->setCost($cost ?? $gear->getBaseCost());
         $possession->setNote($note ?? '');
         $possession->setNoteOrga($noteOrga ?? '');
         $possession->setCharacter($this);
-
         $this->possessions->add($possession);
-
         return $this;
     }
 

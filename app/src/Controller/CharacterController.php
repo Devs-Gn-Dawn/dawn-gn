@@ -302,6 +302,10 @@ class CharacterController extends AbstractController
         try {
             $this->checkCharacterAccess($character);
 
+            if (!$isOrga) {
+                $this->checkCharacterValidation($character);
+            }
+
             if ($this->entityManager->getRepository(Skill::class)->isSkillAvailableForCharacter($skill, $character, $isOrga ? $data['skillCost'] ?? null : null)) {
                 $character->addSkill($skill, $isOrga ? $data['skillCost'] ?? null : null, $isOrga ? $data['skillNote'] ?? null : null, $isOrga ? $data['skillNoteOrga'] ?? null : null);
                 $this->entityManager->flush();
@@ -506,21 +510,22 @@ class CharacterController extends AbstractController
         try {
             $this->checkCharacterAccess($character);
 
-            $this->checkCharacterValidation($character);
+            if (!$isOrga) {
+                $this->checkCharacterValidation($character);
+            }
 
             $data = json_decode($request->getContent(), true);
             $gearId = $data['gearId'] ?? null;
-
             if (!$gearId) {
                 throw new \Exception('Aucun équipement sélectionné.');
             }
-
             $gear = $this->entityManager->getRepository(Gear::class)->find($gearId);
             if (!$gear) {
                 throw new \Exception('Équipement non trouvé.');
             }
 
-            $character->addGear($gear, $isOrga ? $data['gearCost'] : $gear->getBaseCost(), $isOrga ? $data['gearNote'] : '', $isOrga ? $data['gearNoteOrga'] : '');
+            $character->addGear($gear, $isOrga ? ($data['gearCost'] ?? null) : $gear->getBaseCost(), $isOrga ? $data['gearNote'] ?? null : '', $isOrga ? $data['gearNoteOrga'] ?? null : '');
+            $this->entityManager->flush();
             return $this->json(['success' => true]);
         } catch (\Exception $e) {
             return $this->json(['error' => $e->getMessage()], 400);
