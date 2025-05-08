@@ -54,13 +54,13 @@ class Character
     #[ORM\JoinColumn(name: 'fk_user', referencedColumnName: 'id', nullable: false)]
     private ?User $user = null;
 
-    #[ORM\OneToMany(mappedBy: 'character', targetEntity: Possession::class)]
+    #[ORM\OneToMany(mappedBy: 'character', targetEntity: Possession::class, cascade: ['persist'])]
     private Collection $possessions;
 
     #[ORM\OneToMany(mappedBy: 'character', targetEntity: SkillLearned::class, cascade: ['persist'])]
     private Collection $skillsLearned;
 
-    #[ORM\OneToMany(mappedBy: 'character', targetEntity: CharacterAsset::class)]
+    #[ORM\OneToMany(mappedBy: 'character', targetEntity: CharacterAsset::class, cascade: ['persist'])]
     private Collection $characterAssets;
 
     public function __construct()
