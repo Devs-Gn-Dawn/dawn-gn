@@ -13,15 +13,18 @@ use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\User;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use App\Entity\FactionType;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 
 #[IsGranted(RoleType::ROLE_ADMIN)]
 class AdminController extends AbstractController
 {
     private $entityManager;
 
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(EntityManagerInterface $entityManager, private MailerInterface $mailer)
     {
         $this->entityManager = $entityManager;
+        $this->mailer = $mailer;
     }
 
     #[Route('/admin', name: 'app_admin')]
@@ -170,5 +173,66 @@ class AdminController extends AbstractController
             'success' => true,
             'users' => $usersData
         ]);
+    }
+
+    #[Route('/admin/send-invite', name: 'admin_send_invite')]
+    public function invite(): Response
+    {
+        return $this->render('admin/send_invite.html.twig', [
+            'breadcrumb' => [
+                '/admin' => 'Administration',
+                '/admin/send-invite' => 'Envoyer un mail d\'invitation',
+            ],
+        ]);
+    }
+
+
+    #[Route('/api/send-invite', name: 'api_send_invite', methods: ['POST'])]
+    public function sendInvite(Request $request): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+
+        if ($data['test'] ?? 0 == 1) {
+            $user = $this->getUser();
+            /** @var User $user */
+            try {
+                $this->sendInviteEmail($user);
+            } catch (\Exception $e) {
+                return new JsonResponse(['success' => false, 'error' => $e->getMessage()], 500);
+            }
+        } else {
+            $errors = [];
+            $players = $this->entityManager->getRepository(User::class)->findAll();
+            foreach ($players as $player) {
+                if ($player->getPassword() == '') {
+                    try {
+                        $this->sendInviteEmail($player);
+
+                        $player->setPassword('1');
+                        $this->entityManager->flush();
+                    } catch (\Exception $e) {
+                        $errors[] = $e->getMessage();
+                    }
+                }
+            }
+            if (!empty($errors)) {
+                return new JsonResponse(['success' => false, 'error' => $errors], 500);
+            }
+        }
+        return new JsonResponse(['success' => true]);
+    }
+
+    private function sendInviteEmail(User $user): void
+    {
+        $email = (new TemplatedEmail())
+            ->from('no-reply@dawn-gn.com')
+            ->to($user->getEmail())
+            ->subject('Dawn 38 - Votre personnage')
+            ->htmlTemplate('contact/invit.html.twig')
+            ->context([
+                'user' => $user
+            ]);
+
+        $this->mailer->send($email);
     }
 }

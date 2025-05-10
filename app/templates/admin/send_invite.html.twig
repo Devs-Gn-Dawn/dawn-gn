@@ -1,0 +1,55 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion des utilisateurs{% endblock %}
+
+{% block body %}
+<div class="w-full px-6 py-6 mx-auto">
+    <div class="flex flex-wrap -mx-3">
+        <div class="flex-none w-full max-w-full px-3">
+            <div class="relative flex flex-col min-w-0 mb-6 break-words bg-white border-0 border-transparent border-solid shadow-soft-xl rounded-2xl bg-clip-border">
+                <div class="p-6 pb-0 mb-0 bg-white border-b-0 border-b-solid rounded-t-2xl border-b-transparent">
+                    <div class="flex flex-wrap -mx-3">
+                        <div class="flex-none w-full max-w-full px-3 grid grid-cols-2 gap-4 mb-6">
+                            <div class="flex items-center justify-self-start ">
+                                <h6>Envoyer des mails d'invitation à tous les utilisateurs</h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex-auto px-6 pb-2 border-t pt-6">
+                    <div class="p-0 overflow-x-auto">
+                        <div class="form-group">
+                            <label for="test">Test</label>
+                            <input type="checkbox" id="test" name="test" value="1">
+                        </div>
+                        <button data-action="sendInvite" class="inline-block mx-auto sm:mr-0 px-2 py-1 font-bold text-right text-white uppercase align-middle transition-all rounded-lg cursor-pointer bg-gradient-to-tl from-cyan-300 to-cyan-600 leading-pro text-xs ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 hover:scale-102 active:opacity-85 hover:shadow-soft-xs hover:text-cyan-100">Envoyer</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+   document.addEventListener('DOMContentLoaded', function() {
+        document.querySelector('[data-action="sendInvite"]').addEventListener('click', function() {
+            var isTest = document.getElementById('test').checked ? 1 : 0;
+            createModal({
+                title: "Confirmation",
+                html: isTest == 1 ? "Êtes-vous sûr de vouloir envoyer un mail de test ?" : "Êtes-vous sûr de vouloir envoyer des mails d'invitation à tous les utilisateurs ?<br/><br/><span class='text-red-700'>Cette action est irréversible.</span>",
+                confirmButtonText: "Confirmer",
+                getData: () => ({
+                    test: isTest
+                }),
+                validate: () => true,
+                url: '{{ path('api_send_invite') }}',
+                successTitle: isTest == 1 ? "Mail de test envoyé !" : "Mails envoyés !",
+                successMessage: isTest == 1 ? "Le mail de test a été envoyé avec succès." : "Les mails ont été envoyés avec succès."
+            });
+        });
+    });
+</script>
+{% endblock %}
