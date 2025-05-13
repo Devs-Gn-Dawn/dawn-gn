@@ -419,4 +419,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->faction = $faction;
         return $this;
     }
+
+    public function getOrgaEmail(): ?string
+    {
+        $mainFaction = '';
+        if ($this->getFaction()) {
+            $mainFaction = $this->getFaction();
+        } elseif ($this->hasMainCharacter()) {
+            $mainFaction = $this->getMainCharacter()->getFaction();
+        }
+        return OrgasType::getEmail($mainFaction);
+    }
 }

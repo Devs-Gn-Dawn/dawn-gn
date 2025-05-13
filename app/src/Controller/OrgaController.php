@@ -160,6 +160,7 @@ class OrgaController extends AbstractController
         $email = (new TemplatedEmail())
             ->from(new Address('no-reply@dawn-gn.com', 'Dawn GN'))
             ->to($user->getEmail())
+            ->replyTo($user->getOrgaEmail())
             ->subject('[Dawn GN] - ' . $title)
             ->htmlTemplate('contact/orga_email.html.twig')
             ->context([
