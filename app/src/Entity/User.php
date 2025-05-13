@@ -424,7 +424,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $mainFaction = '';
         if ($this->getFaction()) {
-            $mainFaction = $this->getFaction();
+            $mainFaction = $this->getFaction()->value;
         } elseif ($this->hasMainCharacter()) {
             $mainFaction = $this->getMainCharacter()->getFaction();
         }
