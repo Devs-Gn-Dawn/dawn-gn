@@ -21,4 +21,10 @@ class HomeController extends AbstractController
 
         return $this->redirectToRoute('app_character_index');
     }
+
+    #[Route('/dashboard', name: 'app_dashboard')]
+    public function dashboard(): Response
+    {
+        return $this->redirectToRoute('app_home');
+    }
 }
