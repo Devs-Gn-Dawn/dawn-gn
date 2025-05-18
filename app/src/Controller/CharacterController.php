@@ -131,8 +131,16 @@ class CharacterController extends AbstractController
     #[Route('/{id}/check', name: 'app_character_check', methods: ['GET'])]
     public function check(Character $character): Response
     {
+        $user = $this->getUser();
+        $route = 'app_character_edit';
+        /** @var User $user */
+        if ($user->isOrga() && $user->modeCheckin()) {
+            $route = 'orga_checkin';
+        } elseif($user->isOrga()) {
+            $route = 'app_orga_character_edit';
+        }
         // redirect to edit page
-        return $this->redirectToRoute('app_character_edit', ['id' => $character->getId()]);
+        return $this->redirectToRoute($route, ['id' => $character->getId()]);
     }
 
     #[Route('/{id}/edit', name: 'app_character_edit', methods: ['GET', 'POST'])]
