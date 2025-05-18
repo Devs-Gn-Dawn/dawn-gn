@@ -368,6 +368,40 @@ class CharacterController extends AbstractController
         }
     }
 
+    #[Route('/api/character/{id}/skill/xp/remove', name: 'api_character_skill_xp_remove', methods: ['POST'])]
+    public function removeSkillXpApi(Character $character, Request $request): JsonResponse
+    {
+        $currentSkillXp = $character->getXpSkill();
+        $usedSkillXp = $character->getSkillsXpUsed();
+        $availableXp = min($currentSkillXp - 20, $currentSkillXp - $usedSkillXp);
+        try {
+            $this->checkCharacterAccess($character);
+            if ($character->getValidationType() === ValidationType::REJETE) {
+                throw new \Exception('Ce personnage a été rejeté.');
+            }
+            $data = json_decode($request->getContent(), true);
+            $xp = $data['xp'] ?? null;
+
+            if (!$xp || !is_numeric($xp) || $xp <= 0) {
+                throw new \Exception('Valeur d\'XP invalide');
+            }
+
+            if ($xp > $availableXp) {
+                throw new \Exception('Points d\'XP insuffisants');
+            }            
+        } catch (\Exception $e) {
+            return $this->json(['error' => $e->getMessage()], 400);
+        }
+        
+        try {
+            $character->setXpSkill($character->getXpSkill() - $xp);
+            $this->entityManager->flush();
+            return $this->json(['success' => true]);
+        } catch (\Exception $e) {
+            return $this->json(['error' => 'Erreur lors de la suppression des points d\'XP'], 500);
+        }
+    }
+
     #[Route('/api/character/{id}/skill/xp/add', name: 'api_character_skill_xp_add', methods: ['POST'])]
     public function addSkillXpApi(Character $character, Request $request): JsonResponse
     {
@@ -464,6 +498,40 @@ class CharacterController extends AbstractController
             return $this->json(['success' => true]);
         } catch (\Exception $e) {
             return $this->json(['error' => 'Erreur lors de l\'ajout des points d\'XP'], 500);
+        }
+    }
+
+    #[Route('/api/character/{id}/gear/xp/remove', name: 'api_character_gear_xp_remove', methods: ['POST'])]
+    public function removeGearXpApi(Character $character, Request $request): JsonResponse
+    {
+        $currentGearXp = $character->getXpGear();
+        $usedGearXp = $character->getGearXpUsed();
+        $availableXp = min($currentGearXp - 10, $currentGearXp - $usedGearXp);
+        try {
+            $this->checkCharacterAccess($character);
+            if ($character->getValidationType() === ValidationType::REJETE) {
+                throw new \Exception('Ce personnage a été rejeté.');
+            }
+            $data = json_decode($request->getContent(), true);
+            $xp = $data['xp'] ?? null;
+
+            if (!$xp || !is_numeric($xp) || $xp <= 0) {
+                throw new \Exception('Valeur d\'XP invalide');
+            }
+
+            if ($xp > $availableXp) {
+                throw new \Exception('Points d\'XP insuffisants');
+            }            
+        } catch (\Exception $e) {
+            return $this->json(['error' => $e->getMessage()], 400);
+        }
+        
+        try {
+            $character->setXpGear($character->getXpGear() - $xp);
+            $this->entityManager->flush();
+            return $this->json(['success' => true]);
+        } catch (\Exception $e) {
+            return $this->json(['error' => 'Erreur lors de la suppression des points d\'XP'], 500);
         }
     }
 

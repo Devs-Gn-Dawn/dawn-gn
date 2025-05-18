@@ -128,6 +128,15 @@
                             <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
                           </div>
                         {% endif %}
+                        {% if character.getXpSkill() - 20 > 0 and character.getXpSkill() - character.getSkillsXpUsed() > 0 and character.isNotValidated() %}
+                          <button onclick="showRemoveSkillXpModal()" data-target="tooltip_trigger" data-placement="top" class="text-xs font-semibold leading-tight text-slate-300 cursor-pointer hover:scale-102 hover:text-slate-700 hover:underline">
+                            <i class="fa fa-minus-circle text-red-600 hover:text-red-900 text-sm" aria-hidden="true"></i>
+                          </button> 
+                          <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-red-600 rounded-lg text-sm" role="tooltip">
+                            Retirer PA
+                            <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
+                          </div>
+                        {% endif %}
                       </h5>
                     </div> 
                   </div>
@@ -258,6 +267,15 @@
                           Ajouter PA
                           <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
                         </div>
+                        {% endif %}
+                        {% if character.getXpGear() - 10 > 0 and character.getXpGear() - character.getGearXpUsed() > 0 and character.isNotValidated() %}
+                          <button onclick="showRemoveGearXpModal()" data-target="tooltip_trigger" data-placement="top" class="text-xs font-semibold leading-tight text-slate-300 cursor-pointer hover:scale-102 hover:text-slate-700 hover:underline">
+                            <i class="fa fa-minus-circle text-red-600 hover:text-red-900 text-sm" aria-hidden="true"></i>
+                          </button> 
+                          <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-red-600 rounded-lg text-sm" role="tooltip">
+                            Retirer PA
+                            <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
+                          </div>
                         {% endif %}
                       </h5>
                     </div> 
@@ -604,6 +622,96 @@
             successMessage: "Les PA ont été ajoutés avec succès.",
             didOpen: () => {
                 const xpInput = document.getElementById("skillXp");
+                xpInput.addEventListener("input", function() {
+                    const value = parseInt(this.value);
+                    if (value > availableXp) {
+                        this.value = availableXp;
+                    } else if (value < 1) {
+                        this.value = 1;
+                    }
+                });
+            }
+        });
+    }
+
+    function showRemoveSkillXpModal() {
+        const currentSkillXp = {{ character.getXpSkill() }};
+        const usedSkillXp = {{ character.getSkillsXpUsed() }};
+        const availableXp = Math.min(currentSkillXp - 20, currentSkillXp - usedSkillXp);
+
+        createModal({
+            title: "Retirer des PA aux compétences",
+            html: `
+                <form id="skillXpForm" class="text-left">
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700">Nombre de PA à retirer</label>
+                        <input type="number" id="skillXp" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 mt-1 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow" 
+                               min="1" max="${availableXp}" value="1">
+                        <p class="mt-2 text-sm text-gray-500">
+                            PA disponibles : ${availableXp}<br>
+                            PA actuels : ${currentSkillXp - usedSkillXp}
+                        </p>
+                    </div>
+                </form>
+            `,
+            getData: () => ({
+                xp: document.getElementById("skillXp").value,
+            }),
+            validate: (data) => {
+                const xp = parseInt(data.xp);
+                return xp > 0 && xp <= availableXp;
+            },
+            url: "{{ path('api_character_skill_xp_remove', {'id': character.id}) }}",
+            confirmButtonText: "Retirer",
+            successTitle: "PA retirés !",
+            successMessage: "Les PA ont été retirés avec succès.",
+            didOpen: () => {
+                const xpInput = document.getElementById("skillXp");
+                xpInput.addEventListener("input", function() {
+                    const value = parseInt(this.value);
+                    if (value > availableXp) {
+                        this.value = availableXp;
+                    } else if (value < 1) {
+                        this.value = 1;
+                    }
+                });
+            }
+        });
+    }
+
+    function showRemoveGearXpModal() {
+        const currentGearXp = {{ character.getXpGear() }};
+        const usedGearXp = {{ character.getGearXpUsed() }};
+        const availableXp = Math.min(currentGearXp - 10, currentGearXp - usedGearXp);
+
+        createModal({
+            title: "Retirer des PA aux équipements",
+            html: `
+                <form id="gearXpForm" class="text-left">
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700">Nombre de PA à retirer</label>
+                        <input type="number" id="gearXp" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 mt-1 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow" 
+                               min="1" max="${availableXp}" value="1">
+                        <p class="mt-2 text-sm text-gray-500">
+                            PA disponibles : ${availableXp}<br>
+                            PA actuels : ${currentGearXp - usedGearXp}
+                        </p>
+                    </div>
+                </form>
+            `,
+            getData: () => ({
+                xp: document.getElementById("gearXp").value,
+            }),
+            validate: (data) => {
+                const xp = parseInt(data.xp);
+                return xp > 0 && xp <= availableXp;
+            },
+            url: "{{ path('api_character_gear_xp_remove', {'id': character.id}) }}",
+            confirmButtonText: "Retirer",
+            successTitle: "PA retirés !",
+            successMessage: "Les PA ont été retirés avec succès.",
+            didOpen: () => {
+                const xpInput = document.getElementById("gearXp");
                 xpInput.addEventListener("input", function() {
                     const value = parseInt(this.value);
                     if (value > availableXp) {
