@@ -31,7 +31,7 @@
                     <h5 class="mb-1 py-1 text-xl text-slate-700 font-semibold bg-transparent border border-transparent">{{ character.name|raw }}</h5>
 
                     </div>
-                    <div class="mb-0 font-semibold leading-normal text-base"><span class="font-extrabold">{{ character.getFactionType().getLabel() }}</span> - {{ character.getClassLabel() }}
+                    <div class="mb-0 font-semibold leading-normal text-base"><span class="font-extrabold">{{ character.user.fullName|raw }}</span>
                     
                     </div>
                     {% if character.getAvailableXp() > 0 %}
