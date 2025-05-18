@@ -10,6 +10,9 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use SymfonyCasts\Bundle\ResetPassword\Model\ResetPasswordRequestInterface;
 use App\Entity\FactionType;
+use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Cookie;
+use Symfony\Component\HttpFoundation\Request;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
@@ -429,5 +432,39 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             $mainFaction = $this->getMainCharacter()->getFaction();
         }
         return OrgasType::getEmail($mainFaction);
+    }
+
+    public function modeCheckin(): bool
+    {
+        if(!$this->isOrga()) {
+            return false;
+        }
+        
+        $session = new Session();
+        $modeCheckin = $session->get('modeCheckin', false);
+        
+        if(!$modeCheckin) {
+            // Vérifier si le cookie modeCheckin existe
+            $request = Request::createFromGlobals();
+            $modeCheckin = $request->cookies->get('modeCheckin', false);
+        }
+        
+        return (bool)$modeCheckin;
+    }
+
+    public function setModeCheckin(bool $modeCheckin): self
+    {
+        // store modeCheckin in session and cookie
+        $session = new Session();
+        $session->set('modeCheckin', $modeCheckin);
+        $session->save();
+
+        $cookie = new Cookie(
+            'modeCheckin',
+            $modeCheckin ? '1' : '0',
+            time() + 3600, // expire dans 1 heure
+            '/'
+        );
+        return $this;
     }
 }

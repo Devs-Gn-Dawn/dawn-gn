@@ -176,3 +176,24 @@ window.createModal = function (options) {
     }
   });
 };
+
+window.toggleModeCheckin = function (checkbox) {
+  fetch("/api/mode-checkin", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ modeCheckin: checkbox.checked }),
+  }).then(response => {
+    if (!response.ok) {
+      throw new Error('Une erreur est survenue');
+    }
+    const modeCheckin = document.getElementById("modeCheckin");
+    const modeCheckinText = document.querySelector("[data-mode-checkin]");
+    modeCheckinText.textContent = checkbox.checked ? "Actif" : "Inactif";
+    return response.json();
+  }).catch(error => {
+    console.error('Erreur:', error);
+    checkbox.checked = !checkbox.checked;
+  });
+};

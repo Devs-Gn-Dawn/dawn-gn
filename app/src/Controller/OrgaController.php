@@ -423,4 +423,26 @@ class OrgaController extends AbstractController
 
         return $this->json(['success' => true]);
     }
+
+    #[Route('/api/mode-checkin', name: 'api_mode_checkin', methods: ['POST'])]
+    public function modeCheckin(Request $request): JsonResponse
+    {
+        try {
+            $data = json_decode($request->getContent(), true);
+            if (!isset($data['modeCheckin'])) {
+                throw new \Exception('Données manquantes');
+            }
+
+            $user = $this->getUser();
+            /** @var User $user */
+            error_log('modeCheckin data: ' . json_encode($data));
+            $user->setModeCheckin((bool)$data['modeCheckin']);
+            error_log('modeCheckin user: ' . json_encode($user->modeCheckin()));
+            $this->entityManager->flush();
+            return $this->json(['success' => true]);
+        } catch (\Exception $e) {
+            error_log('modeCheckin error: ' . $e->getMessage());
+            return $this->json(['error' => $e->getMessage()], 400);
+        }
+    }
 }
