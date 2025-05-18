@@ -267,7 +267,7 @@ class CharacterController extends AbstractController
             }
 
             // Sinon, traitement du formulaire classique
-            $character->setDescription($request->request->get('description', ''));
+            // $character->setDescription($request->request->get('description', ''));
             $character->setBackground($request->request->get('background', ''));
 
             $this->entityManager->flush();
