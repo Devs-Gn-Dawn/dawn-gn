@@ -143,7 +143,15 @@
         </a>
       </li>
       {% endif %}
-      
+      {% if is_granted('ROLE_ORGA') %}
+      <li class="mt-1 w-full">
+        <div class="min-h-6 mx-8 mb-0.5 block pl-0">
+          <input id="follow" class="mt-0.54 rounded-10 duration-250 ease-soft-in-out after:rounded-circle after:shadow-soft-2xl after:duration-250 checked:after:translate-x-5.25 h-5 relative float-left ml-auto w-10 cursor-pointer appearance-none border border-solid border-gray-200 bg-slate-800/10 bg-none bg-contain bg-left bg-no-repeat align-top transition-all after:absolute after:top-px after:h-4 after:w-4 after:translate-x-px after:bg-white after:content-[''] checked:border-slate-800/95 checked:bg-green-700/95 checked:bg-none checked:bg-right" type="checkbox" checked="">
+          <label for="follow" class="w-3/5 mb-0 ml-2 overflow-hidden font-normal cursor-pointer select-none text-sm text-ellipsis whitespace-nowrap text-slate-500">Check-in : Activé</label>
+        </div>
+      </li>
+      {% endif %}
+
     </ul>
   </div>
 </aside> 
