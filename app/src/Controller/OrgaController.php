@@ -445,4 +445,12 @@ class OrgaController extends AbstractController
             return $this->json(['error' => $e->getMessage()], 400);
         }
     }
+
+    #[Route('/orga/check-in/{id}', name: 'orga_checkin', methods: ['GET'])]
+    public function checkIn(Character $character): Response
+    {
+        return $this->render('orga/checkin.html.twig', [
+            'character' => $character,
+        ]);
+    }
 }

@@ -241,8 +241,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         });
     }
 
-    public function lastRegistrationWithState(string $state): ?Registration
+    public function lastRegistrationWithState(?string $state = null): ?Registration
     {
+        $state = $state ?? EventType::STATUS_OPEN;
         return $this->registrations->filter(function (Registration $registration) use ($state) {
             return $registration->getEventType()->getStatus() === $state;
         })->last() ?: null;

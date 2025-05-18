@@ -1,0 +1,88 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Check-in{% endblock %}
+
+{% block body %}
+    <div class="w-full px-6 mx-auto">
+        <div class="relative flex items-center p-0 mt-6 overflow-hidden bg-right bg-cover min-h-75 rounded-2xl" style="background-image: url('{{ asset('build/images/bandeaux/' ~ character.getBanner() ~ '.jpg') }}'); background-position-y: 50%">
+            <!-- <span class="absolute inset-y-0 w-full h-full bg-center bg-cover bg-gradient-to-tl from-red-900 to-red-700 opacity-30"></span> -->
+        </div>
+
+        <div class="w-full max-w-full border ml-2 md:w-1/2 md:flex-none lg:w-4/12 mx-6 -mt-34">
+            <ul class="relative flex flex-wrap p-1 list-none bg-transparent">
+                <li class="z-30 flex-auto py-2 ml-2 bg-white/80 rounded-xl text-center text-xs font-semibold leading-tight text-slate-300 cursor-pointer hover:bg-white hover:scale-102 hover:text-slate-700 hover:underline">
+                    <a href="{{ path('app_orga_player', {'id': character.user.id}) }}" class="z-30 block w-full px-0 py-1 mb-0 transition-all border-0 rounded-lg ease-soft-in-out text-slate-700">
+                    <span class="ml-1">Informations de lae joueureuse</span>
+                    </a>
+                </li>
+                <li class="z-30 flex-auto py-2 ml-2 bg-white/80 rounded-xl text-center text-xs font-semibold leading-tight text-slate-300 cursor-pointer hover:bg-white hover:scale-102 hover:text-slate-700 hover:underline">
+                    <a href="{{ path('app_pdf', {'id': character.id}) }}" target="_blank" class="z-30 block w-full px-0 py-1 mb-0 transition-all border-0 rounded-lg ease-soft-in-out text-slate-700">
+                    <span class="ml-1">Fiche personnage</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="relative flex flex-col flex-auto min-w-0 p-4 overflow-hidden break-words border-0 shadow-blur rounded-2xl bg-white/80 bg-clip-border backdrop-blur-2xl backdrop-saturate-200">
+            <div class="flex flex-wrap -mx-3 px-6">
+                <div class="flex-none w-auto max-w-full my-auto">
+                <div class="h-full">
+                    <div class="h-full flex items-center gap-2">
+                    <h5 class="mb-1 py-1 text-xl text-slate-700 font-semibold bg-transparent border border-transparent">{{ character.name|raw }}</h5>
+
+                    </div>
+                    <div class="mb-0 font-semibold leading-normal text-base"><span class="font-extrabold">{{ character.getFactionType().getLabel() }}</span> - {{ character.getClassLabel() }}
+                    
+                    </div>
+                    {% if character.getAvailableXp() > 0 %}
+                    <div class="mb-0 font-semibold leading-normal text-sm"><span class="font-extrabold">{{ character.getAvailableXp() }}</span> XP disponibles</div>
+                    {% else %}
+                    <div class="mb-0 font-semibold leading-normal text-sm"><span class="font-extrabold">Aucun</span> XP disponible</div>
+                    {% endif %}
+                    </div>
+                </div>
+                </div>
+            </div>
+        </div>
+        {% if character.user.lastRegistrationWithState() %}
+        <div id="ticketValidation" class="p-6 pb-0 mx-auto block">
+            <div class="text-sm text-center w-full max-w-full shadow-soft-xl rounded-xl py-4 bg-green-200 text-green-900 bg-opacity-70">
+            Billet valide
+            </div>
+        </div>
+        {% else %}
+        <div id="ticketValidation" class="p-6 pb-0 mx-auto block">
+            <div class="text-sm text-center w-full max-w-full shadow-soft-xl rounded-xl py-4 bg-red-200 text-red-900 bg-opacity-70">
+            Billet non valide
+            </div>
+        </div>
+        {% endif %}
+        <div id="compTab" class="block p-6 mx-auto" active-tab>
+        <div class="flex flex-wrap -mx-3">
+          <!-- Posséssion -->
+           <div class="flex-none w-full max-w-full px-3  mb-6">
+            <div class="relative flex flex-col min-w-0 pb-2 break-words bg-white border-0 border-transparent border-solid shadow-soft-xl rounded-2xl bg-clip-border">
+              <div class="flex flex-wrap mx-3 my-3">
+                <div class="flex-none w-auto max-w-full px-3 my-auto">
+                  <div class="h-full">
+                    <h5 class="mb-1">Les posséssions à distribuer</h5>
+                  </div>
+                </div>
+              </div>
+              <div class="flex-auto px-0 pt-0 pb-2">
+                <div class="p-0 mx-5">
+                    <ul class="list-square list-inside ml-5">
+                    {% for possession in character.possessions %}
+                        <li class="">{{ possession.gear.label }} ({{ possession.quantity ?? 1 }}) : {{ possession.gear.short }}</li>
+                    {% endfor %}
+                    {% for object in character.characterAssetsByType(constant('App\\Entity\\AssetType::OBJECT')) %}
+                        <li class="">{{ object.asset.label }} ({{ object.quantity }}) : {{ object.asset.short }}</li>
+                    {% endfor %}
+                    </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+    </div>
+{% endblock %}
