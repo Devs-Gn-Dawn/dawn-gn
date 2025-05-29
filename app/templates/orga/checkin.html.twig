@@ -34,6 +34,9 @@
                     <div class="mb-0 font-semibold leading-normal text-base"><span class="font-extrabold">{{ character.user.fullName|raw }}</span>
                     
                     </div>
+                    <div class="mb-0 font-semibold leading-normal text-base">
+                        <span class="font-extrabold">{{ character.getFactionType().getLabel() }}</span> - {{ character.getClassLabel() }}
+                    </div>
                     {% if character.getAvailableXp() > 0 %}
                     <div class="mb-0 font-semibold leading-normal text-sm"><span class="font-extrabold">{{ character.getAvailableXp() }}</span> XP disponibles</div>
                     {% else %}
