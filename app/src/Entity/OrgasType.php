@@ -9,6 +9,7 @@ enum OrgasType: string
     case RODOIR = 'Rodoir';
     case NEOCUBA = 'Néo-cuba';
     case PNJ = 'Pnj';
+    case MILIEU = 'Milieu';
 
 
     public static function getEmail(string $faction): string
@@ -19,6 +20,7 @@ enum OrgasType: string
             self::RODOIR->value => 'orgas-rodoir@dawn-gn.com',
             self::NEOCUBA->value => 'orgas-neocuba@dawn-gn.com',
             self::PNJ->value => 'orgas-pnj@dawn-gn.com',
+            self::MILIEU->value => 'orgas-milieu@dawn-gn.com',
             default => 'orgas-nomads@dawn-gn.com',
         };
     }
