@@ -134,6 +134,7 @@ Le fichier `docker-compose.yml` définit les services :
 - **web** : Conteneur PHP/Apache
 - **db** : Conteneur MySQL
 - **adminer** : Interface web pour MySQL
+- **mailhog** : Serveur SMTP de test pour le développement local (ports 1025 SMTP, 8025 web)
 
 ### Dockerfile PHP
 
@@ -217,6 +218,28 @@ MAILER_DSN=null://null
 ```
 
 Les emails sont loggés mais pas envoyés.
+
+### MailHog (développement local)
+
+MailHog est un serveur SMTP de test intégré dans Docker pour le développement local. Il capture tous les emails envoyés et permet de les visualiser via une interface web.
+
+**Configuration dans `.env.dev`** :
+
+```env
+MAILER_DSN=smtp://mailhog:1025
+```
+
+**Utilisation** :
+
+1. Démarrer les conteneurs Docker : `make up` ou `docker compose up -d`
+2. Les emails envoyés par l'application sont automatiquement capturés par MailHog
+3. Accéder à l'interface web sur `http://localhost:8025` pour visualiser les emails reçus
+
+**Avantages** :
+- Aucune configuration SMTP externe nécessaire
+- Visualisation des emails avec leur contenu HTML/text
+- Test des emails sans risque d'envoi réel
+- Interface web intuitive pour déboguer les emails
 
 ## Configuration des logs
 

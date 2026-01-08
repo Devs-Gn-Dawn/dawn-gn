@@ -56,6 +56,14 @@ services:
     networks:
       - app-network
 
+  mailhog:
+    image: mailhog/mailhog
+    ports:
+      - "1025:1025"  # Port SMTP
+      - "8025:8025"  # Port web interface
+    networks:
+      - app-network
+
 networks:
   app-network:
     driver: bridge
