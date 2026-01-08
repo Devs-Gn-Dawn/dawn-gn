@@ -1,0 +1,50 @@
+{% extends 'email/base.html.twig' %}
+
+{% block title %}Dawn GN - Alerte : Commande avec quantité >1{% endblock %}
+
+{% block content %}
+<p>Bonjour,</p>
+
+<p>Une commande HelloAsso avec une quantité supérieure à 1 a été reçue et nécessite une attention manuelle.</p>
+
+<h3>Détails de la commande :</h3>
+<ul>
+    <li><strong>ID Commande HelloAsso :</strong> {{ orderData.order.id ?? orderData['order']['id'] ?? 'N/A' }}</li>
+    <li><strong>Email de l'acheteur :</strong> {{ orderData.payer.email ?? orderData['payer']['email'] ?? 'N/A' }}</li>
+    <li><strong>Quantité achetée :</strong> {{ quantity }}</li>
+    {% if orderData.amount is defined %}
+    <li><strong>Montant total :</strong> {{ orderData.amount.total ?? orderData['amount']['total'] ?? 'N/A' }} {{ orderData.amount.currency ?? orderData['amount']['currency'] ?? 'EUR' }}</li>
+    {% endif %}
+</ul>
+
+{% set orderItems = orderData.order.items ?? orderData['order']['items'] ?? [] %}
+{% if orderItems is not empty %}
+<h3>Détails des billets :</h3>
+<ul>
+    {% for item in orderItems %}
+        {% set itemType = item.type ?? item['type'] ?? '' %}
+        {% if itemType == 'Ticket' %}
+        <li>
+            <strong>{{ item.name ?? item['name'] ?? 'Billet' }}</strong> - Quantité : {{ item.quantity ?? item['quantity'] ?? 1 }}
+            {% if item.event is defined or item['event'] is defined %}
+                <br>Événement : {{ item.event ?? item['event'] }}
+            {% endif %}
+        </li>
+        {% endif %}
+    {% endfor %}
+</ul>
+{% endif %}
+
+<p><strong>Action requise :</strong></p>
+<p>Une seule inscription a été créée automatiquement pour cette commande. Vous devez créer manuellement les inscriptions supplémentaires ({{ quantity - 1 }} inscription(s) restante(s)) via l'interface d'administration.</p>
+
+<p>Informations à utiliser :</p>
+<ul>
+    <li>Email : {{ orderData.payer.email ?? orderData['payer']['email'] ?? 'N/A' }}</li>
+    <li>Order ID : {{ orderData.order.id ?? orderData['order']['id'] ?? 'N/A' }}</li>
+</ul>
+
+<p>Merci de votre attention.</p>
+
+<p>L'équipe Dawn GN</p>
+{% endblock %}

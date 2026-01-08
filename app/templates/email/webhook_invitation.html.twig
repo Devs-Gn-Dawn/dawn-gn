@@ -1,0 +1,24 @@
+{% extends 'email/base.html.twig' %}
+
+{% block title %}Dawn GN - Votre compte a été créé{% endblock %}
+
+{% block content %}
+<p>Bonjour {{ user.firstname }} {{ user.name }},</p>
+
+<p>Votre compte a été créé automatiquement suite à votre achat de billet sur HelloAsso.</p>
+
+<p>Pour accéder à votre compte, vous devez générer votre mot de passe via l'option « mot de passe oublié » : <a href="https://gestion.dawn-gn.com/reset-password">https://gestion.dawn-gn.com/reset-password</a></p>
+
+<p>Une fois connecté, vous pourrez :</p>
+<ul>
+    <li>Créer votre personnage</li>
+    <li>Consulter vos inscriptions</li>
+    <li>Gérer votre profil</li>
+</ul>
+
+<p>Si vous avez des questions ou besoin d'aide, n'hésitez pas à contacter les organisateurs.</p>
+
+<p>Bienvenue dans l'aventure Dawn GN !</p>
+
+<p>L'équipe Dawn GN</p>
+{% endblock %}

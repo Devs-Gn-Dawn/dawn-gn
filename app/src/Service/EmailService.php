@@ -4,6 +4,8 @@ namespace App\Service;
 
 use App\Entity\User;
 use App\Entity\Character;
+use App\Entity\Registration;
+use App\Repository\UserRepository;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mime\Address;
@@ -19,7 +21,8 @@ class EmailService
 
     public function __construct(
         private MailerInterface $mailer,
-        private UrlGeneratorInterface $urlGenerator
+        private UrlGeneratorInterface $urlGenerator,
+        private UserRepository $userRepository
     ) {
         $this->senderAddress = new Address(self::SENDER_EMAIL, self::SENDER_NAME);
     }
@@ -34,6 +37,23 @@ class EmailService
             ->to($user->getEmail())
             ->subject('[Dawn GN] - Votre personnage')
             ->htmlTemplate('contact/invit.html.twig')
+            ->context([
+                'user' => $user
+            ]);
+
+        $this->mailer->send($email);
+    }
+
+    /**
+     * Envoie un email d'invitation pour un utilisateur créé via webhook HelloAsso
+     */
+    public function sendWebhookInviteEmail(User $user): void
+    {
+        $email = (new TemplatedEmail())
+            ->from($this->senderAddress)
+            ->to($user->getEmail())
+            ->subject('[Dawn GN] - Votre compte a été créé')
+            ->htmlTemplate('email/webhook_invitation.html.twig')
             ->context([
                 'user' => $user
             ]);
@@ -117,5 +137,49 @@ class EmailService
             ]);
 
         $this->mailer->send($email);
+    }
+
+    /**
+     * Envoie un email de confirmation d'inscription à un utilisateur existant
+     */
+    public function sendRegistrationConfirmationEmail(User $user, Registration $registration): void
+    {
+        $email = (new TemplatedEmail())
+            ->from($this->senderAddress)
+            ->to($user->getEmail())
+            ->subject('[Dawn GN] - Confirmation d\'inscription')
+            ->htmlTemplate('email/registration_confirmation.html.twig')
+            ->context([
+                'user' => $user,
+                'registration' => $registration,
+            ]);
+
+        $this->mailer->send($email);
+    }
+
+    /**
+     * Envoie un email d'alerte aux administrateurs pour une commande avec quantité >1
+     */
+    public function sendAdminQuantityAlertEmail(array $orderData, int $quantity): void
+    {
+        $admins = $this->userRepository->findAdmins();
+
+        if (empty($admins)) {
+            return;
+        }
+
+        foreach ($admins as $admin) {
+            $email = (new TemplatedEmail())
+                ->from($this->senderAddress)
+                ->to($admin->getEmail())
+                ->subject('[Dawn GN] - Alerte : Commande avec quantité >1')
+                ->htmlTemplate('email/admin_quantity_alert.html.twig')
+                ->context([
+                    'orderData' => $orderData,
+                    'quantity' => $quantity,
+                ]);
+
+            $this->mailer->send($email);
+        }
     }
 }

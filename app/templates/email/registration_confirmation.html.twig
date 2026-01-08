@@ -1,0 +1,20 @@
+{% extends 'email/base.html.twig' %}
+
+{% block title %}Dawn GN - Confirmation d'inscription{% endblock %}
+
+{% block content %}
+<p>Bonjour {{ user.firstname }} {{ user.name }},</p>
+
+<p>Votre inscription a été enregistrée avec succès.</p>
+
+<p><strong>Événement :</strong> {{ registration.eventType ? registration.eventType.getLabel() : registration.event }}</p>
+<p><strong>Numéro de commande HelloAsso :</strong> {{ registration.helloassoTicket }}</p>
+
+<p>Vous pouvez consulter vos inscriptions depuis votre compte sur <a href="https://gestion.dawn-gn.com">https://gestion.dawn-gn.com</a></p>
+
+<p>Si vous avez des questions, n'hésitez pas à contacter les organisateurs.</p>
+
+<p>À bientôt !</p>
+
+<p>L'équipe Dawn GN</p>
+{% endblock %}

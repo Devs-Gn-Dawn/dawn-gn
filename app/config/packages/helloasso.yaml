@@ -1,0 +1,8 @@
+parameters:
+    helloasso.webhook_secret: '%env(HELLOASSO_WEBHOOK_SECRET)%'
+    helloasso.form_event_mapping: []
+
+# Exemple de configuration du mapping formulaire → événement
+# helloasso.form_event_mapping:
+#     '123456': 'dawn39'  # ID formulaire HelloAsso → EventType
+#     '789012': 'dawn40'
