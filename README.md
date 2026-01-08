@@ -1,110 +1,94 @@
-# Guide d'Installation du Projet
+# Dawn GN - Application de Gestion de Jeu de Rôle Grandeur Nature
 
-## Prérequis
+Application web Symfony pour la gestion complète d'un jeu de rôle grandeur nature (GN), permettant aux joueurs de créer et gérer leurs personnages, et aux organisateurs de valider et administrer les inscriptions aux événements.
 
-- Docker
-- Docker Compose
+## Vue d'ensemble
+
+Dawn GN est une plateforme web complète qui facilite :
+
+- La création et la gestion de personnages de jeu de rôle
+- L'inscription aux événements Dawn
+- La validation des personnages par les organisateurs
+- L'administration des utilisateurs et des événements
+
+## Documentation complète
+
+📚 **La documentation complète est disponible dans le dossier [`docs/`](docs/README.md)**
+
+### Navigation rapide
+
+- [📖 Présentation de l'application](docs/01-presentation.md)
+- [⚙️ Fonctionnalités](docs/02-fonctionnalites.md)
+- [🏗️ Architecture technique](docs/03-architecture.md)
+- [🔄 Workflows](docs/04-workflows.md)
+- [⭐ Système de points d'expérience](docs/05-systeme-xp.md)
+- [📊 Structure des entités](docs/06-entites.md)
+- [🔌 API et endpoints](docs/07-api.md)
+
+### Guides d'utilisation
+
+- [👤 Guide joueur](docs/guides/guide-joueur.md)
+- [👥 Guide organisateur](docs/guides/guide-organisateur.md)
+- [🔧 Guide administrateur](docs/guides/guide-administrateur.md)
+
+### Installation et configuration
+
+- [🚀 Installation](docs/configuration/installation.md)
+- [⚙️ Configuration](docs/configuration/configuration.md)
+- [🔧 Dépannage](docs/configuration/depannage.md)
+
+## Démarrage rapide
+
+### Prérequis
+
+- Docker et Docker Compose
 - Git
-- Node.js (pour le développement local)
-- npm (pour le développement local)
+- Node.js et npm (pour le développement local)
 
-## Installation
+### Installation rapide
 
-### Option 1 : Installation Automatique (Recommandée)
-
-Utilisez le script d'installation automatique qui configurera l'environnement pour vous :
-
-```bash
-chmod +x install-symfony.sh
-./install-symfony.sh
-```
-
-Ce script va :
-
-- Créer et configurer les fichiers `.env`
-- Générer les secrets de sécurité
-- Configurer la base de données
-- Installer les dépendances Composer
-- Installer les dépendances npm
-- Configurer les permissions
-- Préparer l'environnement de développement
-
-### Option 2 : Installation Manuelle
-
-Si vous préférez installer manuellement, suivez ces étapes :
-
-1. Cloner le projet
+1. Cloner le projet :
 
 ```bash
 git clone [URL_DU_PROJET]
-cd [NOM_DU_PROJET]
+cd dawn-gn
 ```
 
-2. Copier les fichiers d'environnement
-
-```bash
-cp .env.dist .env
-cp .env.dev.dist .env.dev
-cp .env.test.dist .env.test
-```
-
-3. Construire et démarrer les conteneurs Docker
+2. Démarrer les conteneurs Docker :
 
 ```bash
 make up
 ```
 
-4. Installer les dépendances
+3. Installer les dépendances :
 
 ```bash
 make install
 ```
 
-## Commandes Make Disponibles
+4. Accéder à l'application :
+
+- Application : http://localhost:8080
+- Adminer (base de données) : http://localhost:8081
+
+Pour plus de détails, consultez le [guide d'installation complet](docs/configuration/installation.md).
+
+## Commandes principales
 
 - `make up` : Démarre les conteneurs Docker
 - `make down` : Arrête les conteneurs Docker
 - `make install` : Installe toutes les dépendances (Composer + npm)
-- `make build` : Compile les assets avec npm
+- `make build` : Compile les assets pour la production
 - `make watch` : Lance le watcher pour le développement
-- `make tests` : Lance les tests
+- `make migrate` : Exécute les migrations Doctrine
 - `make bash` : Ouvre un terminal dans le conteneur PHP
 
-## Accès à l'Application
+## Technologies utilisées
 
-- Application : http://localhost:8080
-- Adminer (gestionnaire de base de données) : http://localhost:8081
-
-## Commandes Utiles
-
-- Arrêter les conteneurs : `docker-compose down`
-- Voir les logs : `docker-compose logs -f`
-- Accéder au conteneur PHP : `docker-compose exec php bash`
-- Lancer les tests : `docker-compose exec php bin/phpunit`
-
-## Structure du Projet
-
-Le projet suit la structure standard d'une application Symfony :
-
-```
-├── app/                # Application Symfony
-│   ├── assets/        # Fichiers source JS et CSS
-│   ├── bin/           # Exécutables
-│   ├── config/        # Configuration
-│   ├── public/        # Fichiers publics
-│   ├── src/           # Code source PHP
-│   ├── templates/     # Templates Twig
-│   ├── translations/  # Fichiers de traduction
-│   ├── var/          # Fichiers temporaires
-│   └── vendor/       # Dépendances PHP
-├── docker/           # Configuration Docker
-├── .env             # Variables d'environnement
-├── .env.dev         # Variables pour le développement
-├── .env.test        # Variables pour les tests
-├── docker-compose.yml
-├── Makefile
-└── install-symfony.sh
-```
+- **Backend** : Symfony 7.2 (PHP 8.1+)
+- **Base de données** : MySQL 8.0
+- **Frontend** : Twig, Tailwind CSS, Webpack Encore
+- **Infrastructure** : Docker Compose
 
 ## Contribution
 
