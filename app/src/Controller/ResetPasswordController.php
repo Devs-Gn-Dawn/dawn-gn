@@ -9,7 +9,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Mime\Address;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use SymfonyCasts\Bundle\ResetPassword\Controller\ResetPasswordControllerTrait;
@@ -17,7 +16,7 @@ use SymfonyCasts\Bundle\ResetPassword\Exception\ResetPasswordExceptionInterface;
 use SymfonyCasts\Bundle\ResetPassword\Exception\TooManyPasswordRequestsException;
 use SymfonyCasts\Bundle\ResetPassword\ResetPasswordHelperInterface;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Mailer\MailerInterface;
+use App\Service\EmailService;
 use SymfonyCasts\Bundle\ResetPassword\Model\ResetPasswordToken;
 
 #[Route('/reset-password')]
@@ -29,7 +28,7 @@ class ResetPasswordController extends AbstractController
         private ResetPasswordHelperInterface $resetPasswordHelper,
         private EntityManagerInterface $entityManager,
         private LoggerInterface $logger,
-        private MailerInterface $mailer
+        private EmailService $emailService
     ) {}
 
     #[Route('', name: 'app_forgot_password_request', methods: ['GET', 'POST'])]
@@ -160,20 +159,12 @@ class ResetPasswordController extends AbstractController
                 'token' => $resetToken,
                 'url' => $this->generateUrl('app_reset_password', ['token' => $resetToken->getToken()]),
             ]);
-            $email = (new TemplatedEmail())
-                ->from(new Address('no-reply@dawn-gn.com', 'Dawn GN'))
-                ->to($user->getEmail())
-                ->subject('Votre demande de réinitialisation de mot de passe')
-                ->htmlTemplate('security/reset_password/email.html.twig')
-                ->context([
-                    'resetToken' => $resetToken,
-                    'expiresAtDiffForHumans' => $this->getExpiresAtDiffForHumans($resetToken),
-                ]);
-
-            $this->mailer->send($email);
+            
+            $expiresAtDiffForHumans = $this->getExpiresAtDiffForHumans($resetToken);
+            $this->emailService->sendPasswordResetEmail($user, $resetToken, $expiresAtDiffForHumans);
 
             $this->setTokenObjectInSession($resetToken);
-            $this->addFlash('success', 'Un email de réinitialisation a été envoyé à votre adresse email si un compte existe avec cette adresse. Le lien expirera dans ' . $this->getExpiresAtDiffForHumans($resetToken));
+            $this->addFlash('success', 'Un email de réinitialisation a été envoyé à votre adresse email si un compte existe avec cette adresse. Le lien expirera dans ' . $expiresAtDiffForHumans);
         } catch (ResetPasswordExceptionInterface $e) {
             if ($e instanceof TooManyPasswordRequestsException) {
                 $this->addFlash('reset_password_error', 'Vous avez déjà demandé une réinitialisation de mot de passe. Veuillez vérifier votre email ou vos spam. Vous pouvez réessayer dans ' . round($e->getRetryAfter() / 60) . ' minutes.');

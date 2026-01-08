@@ -40,6 +40,7 @@ Bienvenue dans la documentation complète de l'application Dawn GN. Cette docume
 7. [🔌 API et endpoints](07-api.md)
    - Liste des endpoints API
    - Documentation des routes principales
+   - Services métier (EmailService, CharacterService, UserService)
    - Exemples de requêtes
 
 ### Guides d'utilisation
@@ -97,5 +98,5 @@ Bienvenue dans la documentation complète de l'application Dawn GN. Cette docume
 ### Je suis un développeur
 1. Lisez l'[architecture technique](03-architecture.md)
 2. Consultez la [structure des entités](06-entites.md)
-3. Découvrez l'[API](07-api.md)
+3. Découvrez l'[API](07-api.md) et les services métier
 4. Suivez le [guide d'installation](configuration/installation.md)

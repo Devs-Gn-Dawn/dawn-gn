@@ -8,15 +8,12 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\Mime\Address;
-use Symfony\Component\Mime\Email;
-use Symfony\Component\Mailer\MailerInterface;
-use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+use App\Service\EmailService;
 use App\Entity\User;
 
 class SecurityController extends AbstractController
 {
-    public function __construct(private MailerInterface $mailer) {}
+    public function __construct(private EmailService $emailService) {}
 
     #[Route('/login', name: 'app_login')]
     public function login(AuthenticationUtils $authenticationUtils): Response
@@ -78,19 +75,7 @@ class SecurityController extends AbstractController
         $orgaEmail = \App\Entity\OrgasType::getEmail($userMainFaction);
 
         try {
-            $email = (new TemplatedEmail())
-                ->from(new Address('no-reply@dawn-gn.com', 'Dawn GN'))
-                ->to($orgaEmail)
-                ->replyTo($emailFrom)
-                ->subject('[Dawn GN] - ' . $data['subject'])
-                ->htmlTemplate('contact/email.html.twig')
-                ->context([
-                    'message' => $data['message'],
-                    'user' => $user,
-                    'replyTo' => $emailFrom,
-                ]);
-
-            $this->mailer->send($email);
+            $this->emailService->sendContactToOrga($orgaEmail, $data['subject'], $data['message'], $emailFrom, $user);
 
             return new JsonResponse(['success' => true]);
         } catch (\Exception $e) {

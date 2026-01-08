@@ -62,6 +62,7 @@ dawn-gn/
 │   │   ├── Controller/         # Contrôleurs
 │   │   ├── Entity/             # Entités Doctrine
 │   │   ├── Repository/         # Repositories Doctrine
+│   │   ├── Service/             # Services métier
 │   │   ├── DTO/                # Data Transfer Objects
 │   │   └── Kernel.php          # Kernel Symfony
 │   ├── templates/               # Templates Twig
@@ -94,13 +95,14 @@ dawn-gn/
 
 ## Architecture de l'application
 
-### Pattern MVC
+### Pattern MVC avec Services
 
-L'application suit le pattern Model-View-Controller :
+L'application suit le pattern Model-View-Controller avec une couche de services :
 
 - **Model** : Entités Doctrine dans `src/Entity/`
 - **View** : Templates Twig dans `templates/`
 - **Controller** : Contrôleurs Symfony dans `src/Controller/`
+- **Service** : Services métier dans `src/Service/` pour centraliser la logique métier
 
 ### Contrôleurs principaux
 
@@ -130,6 +132,7 @@ L'application suit le pattern Model-View-Controller :
 ### Repositories
 
 Chaque entité possède son repository pour les requêtes personnalisées :
+
 - `UserRepository`
 - `CharacterRepository`
 - `RegistrationRepository`
@@ -137,6 +140,16 @@ Chaque entité possède son repository pour les requêtes personnalisées :
 - `GearRepository`
 - `AssetRepository`
 - etc.
+
+### Services
+
+Services métier pour centraliser la logique et réduire la duplication :
+
+- **EmailService** : Centralise tous les envois d'emails (invitations, contacts, validations, réinitialisation de mot de passe)
+- **CharacterService** : Gestion complète des personnages (création, compétences, équipements, assets, XP, validation)
+- **UserService** : Gestion des utilisateurs (profil, identifiants, création, filtrage)
+
+Les services sont injectés dans les contrôleurs via l'injection de dépendances de Symfony.
 
 ## Sécurité
 

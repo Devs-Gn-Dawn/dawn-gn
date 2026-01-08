@@ -23,6 +23,7 @@ use App\Entity\CharacterType;
 use App\Entity\ValidationType;
 use App\DTO\CreateCharacterDTO;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use App\Service\CharacterService;
 
 #[Route('/characters')]
 #[IsGranted('ROLE_USER')]
@@ -31,6 +32,7 @@ class CharacterController extends AbstractController
     private LoggerInterface $logger;
     public function __construct(
         private EntityManagerInterface $entityManager,
+        private CharacterService $characterService,
         LoggerInterface $logger
     ) {
         $this->logger = $logger;
@@ -74,26 +76,7 @@ class CharacterController extends AbstractController
                     throw new \Exception(implode(', ', $errorMessages));
                 }
 
-                // Validation des valeurs de faction et classe
-                if (!in_array($dto->getFaction(), FactionType::getChoices())) {
-                    throw new \Exception('Faction invalide');
-                }
-
-                $character = new Character();
-                $character->setUser($this->getUser());
-                $character->setName(htmlspecialchars($dto->getCharacterName(), ENT_QUOTES, 'UTF-8'));
-                $character->setFaction($dto->getFaction());
-                $character->setClass($dto->getClass());
-                $character->setBackground($dto->getBackground() ? htmlspecialchars($dto->getBackground(), ENT_QUOTES, 'UTF-8') : '');
-                $character->setDescription('');
-                $character->setNoteOrga('');
-                $character->setXpSkill(20);
-                $character->setXpGear(10);
-                $character->setType(CharacterType::DRAFT);
-                $character->setValidationType(ValidationType::NON_VALIDE);
-
-                $this->entityManager->persist($character);
-                $this->entityManager->flush();
+                $character = $this->characterService->createCharacter($dto, $this->getUser());
 
                 if ($request->getContent()) {
                     return $this->json(['success' => true]);
@@ -175,25 +158,13 @@ class CharacterController extends AbstractController
         return $this->json(ClassType::getChoicesForFaction($faction));
     }
 
-    private function checkCharacterValidation(Character $character): void
-    {
-        if ($character->isValidated()) {
-            throw new \Exception('Ce personnage est déjà validé.');
-        }
-        if ($character->isRejected()) {
-            throw new \Exception('Ce personnage a été rejeté.');
-        }
-        if ($character->isInValidation()) {
-            throw new \Exception('Ce personnage est en cours de validation.');
-        }
-    }
 
     #[Route('/{id}/delete', name: 'character_delete', methods: ['POST'])]
     public function delete(Character $character): JsonResponse
     {
         // Vérifier que l'utilisateur est propriétaire du personnage
         try {
-            $this->checkCharacterAccess($character);
+            $this->characterService->checkCharacterAccess($character, $this->getUser());
         } catch (\Exception $e) {
             return $this->json(['error' => $e->getMessage()], 400);
         }
@@ -225,9 +196,8 @@ class CharacterController extends AbstractController
     {
         // Vérifier que le personnage n'est pas déjà validé
         try {
-            $this->checkCharacterAccess($character);
-
-            $this->checkCharacterValidation($character);
+            $this->characterService->checkCharacterAccess($character, $this->getUser());
+            $this->characterService->checkCharacterValidation($character);
             // Vérifier que le personnage a un nom, une faction et une classe
             if (empty($character->getName()) || empty($character->getFaction()) || empty($character->getClass())) {
                 throw new \Exception('Votre personnage doit avoir un nom, une faction et une classe avant d\'être soumis.');
@@ -235,7 +205,6 @@ class CharacterController extends AbstractController
         } catch (\Exception $e) {
             return $this->json(['error' => $e->getMessage()], 400);
         }
-
 
         $character->setValidationType(ValidationType::EN_COURS);
         $this->entityManager->flush();
@@ -248,7 +217,7 @@ class CharacterController extends AbstractController
     {
         // Vérifier que l'utilisateur est propriétaire du personnage
         try {
-            $this->checkCharacterAccess($character);
+            $this->characterService->checkCharacterAccess($character, $this->getUser());
         } catch (\Exception $e) {
             return $this->json(['error' => $e->getMessage()], 400);
         }
@@ -308,18 +277,15 @@ class CharacterController extends AbstractController
         $isOrga = $this->getUser()->isOrga();
 
         try {
-            $this->checkCharacterAccess($character);
-
-            if (!$isOrga) {
-                $this->checkCharacterValidation($character);
-            }
-
-            if ($this->entityManager->getRepository(Skill::class)->isSkillAvailableForCharacter($skill, $character, $isOrga ? $data['skillCost'] ?? null : null)) {
-                $character->addSkill($skill, $isOrga ? $data['skillCost'] ?? null : null, $isOrga ? $data['skillNote'] ?? null : null, $isOrga ? $data['skillNoteOrga'] ?? null : null);
-                $this->entityManager->flush();
-            } else {
-                throw new \Exception('Cette compétence n\'est pas disponible pour ce personnage');
-            }
+            $this->characterService->checkCharacterAccess($character, $this->getUser());
+            $this->characterService->addSkill(
+                $character,
+                $skill,
+                $isOrga ? $data['skillCost'] ?? null : null,
+                $isOrga ? $data['skillNote'] ?? null : null,
+                $isOrga ? $data['skillNoteOrga'] ?? null : null,
+                $isOrga
+            );
         } catch (\Exception $e) {
             return $this->json(['error' => $e->getMessage()], 400);
         }
@@ -334,107 +300,50 @@ class CharacterController extends AbstractController
         $skillId = $data['skillId'] ?? null;
 
         try {
-            $this->checkCharacterAccess($character);
+            $this->characterService->checkCharacterAccess($character, $this->getUser());
             if (!$skillId) {
                 throw new \Exception('Paramètre skillId manquant');
             }
-
-            $skillLearned = $character->getSkillsLearned()->filter(
-                fn($skillLearned) => $skillLearned->getSkill()->getId() === $skillId
-            )->first();
-
-            if (!$skillLearned) {
-                throw new \Exception('Cette compétence n\'est pas apprise par ce personnage');
-            }
-
-            if ($skillLearned->isLocked() && !$this->getUser()->isOrga()) {
-                throw new \Exception('Cette compétence est verrouillée et ne peut pas être supprimée');
-            }
+            $this->characterService->deleteSkill($character, $skillId, $this->getUser()->isOrga());
         } catch (\Exception $e) {
             return $this->json(['error' => $e->getMessage()], 400);
         }
-
-
-        $this->entityManager->remove($skillLearned);
-        $this->entityManager->flush();
 
         return $this->json(['success' => true]);
     }
 
-    private function checkCharacterAccess(Character $character): void
-    {
-        if ($character->getUser() !== $this->getUser() && !$this->getUser()->isOrga()) {
-            throw $this->createAccessDeniedException('Vous n\'êtes pas autorisé à modifier ce personnage.');
-        }
-    }
 
     #[Route('/api/character/{id}/skill/xp/remove', name: 'api_character_skill_xp_remove', methods: ['POST'])]
     public function removeSkillXpApi(Character $character, Request $request): JsonResponse
     {
-        $currentSkillXp = $character->getXpSkill();
-        $usedSkillXp = $character->getSkillsXpUsed();
-        $availableXp = min($currentSkillXp - 20, $currentSkillXp - $usedSkillXp);
         try {
-            $this->checkCharacterAccess($character);
-            if ($character->getValidationType() === ValidationType::REJETE) {
-                throw new \Exception('Ce personnage a été rejeté.');
-            }
+            $this->characterService->checkCharacterAccess($character, $this->getUser());
             $data = json_decode($request->getContent(), true);
             $xp = $data['xp'] ?? null;
-
             if (!$xp || !is_numeric($xp) || $xp <= 0) {
                 throw new \Exception('Valeur d\'XP invalide');
             }
-
-            if ($xp > $availableXp) {
-                throw new \Exception('Points d\'XP insuffisants');
-            }            
-        } catch (\Exception $e) {
-            return $this->json(['error' => $e->getMessage()], 400);
-        }
-        
-        try {
-            $character->setXpSkill($character->getXpSkill() - $xp);
-            $this->entityManager->flush();
+            $this->characterService->removeSkillXp($character, $xp);
             return $this->json(['success' => true]);
         } catch (\Exception $e) {
-            return $this->json(['error' => 'Erreur lors de la suppression des points d\'XP'], 500);
+            return $this->json(['error' => $e->getMessage()], 400);
         }
     }
 
     #[Route('/api/character/{id}/skill/xp/add', name: 'api_character_skill_xp_add', methods: ['POST'])]
     public function addSkillXpApi(Character $character, Request $request): JsonResponse
     {
-        // Vérifier que l'utilisateur est propriétaire du personnage
         try {
-            $this->checkCharacterAccess($character);
-            // Vérifier que le personnage n'a pas été rejeté
-            if ($character->getValidationType() === ValidationType::REJETE) {
-                throw new \Exception('Ce personnage a été rejeté.');
-            }
-
+            $this->characterService->checkCharacterAccess($character, $this->getUser());
             $data = json_decode($request->getContent(), true);
             $xp = $data['xp'] ?? null;
-
             if (!$xp || !is_numeric($xp) || $xp <= 0) {
                 throw new \Exception('Valeur d\'XP invalide');
             }
-
-            $availableXp = $character->getAvailableXp();
-            if ($xp > $availableXp) {
-                throw new \Exception('Points d\'XP insuffisants');
-            }
-        } catch (\Exception $e) {
-            return $this->json(['error' => $e->getMessage()], 400);
-        }
-
-
-        try {
-            $character->setXpSkill($character->getXpSkill() + $xp);
-            $this->entityManager->flush();
+            $this->characterService->addSkillXp($character, $xp);
             return $this->json(['success' => true]);
         } catch (\Exception $e) {
-            return $this->json(['error' => 'Erreur lors de l\'ajout des points d\'XP'], 500);
+            return $this->json(['error' => $e->getMessage()], 400);
         }
     }
 
@@ -445,26 +354,14 @@ class CharacterController extends AbstractController
         $possessionId = $data['possessionId'] ?? null;
 
         try {
-            $this->checkCharacterAccess($character);
+            $this->characterService->checkCharacterAccess($character, $this->getUser());
             if (!$possessionId) {
                 throw new \Exception('Aucun équipement sélectionné.');
             }
-
-            $possession = $this->entityManager->getRepository(Possession::class)->find($possessionId);
-            if (!$possession) {
-                throw new \Exception('Équipement non trouvé.');
-            }
-
-            if ($possession->isLocked() && !$this->getUser()->isOrga()) {
-                throw new \Exception('Cet équipement est verrouillé et ne peut pas être supprimé');
-            }
+            $this->characterService->deleteGear($character, $possessionId, $this->getUser()->isOrga());
         } catch (\Exception $e) {
             return $this->json(['error' => $e->getMessage()], 400);
         }
-
-
-        $this->entityManager->remove($possession);
-        $this->entityManager->flush();
 
         return $this->json(['success' => true]);
     }
@@ -472,66 +369,34 @@ class CharacterController extends AbstractController
     #[Route('/api/character/{id}/gear/xp/add', name: 'api_character_gear_xp_add', methods: ['POST'])]
     public function addGearXpApi(Character $character, Request $request): JsonResponse
     {
-        // Vérifier que le personnage n'est pas déjà validé
         try {
-            $this->checkCharacterAccess($character);
-            $this->checkCharacterValidation($character);
-
+            $this->characterService->checkCharacterAccess($character, $this->getUser());
             $data = json_decode($request->getContent(), true);
             $xp = $data['xp'] ?? null;
-
             if (!$xp || !is_numeric($xp) || $xp <= 0) {
                 throw new \Exception('Valeur d\'XP invalide');
             }
-
-            $availableXp = $character->getAvailableXp();
-            if ($xp > $availableXp) {
-                throw new \Exception('Points d\'XP insuffisants');
-            }
-        } catch (\Exception $e) {
-            return $this->json(['error' => $e->getMessage()], 400);
-        }
-
-        try {
-            $character->setXpGear($character->getXpGear() + $xp);
-            $this->entityManager->flush();
+            $this->characterService->addGearXp($character, $xp);
             return $this->json(['success' => true]);
         } catch (\Exception $e) {
-            return $this->json(['error' => 'Erreur lors de l\'ajout des points d\'XP'], 500);
+            return $this->json(['error' => $e->getMessage()], 400);
         }
     }
 
     #[Route('/api/character/{id}/gear/xp/remove', name: 'api_character_gear_xp_remove', methods: ['POST'])]
     public function removeGearXpApi(Character $character, Request $request): JsonResponse
     {
-        $currentGearXp = $character->getXpGear();
-        $usedGearXp = $character->getGearXpUsed();
-        $availableXp = min($currentGearXp - 10, $currentGearXp - $usedGearXp);
         try {
-            $this->checkCharacterAccess($character);
-            if ($character->getValidationType() === ValidationType::REJETE) {
-                throw new \Exception('Ce personnage a été rejeté.');
-            }
+            $this->characterService->checkCharacterAccess($character, $this->getUser());
             $data = json_decode($request->getContent(), true);
             $xp = $data['xp'] ?? null;
-
             if (!$xp || !is_numeric($xp) || $xp <= 0) {
                 throw new \Exception('Valeur d\'XP invalide');
             }
-
-            if ($xp > $availableXp) {
-                throw new \Exception('Points d\'XP insuffisants');
-            }            
-        } catch (\Exception $e) {
-            return $this->json(['error' => $e->getMessage()], 400);
-        }
-        
-        try {
-            $character->setXpGear($character->getXpGear() - $xp);
-            $this->entityManager->flush();
+            $this->characterService->removeGearXp($character, $xp);
             return $this->json(['success' => true]);
         } catch (\Exception $e) {
-            return $this->json(['error' => 'Erreur lors de la suppression des points d\'XP'], 500);
+            return $this->json(['error' => $e->getMessage()], 400);
         }
     }
 
@@ -540,8 +405,8 @@ class CharacterController extends AbstractController
     {
         // Vérifier que le personnage n'est pas déjà validé
         try {
-            $this->checkCharacterAccess($character);
-            $this->checkCharacterValidation($character);
+            $this->characterService->checkCharacterAccess($character, $this->getUser());
+            $this->characterService->checkCharacterValidation($character);
         } catch (\Exception $e) {
             return $this->json(['error' => $e->getMessage()], 400);
         }
@@ -582,14 +447,8 @@ class CharacterController extends AbstractController
     public function addGearApi(Character $character, Request $request): JsonResponse
     {
         $isOrga = $this->getUser()->isOrga();
-        // Vérifier que le personnage n'est pas déjà validé
         try {
-            $this->checkCharacterAccess($character);
-
-            if (!$isOrga) {
-                $this->checkCharacterValidation($character);
-            }
-
+            $this->characterService->checkCharacterAccess($character, $this->getUser());
             $data = json_decode($request->getContent(), true);
             $gearId = $data['gearId'] ?? null;
             if (!$gearId) {
@@ -599,9 +458,14 @@ class CharacterController extends AbstractController
             if (!$gear) {
                 throw new \Exception('Équipement non trouvé.');
             }
-
-            $character->addGear($gear, $isOrga ? ($data['gearCost'] ?? null) : $gear->getBaseCost(), $isOrga ? $data['gearNote'] ?? null : '', $isOrga ? $data['gearNoteOrga'] ?? null : '');
-            $this->entityManager->flush();
+            $this->characterService->addGear(
+                $character,
+                $gear,
+                $isOrga ? ($data['gearCost'] ?? null) : $gear->getBaseCost(),
+                $isOrga ? $data['gearNote'] ?? null : '',
+                $isOrga ? $data['gearNoteOrga'] ?? null : '',
+                $isOrga
+            );
             return $this->json(['success' => true]);
         } catch (\Exception $e) {
             return $this->json(['error' => $e->getMessage()], 400);
@@ -613,9 +477,8 @@ class CharacterController extends AbstractController
     {
         // Vérifier que le personnage n'est pas déjà validé
         try {
-            $this->checkCharacterAccess($character);
-
-            $this->checkCharacterValidation($character);
+            $this->characterService->checkCharacterAccess($character, $this->getUser());
+            $this->characterService->checkCharacterValidation($character);
             // Vérifier que le type est valide
             if (!in_array($type, ['main', 'secondary'])) {
                 throw new \Exception('Type de personnage invalide.');

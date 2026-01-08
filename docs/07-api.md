@@ -72,15 +72,15 @@ Cette page documente les principaux endpoints API de l'application Dawn GN.
 
 ### Allergies
 
-- `POST /allergy/add` - Ajout d'une allergie
-- `POST /allergy/{id}/edit` - Modification d'une allergie
-- `POST /allergy/{id}/delete` - Suppression d'une allergie
+- `POST /api/allergy/add` - Ajout d'une allergie
+- `POST /api/allergy/{id}/edit` - Modification d'une allergie
+- `POST /api/allergy/{id}/delete` - Suppression d'une allergie
 
 ### Notes
 
-- `POST /note/add` - Ajout d'une note
-- `POST /note/{id}/edit` - Modification d'une note
-- `POST /note/{id}/delete` - Suppression d'une note
+- `POST /api/note/add` - Ajout d'une note
+- `POST /api/note/{id}/edit` - Modification d'une note
+- `POST /api/note/{id}/delete` - Suppression d'une note
 
 ### Inscriptions
 
@@ -221,6 +221,40 @@ Les routes sont protégées par des attributs `#[IsGranted]` :
 - `ROLE_USER` : Accès aux routes joueur
 - `ROLE_ORGA` : Accès aux routes organisateur + joueur
 - `ROLE_ADMIN` : Accès à toutes les routes
+
+## Services
+
+L'application utilise des services pour centraliser la logique métier :
+
+### EmailService
+
+Service centralisé pour l'envoi d'emails :
+- `sendInviteEmail(User $user)` - Email d'invitation
+- `sendContactEmail(User $to, string $subject, string $message, ?User $from)` - Contact organisateur → joueur
+- `sendContactToOrga(string $toEmail, string $subject, string $message, ?string $replyToEmail, ?User $user)` - Contact joueur → organisateur
+- `sendCharacterValidationEmail(Character $character, string $status)` - Notification de validation/rejet
+- `sendPasswordResetEmail(User $user, ResetPasswordToken $token, string $expiresAtDiffForHumans)` - Réinitialisation de mot de passe
+
+### CharacterService
+
+Service pour la gestion des personnages :
+- `createCharacter(CreateCharacterDTO $dto, User $user, bool $isOrga)` - Création de personnage
+- `checkCharacterAccess(Character $character, User $user)` - Vérification d'accès
+- `checkCharacterValidation(Character $character)` - Vérification de l'état de validation
+- Gestion des compétences : `addSkill()`, `editSkill()`, `deleteSkill()`
+- Gestion des équipements : `addGear()`, `editGear()`, `deleteGear()`
+- Gestion des assets : `addAsset()`, `editAsset()`, `deleteAsset()`
+- Gestion de l'XP : `addSkillXp()`, `removeSkillXp()`, `addGearXp()`, `removeGearXp()`
+- Validation : `validateCharacter()`, `rejectCharacter()`
+
+### UserService
+
+Service pour la gestion des utilisateurs :
+- `updateProfile(User $user, array $data)` - Mise à jour du profil
+- `updateLoginInfo(User $user, array $data, UserPasswordHasherInterface $passwordHasher)` - Mise à jour des identifiants
+- `createUser(array $data, UserPasswordHasherInterface $passwordHasher)` - Création d'utilisateur
+- `updateUser(User $user, array $data)` - Mise à jour d'utilisateur
+- `filterUsers(?string $role)` - Filtrage des utilisateurs
 
 ## Navigation
 

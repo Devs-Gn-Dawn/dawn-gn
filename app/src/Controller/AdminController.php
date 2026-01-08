@@ -13,18 +13,20 @@ use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\User;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use App\Entity\FactionType;
-use Symfony\Component\Mailer\MailerInterface;
-use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+use App\Service\EmailService;
+use App\Service\UserService;
 
 #[IsGranted(RoleType::ROLE_ADMIN)]
 class AdminController extends AbstractController
 {
     private $entityManager;
 
-    public function __construct(EntityManagerInterface $entityManager, private MailerInterface $mailer)
-    {
+    public function __construct(
+        EntityManagerInterface $entityManager,
+        private EmailService $emailService,
+        private UserService $userService
+    ) {
         $this->entityManager = $entityManager;
-        $this->mailer = $mailer;
     }
 
     #[Route('/admin', name: 'app_admin')]
@@ -69,29 +71,13 @@ class AdminController extends AbstractController
     #[Route('/api/user/create', name: 'api_user_create', methods: ['POST'])]
     public function createUser(Request $request, UserPasswordHasherInterface $passwordHasher): JsonResponse
     {
-        $data = json_decode($request->getContent(), true);
-
-        if (!$data) {
-            return new JsonResponse(['success' => false, 'error' => 'Données invalides'], 400);
+        try {
+            $data = json_decode($request->getContent(), true);
+            $this->userService->createUser($data, $passwordHasher);
+            return new JsonResponse(['success' => true]);
+        } catch (\Exception $e) {
+            return new JsonResponse(['success' => false, 'error' => $e->getMessage()], 400);
         }
-
-        $user = new User();
-        $user->setName($data['name']);
-        $user->setFirstname($data['firstname']);
-        $user->setEmail($data['email']);
-        $user->setPhone($data['phone']);
-        $user->setRoles($data['roles']);
-        $user->setSocial('');
-        $user->setFaction(empty($data['faction']) ? null : FactionType::from($data['faction']));
-
-        // Hashage du mot de passe
-        $hashedPassword = $passwordHasher->hashPassword($user, $data['password']);
-        $user->setPassword($hashedPassword);
-
-        $this->entityManager->persist($user);
-        $this->entityManager->flush();
-
-        return new JsonResponse(['success' => true]);
     }
 
     #[Route('/api/user/{id}/update', name: 'api_user_update', methods: ['POST'])]
@@ -103,22 +89,13 @@ class AdminController extends AbstractController
             return new JsonResponse(['success' => false, 'error' => 'Utilisateur non trouvé'], 404);
         }
 
-        $data = json_decode($request->getContent(), true);
-
-        if (!$data) {
-            return new JsonResponse(['success' => false, 'error' => 'Données invalides'], 400);
+        try {
+            $data = json_decode($request->getContent(), true);
+            $this->userService->updateUser($user, $data);
+            return new JsonResponse(['success' => true, 'data' => $data]);
+        } catch (\Exception $e) {
+            return new JsonResponse(['success' => false, 'error' => $e->getMessage()], 400);
         }
-
-        $user->setName($data['name']);
-        $user->setFirstname($data['firstname']);
-        $user->setEmail($data['email']);
-        $user->setPhone($data['phone']);
-        $user->setRoles($data['roles']);
-        $user->setFaction(empty($data['faction']) ? null : FactionType::from($data['faction']));
-
-        $this->entityManager->flush();
-
-        return new JsonResponse(['success' => true, 'data' => $data]);
     }
 
     #[Route('/api/user/{id}/delete', name: 'api_user_delete', methods: ['POST', 'DELETE'])]
@@ -145,16 +122,7 @@ class AdminController extends AbstractController
         // Sauvegarder les filtres en session
         $request->getSession()->set('user_filter_role', $role);
 
-        $qb = $this->entityManager->createQueryBuilder();
-        $qb->select('u')
-            ->from(User::class, 'u');
-
-        if ($role) {
-            $qb->where('u.roles LIKE :role')
-                ->setParameter('role', '%' . $role . '%');
-        }
-
-        $users = $qb->getQuery()->getResult();
+        $users = $this->userService->filterUsers($role);
 
         $usersData = array_map(function ($user) {
             return [
@@ -196,7 +164,7 @@ class AdminController extends AbstractController
             $user = $this->getUser();
             /** @var User $user */
             try {
-                $this->sendInviteEmail($user);
+                $this->emailService->sendInviteEmail($user);
             } catch (\Exception $e) {
                 return new JsonResponse(['success' => false, 'error' => $e->getMessage()], 500);
             }
@@ -206,7 +174,7 @@ class AdminController extends AbstractController
             foreach ($players as $player) {
                 if ($player->getPassword() == '') {
                     try {
-                        $this->sendInviteEmail($player);
+                        $this->emailService->sendInviteEmail($player);
 
                         $player->setPassword('1');
                         $this->entityManager->flush();
@@ -220,19 +188,5 @@ class AdminController extends AbstractController
             }
         }
         return new JsonResponse(['success' => true]);
-    }
-
-    private function sendInviteEmail(User $user): void
-    {
-        $email = (new TemplatedEmail())
-            ->from('no-reply@dawn-gn.com')
-            ->to($user->getEmail())
-            ->subject('Dawn 38 - Votre personnage')
-            ->htmlTemplate('contact/invit.html.twig')
-            ->context([
-                'user' => $user
-            ]);
-
-        $this->mailer->send($email);
     }
 }

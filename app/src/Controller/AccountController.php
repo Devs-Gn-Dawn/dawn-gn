@@ -17,9 +17,7 @@ use App\Entity\EventType;
 use App\Repository\RegistrationRepository;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use App\Entity\User;
-use Symfony\Component\Mime\Address;
-use Symfony\Bridge\Twig\Mime\TemplatedEmail;
-use Symfony\Component\Mailer\MailerInterface;
+use App\Service\UserService;
 
 #[IsGranted('ROLE_USER')]
 class AccountController extends AbstractController
@@ -27,7 +25,7 @@ class AccountController extends AbstractController
 
     public function __construct(
         private RegistrationRepository $registrationRepository,
-        private MailerInterface $mailer
+        private UserService $userService
     ) {}
 
     #[Route('/account', name: 'app_account')]
@@ -108,7 +106,7 @@ class AccountController extends AbstractController
         return new JsonResponse(null, 204);
     }
 
-    #[Route('/allergy/add', name: 'app_account_allergy_add', methods: ['POST'])]
+    #[Route('/api/allergy/add', name: 'app_account_allergy_add', methods: ['POST'])]
     public function addAllergy(Request $request, EntityManagerInterface $entityManager): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
@@ -124,7 +122,7 @@ class AccountController extends AbstractController
         return new JsonResponse(['message' => 'Allergie ajoutée avec succès']);
     }
 
-    #[Route('/allergy/{id}/edit', name: 'app_account_allergy_edit', methods: ['POST'])]
+    #[Route('/api/allergy/{id}/edit', name: 'app_account_allergy_edit', methods: ['POST'])]
     public function editAllergy(Request $request, Allergy $allergy, EntityManagerInterface $entityManager): JsonResponse
     {
         if ($allergy->getUser() !== $this->getUser()) {
@@ -139,7 +137,7 @@ class AccountController extends AbstractController
         return new JsonResponse(['message' => 'Allergie modifiée avec succès']);
     }
 
-    #[Route('/allergy/{id}/delete', name: 'app_account_allergy_delete', methods: ['POST', 'DELETE'])]
+    #[Route('/api/allergy/{id}/delete', name: 'app_account_allergy_delete', methods: ['POST', 'DELETE'])]
     public function deleteAllergy(Allergy $allergy, EntityManagerInterface $entityManager): JsonResponse
     {
         if ($allergy->getUser() !== $this->getUser()) {
@@ -152,7 +150,7 @@ class AccountController extends AbstractController
         return new JsonResponse(['message' => 'Allergie supprimée avec succès']);
     }
 
-    #[Route('/note/add', name: 'app_account_note_add', methods: ['POST'])]
+    #[Route('/api/note/add', name: 'app_account_note_add', methods: ['POST'])]
     public function addNote(Request $request, EntityManagerInterface $entityManager): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
@@ -169,7 +167,7 @@ class AccountController extends AbstractController
         return new JsonResponse(['message' => 'Note ajoutée avec succès']);
     }
 
-    #[Route('/note/{id}/edit', name: 'app_account_note_edit', methods: ['POST'])]
+    #[Route('/api/note/{id}/edit', name: 'app_account_note_edit', methods: ['POST'])]
     public function editNote(Request $request, Note $note, EntityManagerInterface $entityManager): JsonResponse
     {
         if ($note->getUser() !== $this->getUser()) {
@@ -185,7 +183,7 @@ class AccountController extends AbstractController
         return new JsonResponse(['message' => 'Note modifiée avec succès']);
     }
 
-    #[Route('/note/{id}/delete', name: 'app_account_note_delete', methods: ['POST', 'DELETE'])]
+    #[Route('/api/note/{id}/delete', name: 'app_account_note_delete', methods: ['POST', 'DELETE'])]
     public function deleteNote(Note $note, EntityManagerInterface $entityManager): JsonResponse
     {
         if ($note->getUser() !== $this->getUser()) {
@@ -265,56 +263,30 @@ class AccountController extends AbstractController
     }
 
     #[Route('/account/profile/edit', name: 'app_account_profile_edit', methods: ['POST'])]
-    public function editProfile(Request $request, EntityManagerInterface $entityManager): JsonResponse
+    public function editProfile(Request $request): JsonResponse
     {
-        $data = json_decode($request->getContent(), true);
-        $user = $this->getUser();
-        /**
-         * @var User $user
-         */
-
-        if (!isset($data['name']) || !isset($data['firstname']) || !isset($data['phone']) || !isset($data['droitImage'])) {
-            return new JsonResponse(['error' => 'Données manquantes'], 400);
+        try {
+            $data = json_decode($request->getContent(), true);
+            $user = $this->getUser();
+            /** @var User $user */
+            $this->userService->updateProfile($user, $data);
+            return new JsonResponse(['message' => 'Profil modifié avec succès']);
+        } catch (\Exception $e) {
+            return new JsonResponse(['error' => $e->getMessage()], 400);
         }
-
-        $user->setName($data['name']);
-        $user->setFirstname($data['firstname']);
-        $user->setPhone($data['phone']);
-        // $user->setSocial($data['social']);
-        $user->setDroitImage($data['droitImage']);
-
-        $entityManager->flush();
-
-        return new JsonResponse(['message' => 'Profil modifié avec succès']);
     }
 
     #[Route('/account/login/edit', name: 'app_account_login_edit', methods: ['POST'])]
-    public function editLoginInfo(Request $request, EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher): JsonResponse
+    public function editLoginInfo(Request $request, UserPasswordHasherInterface $passwordHasher): JsonResponse
     {
-        $data = json_decode($request->getContent(), true);
-        $user = $this->getUser();
-
-        if (!$user instanceof User) {
-            return new JsonResponse(['error' => 'Utilisateur non trouvé'], 404);
+        try {
+            $data = json_decode($request->getContent(), true);
+            $user = $this->getUser();
+            /** @var User $user */
+            $this->userService->updateLoginInfo($user, $data, $passwordHasher);
+            return new JsonResponse(['success' => true]);
+        } catch (\Exception $e) {
+            return new JsonResponse(['error' => $e->getMessage()], 400);
         }
-
-        if (isset($data['email']) && $data['email'] !== $user->getEmail()) {
-            $existingUser = $entityManager->getRepository(User::class)->findOneBy(['email' => $data['email']]);
-            if ($existingUser) {
-                return new JsonResponse(['error' => 'Cet email est déjà utilisé'], 400);
-            }
-            $user->setEmail($data['email']);
-        }
-
-        if (!empty($data['password'])) {
-            if ($data['password'] !== $data['password_confirm']) {
-                return new JsonResponse(['error' => 'Les mots de passe ne correspondent pas'], 400);
-            }
-            $user->setPassword($passwordHasher->hashPassword($user, $data['password']));
-        }
-
-        $entityManager->flush();
-
-        return new JsonResponse(['success' => true]);
     }
 }
