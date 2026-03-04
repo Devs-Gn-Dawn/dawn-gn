@@ -1,0 +1,49 @@
+{% extends 'email/base.html.twig' %}
+
+{% block title %}Dawn GN - Alerte : Inscription en doublon{% endblock %}
+
+{% block content %}
+<p>Bonjour,</p>
+
+<p>Un utilisateur a tenté de créer une nouvelle inscription alors qu'il possède déjà une inscription pour le même événement.</p>
+
+<h3>Informations de l'utilisateur :</h3>
+<ul>
+    <li><strong>Nom :</strong> {{ user.firstname }} {{ user.name }}</li>
+    <li><strong>Email :</strong> {{ user.email }}</li>
+    <li><strong>ID Utilisateur :</strong> {{ user.id }}</li>
+</ul>
+
+<h3>Inscription existante :</h3>
+<ul>
+    <li><strong>ID Inscription :</strong> {{ existingRegistration.id }}</li>
+    <li><strong>Événement :</strong> {{ existingRegistration.eventType ? existingRegistration.eventType.getLabel() : existingRegistration.event }}</li>
+    <li><strong>Numéro de billet HelloAsso :</strong> {{ existingRegistration.helloassoTicket }}</li>
+    {% if existingRegistration.itemName %}
+    <li><strong>Nom de l'item :</strong> {{ existingRegistration.itemName }}</li>
+    {% endif %}
+</ul>
+
+<h3>Nouvelle tentative d'inscription :</h3>
+<ul>
+    <li><strong>ID Item HelloAsso :</strong> {{ newItemData.id ?? 'N/A' }}</li>
+    <li><strong>Nom de l'item :</strong> {{ newItemData.name ?? 'N/A' }}</li>
+    <li><strong>Type :</strong> {{ newItemData.type ?? 'N/A' }}</li>
+    {% if newItemData.customFields is defined %}
+    <li><strong>Email dans customFields :</strong> 
+        {% for field in newItemData.customFields %}
+            {% if field.id == 6626657 or field.name == 'Adresse Mail de Contact' %}
+                {{ field.answer ?? 'N/A' }}
+            {% endif %}
+        {% endfor %}
+    </li>
+    {% endif %}
+</ul>
+
+<p><strong>Action requise :</strong></p>
+<p>Vérifiez si cette nouvelle inscription doit être créée manuellement ou si c'est une erreur. L'inscription n'a pas été créée automatiquement pour éviter les doublons.</p>
+
+<p>Merci de votre attention.</p>
+
+<p>L'équipe Dawn GN</p>
+{% endblock %}

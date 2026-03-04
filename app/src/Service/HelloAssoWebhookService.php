@@ -10,6 +10,7 @@ use App\Repository\UserRepository;
 use App\Repository\RegistrationRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class HelloAssoWebhookService
 {
@@ -20,7 +21,8 @@ class HelloAssoWebhookService
         private EmailService $emailService,
         private UserRepository $userRepository,
         private RegistrationRepository $registrationRepository,
-        private array $formEventMapping
+        private array $formEventMapping,
+        private UserPasswordHasherInterface $passwordHasher
     ) {}
 
     public function isSignatureValid(string $rawBody, ?string $signature): bool
@@ -80,125 +82,193 @@ class HelloAssoWebhookService
         ]);
     }
 
+    /**
+     * Traite un billet (une inscription). Utilisé par le webhook et par l'import CSV.
+     * Si le numéro de billet existe déjà en base, la ligne est ignorée (retour null).
+     *
+     * @param array<string, mixed> $registrationsCreated Inscriptions créées dans cette requête (pour détection doublon intra-requête)
+     */
+    public function processOneRegistration(
+        string $ticketId,
+        string $email,
+        string $firstName,
+        string $lastName,
+        ?string $itemName,
+        string $eventType,
+        array &$registrationsCreated = []
+    ): ?Registration {
+        $existingRegistrationByTicket = $this->registrationRepository->findOneBy([
+            'helloasso_ticket' => $ticketId
+        ]);
+
+        if ($existingRegistrationByTicket) {
+            $this->logger->info('Inscription déjà existante pour ce ticket', ['itemId' => $ticketId]);
+            return null;
+        }
+
+        $user = $this->userRepository->findOneBy(['email' => $email]);
+        $userExists = $user !== null;
+
+        if (!$user) {
+            $userData = [
+                'email' => $email,
+                'firstName' => $firstName,
+                'lastName' => $lastName,
+                'phone' => ''
+            ];
+            $user = $this->createUser($userData);
+        }
+
+        $existingRegistrationByEvent = $this->registrationRepository->findOneBy([
+            'user' => $user,
+            'event' => $eventType
+        ]);
+        if (!$existingRegistrationByEvent) {
+            foreach ($registrationsCreated as $created) {
+                if ($created->getUser() === $user && $created->getEvent() === $eventType) {
+                    $existingRegistrationByEvent = $created;
+                    break;
+                }
+            }
+        }
+
+        if ($existingRegistrationByEvent) {
+            $this->emailService->sendAdminDuplicateRegistrationAlertEmail(
+                $user,
+                $existingRegistrationByEvent,
+                ['id' => $ticketId, 'name' => $itemName]
+            );
+            $this->logger->warning('Utilisateur a déjà une inscription pour cet événement', [
+                'userId' => $user->getId(),
+                'email' => $email,
+                'event' => $eventType,
+                'existingRegistrationId' => $existingRegistrationByEvent->getId(),
+                'newItemId' => $ticketId
+            ]);
+            return null;
+        }
+
+        $registration = $this->createRegistration($user, $eventType, $ticketId, $itemName);
+        $this->em->persist($registration);
+        $registrationsCreated[] = $registration;
+
+        if ($userExists) {
+            $this->emailService->sendRegistrationConfirmationEmail($user, $registration);
+        }
+
+        return $registration;
+    }
+
     private function confirmOrder(array $payment): void
     {
         $order = $payment['order'] ?? [];
         $payer = $payment['payer'] ?? [];
 
-        if (empty($order) || empty($payer)) {
+        if (empty($order)) {
             $this->logger->warning('Données de commande incomplètes', $payment);
             return;
         }
 
         $orderId = $order['id'] ?? null;
-        $payerEmail = $payer['email'] ?? null;
-
-        if (!$orderId || !$payerEmail) {
-            $this->logger->warning('Order ID ou email manquant', $payment);
+        if (!$orderId) {
+            $this->logger->warning('Order ID manquant', $payment);
             return;
         }
 
-        // Vérifier si une inscription existe déjà avec ce ticket
-        $existingRegistration = $this->registrationRepository->findOneBy([
-            'helloasso_ticket' => $orderId
-        ]);
-
-        if ($existingRegistration) {
-            $this->logger->info('Inscription déjà existante pour cette commande', [
-                'orderId' => $orderId,
-                'email' => $payerEmail
-            ]);
-            return;
-        }
-
-        // Récupérer ou créer l'utilisateur
-        $user = $this->userRepository->findOneBy(['email' => $payerEmail]);
-        $userExists = $user !== null;
-
-        if (!$user) {
-            $user = $this->createUser($payer);
-        }
-
-        // Traiter chaque item de la commande
-        $items = $order['items'] ?? [];
+        $items = $payment['items'] ?? $order['items'] ?? [];
         $registrationsCreated = [];
-        
+
         foreach ($items as $item) {
-            if (($item['type'] ?? null) !== 'Ticket') {
+            if (($item['type'] ?? null) !== 'Registration') {
                 continue;
             }
 
-            $quantity = (int)($item['quantity'] ?? 1);
-            $eventType = $this->getEventTypeFromOrder($order, $item);
+            $itemId = $item['id'] ?? null;
+            if (!$itemId) {
+                $this->logger->warning('Item ID manquant', ['item' => $item]);
+                continue;
+            }
 
-            if (!$eventType) {
-                $this->logger->warning('Impossible de déterminer l\'événement', [
-                    'orderId' => $orderId,
+            $customFields = $item['customFields'] ?? [];
+            $itemEmail = $this->extractEmailFromCustomFields($customFields, $payer);
+            if (!$itemEmail) {
+                $this->logger->warning('Email manquant pour l\'item', [
+                    'itemId' => $itemId,
                     'item' => $item
                 ]);
                 continue;
             }
 
-            if ($quantity > 1) {
-                // Créer une seule inscription
-                $registration = $this->createRegistration($user, $eventType, $orderId);
-                $this->em->persist($registration);
-                $registrationsCreated[] = $registration;
-
-                // Logger l'alerte
-                $this->logger->warning('Commande avec quantité >1', [
+            $eventType = $this->getEventTypeFromOrder($order, $item);
+            if (!$eventType) {
+                $this->logger->warning('Impossible de déterminer l\'événement', [
                     'orderId' => $orderId,
-                    'quantity' => $quantity,
-                    'email' => $payerEmail,
-                    'event' => $eventType
+                    'itemId' => $itemId,
+                    'item' => $item
                 ]);
-
-                // Envoyer alerte aux admins
-                $this->emailService->sendAdminQuantityAlertEmail($payment, $quantity);
-            } else {
-                // Création normale de l'inscription
-                $registration = $this->createRegistration($user, $eventType, $orderId);
-                $this->em->persist($registration);
-                $registrationsCreated[] = $registration;
+                continue;
             }
+
+            $this->processOneRegistration(
+                (string) $itemId,
+                $itemEmail,
+                $item['user']['firstName'] ?? $payer['firstName'] ?? '',
+                $item['user']['lastName'] ?? $payer['lastName'] ?? '',
+                $item['name'] ?? null,
+                $eventType,
+                $registrationsCreated
+            );
         }
 
         $this->em->flush();
 
-        // Si l'utilisateur existait déjà, envoyer email de confirmation pour la première inscription créée
-        if ($userExists && !empty($registrationsCreated)) {
-            $this->emailService->sendRegistrationConfirmationEmail($user, $registrationsCreated[0]);
-        }
-
         $this->logger->info('Commande confirmée', [
             'orderId' => $orderId,
-            'email' => $payerEmail,
-            'userExists' => $userExists
+            'itemsProcessed' => count($registrationsCreated)
         ]);
     }
 
     private function cancelOrder(array $payment): void
     {
-        $orderId = $payment['order']['id'] ?? null;
+        $order = $payment['order'] ?? [];
+        $items = $payment['items'] ?? $order['items'] ?? [];
 
-        if (!$orderId) {
+        if (empty($items)) {
+            $this->logger->warning('Aucun item trouvé pour annulation', $payment);
             return;
         }
 
-        $registration = $this->registrationRepository->findOneBy([
-            'helloasso_ticket' => $orderId
-        ]);
+        $cancelledCount = 0;
 
-        if ($registration) {
-            $this->em->remove($registration);
+        // Traiter chaque item individuellement
+        foreach ($items as $item) {
+            if (($item['type'] ?? null) !== 'Registration') {
+                continue;
+            }
+
+            $itemId = $item['id'] ?? null;
+            if (!$itemId) {
+                continue;
+            }
+
+            $registration = $this->registrationRepository->findOneBy([
+                'helloasso_ticket' => (string)$itemId
+            ]);
+
+            if ($registration) {
+                $this->em->remove($registration);
+                $cancelledCount++;
+            }
+        }
+
+        if ($cancelledCount > 0) {
             $this->em->flush();
-
-            $this->logger->info('Commande annulée', [
-                'orderId' => $orderId
+            $this->logger->info('Inscriptions annulées', [
+                'count' => $cancelledCount
             ]);
         } else {
-            $this->logger->warning('Inscription non trouvée pour annulation', [
-                'orderId' => $orderId
+            $this->logger->warning('Aucune inscription trouvée pour annulation', [
+                'items' => array_column($items, 'id')
             ]);
         }
     }
@@ -218,8 +288,10 @@ class HelloAssoWebhookService
         $user->setFirstname($firstName);
         $user->setName($lastName);
         $user->setPhone($payer['phone'] ?? '');
+        $user->setSocial('');
         $user->setRoles([RoleType::ROLE_USER]);
-        // Pas de mot de passe défini - l'utilisateur devra utiliser reset-password
+        // Mot de passe temporaire invalide : l'utilisateur devra utiliser le lien reset-password envoyé par email
+        $user->setPassword($this->passwordHasher->hashPassword($user, bin2hex(random_bytes(32))));
 
         $this->em->persist($user);
         $this->em->flush();
@@ -234,20 +306,38 @@ class HelloAssoWebhookService
         return $user;
     }
 
-    private function createRegistration(User $user, string $eventType, string $orderId): Registration
+    private function createRegistration(User $user, string $eventType, string|int $itemId, ?string $itemName = null): Registration
     {
         $registration = new Registration();
         $registration->setUser($user);
         $registration->setEvent($eventType);
-        $registration->setHelloassoTicket($orderId);
+        $registration->setHelloassoTicket((string)$itemId);
+        $registration->setItemName($itemName);
 
         return $registration;
+    }
+
+    private function extractEmailFromCustomFields(array $customFields, array $payer): ?string
+    {
+        // Chercher le customField avec l'ID 6626657 ou le nom "Adresse Mail de Contact"
+        foreach ($customFields as $field) {
+            $fieldId = $field['id'] ?? null;
+            $fieldName = $field['name'] ?? '';
+            $answer = $field['answer'] ?? null;
+
+            if (($fieldId === 6626657 || $fieldName === 'Adresse Mail de Contact') && $answer) {
+                return $answer;
+            }
+        }
+
+        // Fallback sur payer.email
+        return $payer['email'] ?? null;
     }
 
     private function getEventTypeFromOrder(array $order, array $item): ?string
     {
         // Essayer d'abord le mapping formulaire → événement
-        $formId = $order['form']['id'] ?? null;
+        $formId = $order['formSlug'] ?? $order['form']['id'] ?? null;
         if ($formId && isset($this->formEventMapping[$formId])) {
             return $this->formEventMapping[$formId];
         }

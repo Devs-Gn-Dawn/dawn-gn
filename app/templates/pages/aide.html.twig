@@ -1,0 +1,106 @@
+{% extends app.user ? 'base.html.twig' : 'blank.html.twig' %}
+
+{% block title %}Aide - Dawn GN{% endblock %}
+
+{% block body %}
+<div class="w-full px-6 mx-auto">
+    <div class="relative flex flex-col flex-auto min-w-0 p-4 mt-12 overflow-hidden break-words border-0 shadow-blur rounded-2xl bg-white/80 bg-clip-border backdrop-blur-2xl backdrop-saturate-200">
+        <h1 class="mb-6 text-2xl font-bold text-slate-700">Aide</h1>
+
+        <p class="mb-6 text-slate-600">
+            Pour faciliter la gestion, le suivi et le check-in du GN Dawn, nous avons mis en place un système de gestion de personnages informatisé.
+            {% if app.user %}
+                Vous y accédez depuis <a href="{{ path('app_home') }}" class="font-semibold text-slate-700 hover:underline">la plateforme</a>.
+            {% else %}
+                Accédez à la plateforme : <a href="{{ path('app_login') }}" class="font-semibold text-slate-700 hover:underline">Se connecter</a>.
+            {% endif %}
+        </p>
+
+        <div class="space-y-8">
+            <section>
+                <h2 class="mb-3 text-lg font-semibold text-slate-700">Première connexion</h2>
+                <p class="mb-2 text-slate-600">
+                    Votre compte a été créé à partir de l’email renseigné sur Hello Asso. Pour accéder à votre compte, vous devez définir votre mot de passe via l’option «&nbsp;mot de passe oublié&nbsp;» :
+                </p>
+                <p>
+                    <a href="{{ path('app_forgot_password_request') }}" class="font-semibold text-slate-700 hover:underline">Générer mon mot de passe (mot de passe oublié)</a>
+                </p>
+            </section>
+
+            <section>
+                <h2 class="mb-3 text-lg font-semibold text-slate-700">Une fois connecté</h2>
+                <p class="mb-3 text-slate-600">Vous pourrez :</p>
+                <ul class="list-disc pl-6 mb-0 text-slate-600 space-y-1">
+                    <li>Créer votre personnage</li>
+                    <li>Consulter vos inscriptions</li>
+                    <li>Gérer votre profil</li>
+                </ul>
+                {% if app.user %}
+                    <p class="mt-3">
+                        <a href="{{ path('app_character_index') }}" class="font-semibold text-slate-700 hover:underline">Mes personnages</a> —
+                        <a href="{{ path('app_account') }}" class="font-semibold text-slate-700 hover:underline">Mes informations</a>
+                    </p>
+                {% endif %}
+            </section>
+
+            <section>
+                <h2 class="mb-3 text-lg font-semibold text-slate-700">Étapes pour votre fiche</h2>
+                <ol class="list-decimal pl-6 mb-0 text-slate-600 space-y-2">
+                    <li>Création de votre personnage</li>
+                    <li>Déclaration du personnage comme PJ principal (pour les premières participations)</li>
+                    <li>Demande de validation par l’orga</li>
+                    <li>L’orga complète si besoin</li>
+                    <li>Validation du personnage par l’orga</li>
+                    <li>La fiche est alors disponible dans le menu (PDF à imprimer ou garder sur votre téléphone)</li>
+                    <li>Jour J, au check-in : présentation du QR code de votre fiche aux orgas</li>
+                    <li>Avec un billet valide et un PJ validé, vous récupérez ce dont vous avez besoin</li>
+                </ol>
+            </section>
+
+            <section>
+                <h2 class="mb-3 text-lg font-semibold text-slate-700">Points importants</h2>
+                <p class="mb-3 text-slate-600">
+                    Le site intègre toutes les règles et ne tolère aucune erreur. S’il n’y a plus assez d’XP, il ne sera plus possible de discrètement gratter un point. Si une compétence n’apparaît pas dans la liste, c’est que votre personnage ne peut pas la prendre (soit c’est une compétence liée à une faction ou classe spécifique, soit il y a un prérequis que vous pourrez retrouver dans les règles).
+                </p>
+                <p class="mb-4 text-slate-600">
+                    L’XP gagnée en fonction du nombre de participations est déjà calculée. Si ce n’est pas le cas ou en cas d’erreur, n’hésitez pas à contacter un de vos orgas. S’il vous reste des points à répartir, vous pouvez les ajouter à l’aide du «&nbsp;+&nbsp;» présent à droite du titre «&nbsp;Compétences&nbsp;» ou «&nbsp;Matériels / Ressources&nbsp;» :
+                </p>
+                <figure class="my-6 text-center">
+                    <img src="{{ asset('build/images/help-invitation.png') }}" alt="Ajout de points : bouton + à droite des titres Compétences ou Matériels / Ressources" class="max-w-full mx-auto rounded-lg shadow-soft-sm" style="max-height: 28rem;">
+                </figure>
+            </section>
+
+            <section>
+                <h2 class="mb-3 text-lg font-semibold text-slate-700">Cas particuliers</h2>
+                <ul class="list-disc pl-6 mb-0 text-slate-600 space-y-1">
+                    <li>Si vous n’avez pas rempli l’enveloppe après le précédent opus, les possessions (sols, scraps, etc.) ne pourront pas être reprises ; vous pourrez garder et utiliser vos plans.</li>
+                    <li>Si vous avez partagé votre fiche mais que le personnage n’est pas créé sur votre compte, contactez un de vos orgas.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2 class="mb-3 text-lg font-semibold text-slate-700">Rerolls et brouillons</h2>
+                <p class="mb-0 text-slate-600">
+                    Vous pouvez créer un reroll (à faire valider par les orgas) et autant de brouillons que vous le souhaitez.
+                </p>
+            </section>
+
+            <section>
+                <h2 class="mb-3 text-lg font-semibold text-slate-700">Besoin d’aide ?</h2>
+                <p class="mb-0 text-slate-600">
+                    En cas de questions, n’hésitez pas à contacter les organisateurs.
+                    {% if app.user and not is_granted('ROLE_ORGA') %}
+                        Utilisez «&nbsp;Contacter mon orga&nbsp;» dans le menu.
+                    {% endif %}
+                </p>
+            </section>
+        </div>
+
+        {% if not app.user %}
+            <p class="mt-8 pt-6 border-t border-slate-200">
+                <a href="{{ path('app_login') }}" class="font-semibold text-slate-700 hover:underline">Retour à la connexion</a>
+            </p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

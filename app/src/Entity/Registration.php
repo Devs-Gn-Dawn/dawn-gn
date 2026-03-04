@@ -20,6 +20,9 @@ class Registration
     #[ORM\Column(length: 127)]
     private ?string $helloasso_ticket = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $item_name = null;
+
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'registrations')]
     #[ORM\JoinColumn(name: 'fk_user', referencedColumnName: 'id', nullable: false)]
     private ?User $user = null;
@@ -72,6 +75,18 @@ class Registration
     public function setHelloassoTicket(string $helloasso_ticket): static
     {
         $this->helloasso_ticket = $helloasso_ticket;
+
+        return $this;
+    }
+
+    public function getItemName(): ?string
+    {
+        return $this->item_name;
+    }
+
+    public function setItemName(?string $item_name): static
+    {
+        $this->item_name = $item_name;
 
         return $this;
     }

@@ -182,4 +182,31 @@ class EmailService
             $this->mailer->send($email);
         }
     }
+
+    /**
+     * Envoie un email d'alerte aux administrateurs si un utilisateur a déjà une inscription pour le même événement
+     */
+    public function sendAdminDuplicateRegistrationAlertEmail(User $user, Registration $existingRegistration, array $newItemData): void
+    {
+        $admins = $this->userRepository->findAdmins();
+
+        if (empty($admins)) {
+            return;
+        }
+
+        foreach ($admins as $admin) {
+            $email = (new TemplatedEmail())
+                ->from($this->senderAddress)
+                ->to($admin->getEmail())
+                ->subject('[Dawn GN] - Alerte : Inscription en doublon pour le même événement')
+                ->htmlTemplate('email/admin_duplicate_registration_alert.html.twig')
+                ->context([
+                    'user' => $user,
+                    'existingRegistration' => $existingRegistration,
+                    'newItemData' => $newItemData,
+                ]);
+
+            $this->mailer->send($email);
+        }
+    }
 }

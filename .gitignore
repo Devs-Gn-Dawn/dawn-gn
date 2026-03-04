@@ -41,3 +41,4 @@ config/packages/dev/*
 htpassword.txt
 package-lock.json
 package.json
+postman/*

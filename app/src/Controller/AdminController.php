@@ -12,8 +12,10 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\User;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use App\Entity\EventType;
 use App\Entity\FactionType;
 use App\Service\EmailService;
+use App\Service\HelloAssoCsvImportService;
 use App\Service\UserService;
 
 #[IsGranted(RoleType::ROLE_ADMIN)]
@@ -24,7 +26,8 @@ class AdminController extends AbstractController
     public function __construct(
         EntityManagerInterface $entityManager,
         private EmailService $emailService,
-        private UserService $userService
+        private UserService $userService,
+        private HelloAssoCsvImportService $csvImportService
     ) {
         $this->entityManager = $entityManager;
     }
@@ -151,6 +154,49 @@ class AdminController extends AbstractController
                 '/admin' => 'Administration',
                 '/admin/send-invite' => 'Envoyer un mail d\'invitation',
             ],
+        ]);
+    }
+
+    #[Route('/admin/import-tickets', name: 'app_admin_import_tickets', methods: ['GET', 'POST'])]
+    public function importTickets(Request $request): Response
+    {
+        $importResult = null;
+
+        if ($request->isMethod('POST')) {
+            if (!$this->isCsrfTokenValid('import_tickets', $request->request->get('_csrf_token'))) {
+                $this->addFlash('error', 'Jeton de sécurité invalide. Veuillez réessayer.');
+            } else {
+            $file = $request->files->get('csv');
+            $event = $request->request->get('event');
+
+            if (!$file || !$file->isValid()) {
+                $this->addFlash('error', 'Veuillez sélectionner un fichier CSV valide.');
+            } elseif (!$event || !\in_array($event, EventType::EVENTS, true)) {
+                $this->addFlash('error', 'Veuillez sélectionner un événement.');
+            } else {
+                $content = file_get_contents($file->getPathname());
+                if ($content === false) {
+                    $this->addFlash('error', 'Impossible de lire le fichier.');
+                } else {
+                    $importResult = $this->csvImportService->import($content, $event);
+                    $this->addFlash('success', sprintf(
+                        'Import terminé : %d créée(s), %d ignorée(s) (billet déjà en base), %d doublon(s) (alerte envoyée).',
+                        $importResult['created'],
+                        $importResult['ignored'],
+                        $importResult['duplicates']
+                    ));
+                }
+            }
+            }
+        }
+
+        return $this->render('admin/import_tickets.html.twig', [
+            'breadcrumb' => [
+                '/admin' => 'Administration',
+                '/admin/import-tickets' => 'Importer des billets (CSV)',
+            ],
+            'eventChoices' => EventType::getChoices(),
+            'importResult' => $importResult,
         ]);
     }
 
