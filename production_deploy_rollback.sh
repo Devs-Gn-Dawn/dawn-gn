@@ -1,4 +1,9 @@
 #!/bin/bash
+set -e
+
+# Se placer à la racine du projet (répertoire du script)
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+cd "$SCRIPT_DIR"
 
 # Configuration
 APP_DIR="app"
@@ -21,6 +26,7 @@ echo "- $APP_DIR/src"
 echo "- $APP_DIR/templates"
 echo "- $APP_DIR/public"
 echo "- $APP_DIR/assets"
+echo "- $APP_DIR/config"
 read -p "Voulez-vous continuer ? (o/n) " -n 1 -r
 echo
 if [[ ! $REPLY =~ ^[Oo]$ ]]
@@ -53,6 +59,12 @@ if [ -d "$LATEST_BACKUP/assets" ]; then
     rm -rf $APP_DIR/assets
     cp -rv $LATEST_BACKUP/assets $APP_DIR/
     echo "Restauration de assets effectuée"
+fi
+
+if [ -d "$LATEST_BACKUP/config" ]; then
+    rm -rf $APP_DIR/config
+    cp -rv $LATEST_BACKUP/config $APP_DIR/
+    echo "Restauration de config effectuée"
 fi
 
 # Nettoyage du cache

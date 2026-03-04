@@ -1,4 +1,9 @@
 #!/bin/bash
+set -e
+
+# Se placer à la racine du projet (répertoire du script)
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+cd "$SCRIPT_DIR"
 
 # Configuration
 REPO_URL="https://github.com/Devs-Gn-Dawn/dawn-gn.git"
@@ -35,6 +40,10 @@ if [ -d "$APP_DIR/assets" ]; then
     cp -r $APP_DIR/assets $BACKUP_DIR/
     echo "Sauvegarde de assets effectuée"
 fi
+if [ -d "$APP_DIR/config" ]; then
+    cp -r $APP_DIR/config $BACKUP_DIR/
+    echo "Sauvegarde de config effectuée"
+fi
 
 # Demande de confirmation
 echo "ATTENTION: Les dossiers suivants vont être écrasés :"
@@ -42,6 +51,7 @@ echo "- $APP_DIR/src"
 echo "- $APP_DIR/templates"
 echo "- $APP_DIR/public"
 echo "- $APP_DIR/assets"
+echo "- $APP_DIR/config"
 echo "Une sauvegarde a été créée dans : $BACKUP_DIR"
 read -p "Voulez-vous continuer ? (o/n) " -n 1 -r
 echo
@@ -57,6 +67,14 @@ cp -rv $TEMP_DIR/$APP_DIR/src $APP_DIR/
 cp -rv $TEMP_DIR/$APP_DIR/templates $APP_DIR/
 cp -rv $TEMP_DIR/$APP_DIR/public $APP_DIR/
 cp -rv $TEMP_DIR/$APP_DIR/assets $APP_DIR/
+cp -rv $TEMP_DIR/$APP_DIR/config $APP_DIR/
+
+# Build des assets (augmenter la mémoire Node si nécessaire pour éviter "Out of memory" WebAssembly)
+echo "Build des assets..."
+cd $APP_DIR
+export NODE_OPTIONS="${NODE_OPTIONS:---max-old-space-size=2048}"
+npm run build || { echo "ATTENTION: le build npm a échoué (ex. mémoire). Vous pouvez builder en local et déployer public/build/ manuellement."; }
+cd "$SCRIPT_DIR"
 
 # Nettoyage du cache
 echo "Nettoyage du cache..."
