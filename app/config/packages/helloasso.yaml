@@ -1,5 +1,7 @@
 parameters:
-  helloasso.webhook_secret: "%env(HELLOASSO_WEBHOOK_SECRET)%"
+  # IPs autorisées pour les webhooks HelloAsso (sans compte partenaire, pas de signature)
+  # Prod: 51.138.206.200 | Test: 4.233.135.234 | En dev local, ajouter 127.0.0.1 si besoin
+  helloasso.webhook_allowed_ips: ["51.138.206.200", "4.233.135.234"]
   helloasso.form_event_mapping:
     "123456": "dawn37"
     "dawn-39": "dawn39"

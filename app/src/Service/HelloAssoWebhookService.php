@@ -17,7 +17,8 @@ class HelloAssoWebhookService
     public function __construct(
         private EntityManagerInterface $em,
         private LoggerInterface $logger,
-        private string $webhookSecret,
+        /** @var list<string> */
+        private array $allowedIps,
         private EmailService $emailService,
         private UserRepository $userRepository,
         private RegistrationRepository $registrationRepository,
@@ -25,20 +26,23 @@ class HelloAssoWebhookService
         private UserPasswordHasherInterface $passwordHasher
     ) {}
 
-    public function isSignatureValid(string $rawBody, ?string $signature): bool
+    /**
+     * Vérifie que la requête webhook provient d'une IP HelloAsso autorisée.
+     * Sans compte partenaire, les webhooks ne sont pas signés ; seule la vérification par IP est disponible.
+     */
+    public function isClientIpAllowed(?string $clientIp): bool
     {
-        if (!$signature) {
-            $this->logger->warning('Signature HelloAsso absente');
+        if ($clientIp === null || $clientIp === '') {
+            $this->logger->warning('Webhook HelloAsso : IP client absente');
             return false;
         }
 
-        $computedSignature = hash_hmac(
-            'sha256',
-            $rawBody,
-            $this->webhookSecret
-        );
+        if (!\in_array($clientIp, $this->allowedIps, true)) {
+            $this->logger->warning('Webhook HelloAsso : IP non autorisée', ['ip' => $clientIp]);
+            return false;
+        }
 
-        return hash_equals($computedSignature, $signature);
+        return true;
     }
 
     public function process(array $payload): void

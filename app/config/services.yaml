@@ -25,5 +25,5 @@ services:
 
   App\Service\HelloAssoWebhookService:
     arguments:
-      $webhookSecret: "%helloasso.webhook_secret%"
+      $allowedIps: "%helloasso.webhook_allowed_ips%"
       $formEventMapping: "%helloasso.form_event_mapping%"

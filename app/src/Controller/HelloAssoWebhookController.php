@@ -16,10 +16,10 @@ class HelloAssoWebhookController extends AbstractController
         HelloAssoWebhookService $webhookService
     ): Response {
         $rawBody = $request->getContent();
-        $signature = $request->headers->get('X-HelloAsso-Signature');
+        $clientIp = $request->getClientIp();
 
-        if (!$webhookService->isSignatureValid($rawBody, $signature)) {
-            return new Response('Invalid signature', Response::HTTP_UNAUTHORIZED);
+        if (!$webhookService->isClientIpAllowed($clientIp)) {
+            return new Response('Unauthorized', Response::HTTP_UNAUTHORIZED);
         }
 
         $payload = json_decode($rawBody, true);

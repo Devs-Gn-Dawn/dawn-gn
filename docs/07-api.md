@@ -134,6 +134,14 @@ Cette page documente les principaux endpoints API de l'application Dawn GN.
 - `GET /admin/send-invite` - Page d'envoi d'invitation
 - `POST /api/send-invite` - Envoi d'une invitation
 
+## Webhooks
+
+### HelloAsso
+
+- `POST /webhook/helloasso` - Réception des notifications HelloAsso (paiements, commandes).
+
+Sans compte partenaire HelloAsso, les webhooks ne sont pas signés. L'authenticité est vérifiée par **adresse IP source** (voir [documentation HelloAsso](https://dev.helloasso.com/docs/secure-webhook)) : IP production `51.138.206.200`, IP test `4.233.135.234`. La liste des IP autorisées est configurée dans `config/packages/helloasso.yaml` ; en développement local, vous pouvez y ajouter `127.0.0.1` pour tester avec Postman.
+
 ## Exemples de requêtes API
 
 ### Création d'un personnage

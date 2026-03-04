@@ -36,13 +36,38 @@ class HelloAssoWebhookServiceTest extends TestCase
         $this->service = new HelloAssoWebhookService(
             $this->em,
             $this->logger,
-            'test-webhook-secret',
+            ['51.138.206.200', '4.233.135.234'],
             $this->emailService,
             $this->userRepository,
             $this->registrationRepository,
             ['dawn-39' => 'dawn39'],
             $this->passwordHasher
         );
+    }
+
+    public function testIsClientIpAllowedReturnsTrueForProductionIp(): void
+    {
+        self::assertTrue($this->service->isClientIpAllowed('51.138.206.200'));
+    }
+
+    public function testIsClientIpAllowedReturnsTrueForTestIp(): void
+    {
+        self::assertTrue($this->service->isClientIpAllowed('4.233.135.234'));
+    }
+
+    public function testIsClientIpAllowedReturnsFalseForUnknownIp(): void
+    {
+        self::assertFalse($this->service->isClientIpAllowed('192.168.1.1'));
+    }
+
+    public function testIsClientIpAllowedReturnsFalseForNull(): void
+    {
+        self::assertFalse($this->service->isClientIpAllowed(null));
+    }
+
+    public function testIsClientIpAllowedReturnsFalseForEmptyString(): void
+    {
+        self::assertFalse($this->service->isClientIpAllowed(''));
     }
 
     public function testProcessPaymentProcessedWithDataItemsCreatesRegistration(): void
