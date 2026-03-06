@@ -31,3 +31,7 @@ services:
     arguments:
       $allowedIps: "%helloasso.webhook_allowed_ips%"
       $formEventMapping: "%helloasso.form_event_mapping%"
+
+  App\EventSubscriber\Error500LogSubscriber:
+    arguments:
+      $error500Logger: '@monolog.logger.error_500'
