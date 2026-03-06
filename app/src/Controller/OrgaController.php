@@ -86,9 +86,17 @@ class OrgaController extends AbstractController
     #[Route('/orga/players', name: 'app_orga_players')]
     public function players(): Response
     {
+        $players = $this->entityManager->getRepository(User::class)
+            ->createQueryBuilder('u')
+            ->leftJoin('u.registrations', 'r')->addSelect('r')
+            ->leftJoin('u.characters', 'c')->addSelect('c')
+            ->orderBy('u.id', 'ASC')
+            ->getQuery()
+            ->getResult();
+
         return $this->render('orga/players.html.twig', [
             'breadcrumb' => ['/orga' => 'Organisation', '/orga/players' => 'Liste des joueureuses'],
-            'players' => $this->entityManager->getRepository(User::class)->findAll()
+            'players' => $players
         ]);
     }
 

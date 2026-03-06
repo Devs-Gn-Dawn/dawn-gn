@@ -50,6 +50,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private Collection $characters;
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Registration::class, cascade: ['remove'], orphanRemoval: true)]
+    #[ORM\OrderBy(['id' => 'ASC'])]
     private Collection $registrations;
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: EmergencyContact::class, cascade: ['remove'], orphanRemoval: true)]
