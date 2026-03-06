@@ -21,9 +21,6 @@ class RegistrationController extends AbstractController
         $user = new User();
 
         if ($request->isMethod('POST')) {
-            // close registration
-            $this->addFlash('error', 'Les inscriptions ne sont pas ouvertes pour le moment.');
-            return $this->redirectToRoute('app_login');
 
             $email = $request->request->get('email');
             $password = $request->request->get('password');
