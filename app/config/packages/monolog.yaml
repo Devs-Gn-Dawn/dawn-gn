@@ -64,7 +64,7 @@ when@prod:
       # Fichier dédié aux erreurs 500 en production
       error_500_file:
         type: stream
-        path: "%kernel.logs_dir%/dawn_gn_errors.log"
+        path: "%kernel.project_dir%/logs/dawn_gn_errors.log"
         level: error
         channels: [error_500]
         formatter: monolog.formatter.json

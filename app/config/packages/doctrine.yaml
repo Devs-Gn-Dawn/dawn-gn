@@ -1,13 +1,7 @@
 doctrine:
   dbal:
-    driver: pdo_mysql
-    host: db
-    port: 3306
-    dbname: app_db
-    user: app_user
-    password: app_password
+    url: '%env(resolve:DATABASE_URL)%'
     charset: utf8mb4
-    server_version: "8.0"
 
   orm:
     auto_generate_proxy_classes: true

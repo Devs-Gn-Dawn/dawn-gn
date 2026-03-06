@@ -34,4 +34,4 @@ services:
 
   App\EventSubscriber\Error500LogSubscriber:
     arguments:
-      $error500Logger: '@monolog.logger.error_500'
+      $error500Logger: "@monolog.logger.error_500"
