@@ -183,7 +183,13 @@ class HelloAssoWebhookService
         $registrationsCreated = [];
 
         foreach ($items as $item) {
-            if (($item['type'] ?? null) !== 'Registration') {
+            if (($item['type'] ?? null) !== 'Payment') {
+                continue;
+            }
+
+            // exclude certains item's names
+            $excludedItemNames = ['Place PNJ'];
+            if (in_array($item['name'] ?? '', $excludedItemNames)) {
                 continue;
             }
 

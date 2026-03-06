@@ -101,6 +101,12 @@ class HelloAssoCsvImportService
             $itemName = $assoc[self::COL_TARIF] ?? null;
             $itemName = $itemName !== '' ? $itemName : null;
 
+            // exclude certains item's names
+            $excludedItemNames = ['Place PNJ'];
+            if (in_array($itemName ?? '', $excludedItemNames)) {
+                continue;
+            }
+
             $result['processed']++;
 
             $existingByTicket = $this->registrationRepository->findOneBy(['helloasso_ticket' => $ticketId]);
@@ -152,5 +158,4 @@ class HelloAssoCsvImportService
             return false;
         }
     }
-
 }
