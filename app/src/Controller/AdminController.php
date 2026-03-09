@@ -14,6 +14,8 @@ use App\Entity\User;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use App\Entity\EventType;
 use App\Entity\FactionType;
+use App\Entity\Registration;
+use App\Repository\RegistrationRepository;
 use App\Service\EmailService;
 use App\Service\HelloAssoCsvImportService;
 use App\Service\UserService;
@@ -27,7 +29,8 @@ class AdminController extends AbstractController
         EntityManagerInterface $entityManager,
         private EmailService $emailService,
         private UserService $userService,
-        private HelloAssoCsvImportService $csvImportService
+        private HelloAssoCsvImportService $csvImportService,
+        private RegistrationRepository $registrationRepository
     ) {
         $this->entityManager = $entityManager;
     }
@@ -154,6 +157,66 @@ class AdminController extends AbstractController
                 '/admin' => 'Administration',
                 '/admin/send-invite' => 'Envoyer un mail d\'invitation',
             ],
+        ]);
+    }
+
+    #[Route('/admin/add-participation', name: 'app_admin_add_participation', methods: ['GET', 'POST'])]
+    public function addParticipation(Request $request): Response
+    {
+        $users = $this->entityManager->getRepository(User::class)->findBy([], ['name' => 'ASC', 'firstname' => 'ASC']);
+        $eventChoices = EventType::getChoices();
+        $selectedUserId = $request->query->getInt('user', 0);
+
+        if ($request->isMethod('POST')) {
+            if (!$this->isCsrfTokenValid('admin_add_participation', $request->request->get('_csrf_token'))) {
+                $this->addFlash('error', 'Jeton de sécurité invalide. Veuillez réessayer.');
+            } else {
+                $userId = $request->request->getInt('user_id');
+                $events = $request->request->all('events');
+
+                if (!$userId) {
+                    $this->addFlash('error', 'Veuillez sélectionner un joueur.');
+                } elseif (empty($events)) {
+                    $this->addFlash('error', 'Veuillez sélectionner au moins un événement.');
+                } else {
+                    $user = $this->entityManager->getRepository(User::class)->find($userId);
+                    if (!$user) {
+                        $this->addFlash('error', 'Joueur non trouvé.');
+                    } else {
+                        $validEvents = array_filter($events, fn ($e) => \in_array($e, EventType::EVENTS, true));
+                        $added = 0;
+                        foreach ($validEvents as $event) {
+                            $existing = $this->registrationRepository->findOneBy([
+                                'user' => $user,
+                                'event' => $event,
+                            ]);
+                            if (!$existing) {
+                                $registration = new Registration();
+                                $registration->setUser($user);
+                                $registration->setEvent($event);
+                                $registration->setHelloassoTicket('admin-manual-' . uniqid('', true));
+                                $this->entityManager->persist($registration);
+                                $added++;
+                            }
+                        }
+                        $this->entityManager->flush();
+                        $this->addFlash('success', $added === 0
+                            ? 'Aucune nouvelle participation ajoutée (toutes existaient déjà).'
+                            : sprintf('%d participation(s) ajoutée(s).', $added));
+                        return $this->redirectToRoute('app_admin_add_participation', ['user' => $userId]);
+                    }
+                }
+            }
+        }
+
+        return $this->render('admin/add_participation.html.twig', [
+            'breadcrumb' => [
+                '/admin' => 'Administration',
+                '/admin/add-participation' => 'Ajouter des participations',
+            ],
+            'users' => $users,
+            'eventChoices' => $eventChoices,
+            'selectedUserId' => $selectedUserId,
         ]);
     }
 
