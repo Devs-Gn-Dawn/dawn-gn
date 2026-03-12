@@ -35,3 +35,7 @@ services:
   App\EventSubscriber\Error500LogSubscriber:
     arguments:
       $error500Logger: "@monolog.logger.error_500"
+
+  App\Controller\HelloAssoWebhookController:
+    arguments:
+      $logger: '@monolog.logger.webhook'

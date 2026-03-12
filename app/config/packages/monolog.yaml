@@ -2,6 +2,7 @@ monolog:
   channels:
     - deprecation # Deprecations are logged in the dedicated "deprecation" channel when it exists
     - error_500 # Erreurs HTTP 5xx en prod, écrites dans un fichier dédié
+    - webhook # Appels webhook (HelloAsso, etc.) : toujours écrits en prod pour traçabilité
 
 when@dev:
   monolog:
@@ -67,4 +68,11 @@ when@prod:
         path: "%kernel.project_dir%/logs/dawn_gn_errors.log"
         level: error
         channels: [error_500]
+        formatter: monolog.formatter.json
+      # Webhooks : niveau info toujours écrit (hors fingers_crossed) pour traçabilité en prod
+      webhook:
+        type: stream
+        path: "%kernel.project_dir%/logs/webhook.log"
+        level: info
+        channels: [webhook]
         formatter: monolog.formatter.json
