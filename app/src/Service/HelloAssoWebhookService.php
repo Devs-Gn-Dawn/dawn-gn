@@ -72,7 +72,7 @@ class HelloAssoWebhookService
         }
 
         match ($state) {
-            'Processed' => $this->confirmOrder($payment),
+            'Processed', 'Authorized' => $this->confirmOrder($payment),
             'Refunded', 'Canceled' => $this->cancelOrder($payment),
             default => null
         };
@@ -183,7 +183,9 @@ class HelloAssoWebhookService
         $registrationsCreated = [];
 
         foreach ($items as $item) {
-            if (($item['type'] ?? null) !== 'Payment') {
+            $itemType = $item['type'] ?? null;
+            // HelloAsso envoie "Registration" pour les billets d'inscription, "Payment" pour d'autres cas
+            if (!\in_array($itemType, ['Payment', 'Registration'], true)) {
                 continue;
             }
 
