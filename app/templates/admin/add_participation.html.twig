@@ -26,19 +26,29 @@
                         <input type="hidden" name="_csrf_token" value="{{ csrf_token('admin_add_participation') }}">
                         <div class="form-group">
                             <label for="user_id" class="block text-sm font-medium text-slate-700 mb-1">Joueur</label>
+                            <input
+                                id="user_search"
+                                type="text"
+                                inputmode="search"
+                                autocomplete="off"
+                                placeholder="Rechercher un joueur (nom, prénom, email)…"
+                                class="mb-2 block w-full rounded-lg border border-slate-300 py-2 px-3 text-slate-700 focus:border-cyan-500 focus:ring-cyan-500"
+                            >
                             <select id="user_id" name="user_id" required class="block w-full rounded-lg border border-slate-300 py-2 px-3 text-slate-700 focus:border-cyan-500 focus:ring-cyan-500">
                                 <option value="">-- Choisir un joueur --</option>
                                 {% for u in users %}
                                     <option value="{{ u.id }}" {{ selectedUserId and u.id == selectedUserId ? 'selected' : '' }}>{{ u.firstname }} {{ u.name }} ({{ u.email }})</option>
                                 {% endfor %}
                             </select>
+                            <p id="user_search_help" class="text-xs text-slate-500 mt-1">Tape pour filtrer la liste. Efface la recherche pour tout afficher.</p>
                         </div>
                         <div class="form-group">
-                            <label class="block text-sm font-medium text-slate-700 mb-2">Événement(s)</label>
+                            <p class="block text-sm font-medium text-slate-700 mb-2">Événement(s)</p>
                             <div class="flex flex-wrap gap-4">
                                 {% for label, value in eventChoices %}
-                                    <label class="inline-flex items-center gap-2 cursor-pointer">
-                                        <input type="checkbox" name="events[]" value="{{ value }}" class="rounded border-slate-300 text-cyan-600 focus:ring-cyan-500">
+                                    {% set already = existingEvents is defined and value in existingEvents %}
+                                    <label class="inline-flex items-center gap-2 cursor-pointer js-event-label {{ already ? 'opacity-50 cursor-not-allowed' : '' }}" data-event="{{ value }}">
+                                        <input type="checkbox" name="events[]" value="{{ value }}" data-event="{{ value }}" {{ already ? 'disabled' : '' }} class="rounded border-slate-300 text-cyan-600 focus:ring-cyan-500 js-event-checkbox">
                                         <span class="text-sm text-slate-700">{{ label }}</span>
                                     </label>
                                 {% endfor %}
@@ -53,4 +63,113 @@
         </div>
     </div>
 </div>
+<script>
+  (function () {
+    const searchInput = document.getElementById('user_search');
+    const select = document.getElementById('user_id');
+    if (!searchInput || !select) return;
+
+    const existingEventsUrlBase = {{ path('app_admin_add_participation_existing_events')|json_encode|raw }};
+
+    const allOptions = Array.from(select.options).map((o) => ({
+      value: o.value,
+      text: o.text,
+      isPlaceholder: o.value === '',
+    }));
+
+    const normalize = (s) =>
+      (s || '')
+        .toString()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .trim();
+
+    const render = (query) => {
+      const selectedValue = select.value;
+      const q = normalize(query);
+
+      const filtered = q
+        ? allOptions.filter((o) => o.isPlaceholder || normalize(o.text).includes(q))
+        : allOptions;
+
+      select.innerHTML = '';
+      for (const o of filtered) {
+        const opt = document.createElement('option');
+        opt.value = o.value;
+        opt.textContent = o.text;
+        select.appendChild(opt);
+      }
+
+      // Restaurer la sélection si toujours présente dans le filtre, sinon revenir au placeholder
+      const stillThere = Array.from(select.options).some((o) => o.value === selectedValue);
+      select.value = stillThere ? selectedValue : '';
+    };
+
+    // Si l'utilisateur navigue avec le clavier et change de joueur, on remplit la recherche
+    // avec le libellé sélectionné pour donner du contexte, sans casser le filtrage.
+    select.addEventListener('change', () => {
+      if (!searchInput.value) return;
+      // ne rien faire: la recherche contrôle déjà l'affichage
+    });
+
+    searchInput.setAttribute('aria-describedby', 'user_search_help');
+    searchInput.addEventListener('input', (e) => render(e.target.value));
+    searchInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        searchInput.value = '';
+        render('');
+        searchInput.blur();
+      }
+    });
+
+    const setExistingEvents = (events) => {
+      const existing = new Set((events || []).map(String));
+
+      document.querySelectorAll('.js-event-checkbox').forEach((cb) => {
+        const ev = cb.getAttribute('data-event') || cb.value;
+        const isExisting = existing.has(String(ev));
+        cb.disabled = isExisting;
+        if (isExisting) cb.checked = false;
+      });
+
+      document.querySelectorAll('.js-event-label').forEach((label) => {
+        const ev = label.getAttribute('data-event');
+        const isExisting = existing.has(String(ev));
+        label.classList.toggle('opacity-50', isExisting);
+        label.classList.toggle('cursor-not-allowed', isExisting);
+        label.classList.toggle('cursor-pointer', !isExisting);
+        if (isExisting) {
+          label.setAttribute('title', 'Participation déjà existante pour ce joueur');
+        } else {
+          label.removeAttribute('title');
+        }
+      });
+    };
+
+    const refreshExistingEvents = async () => {
+      const userId = select.value;
+      if (!userId) {
+        setExistingEvents([]);
+        return;
+      }
+
+      const url = new URL(existingEventsUrlBase, window.location.origin);
+      url.searchParams.set('user', userId);
+      const res = await fetch(url.toString(), { headers: { 'Accept': 'application/json' } });
+      const data = await res.json();
+      setExistingEvents((data && data.success) ? data.events : []);
+    };
+
+    render('');
+
+    // Initial (utile si on arrive avec ?user=...)
+    setExistingEvents({{ (existingEvents ?? [])|json_encode|raw }});
+
+    // Quand on change de joueur
+    select.addEventListener('change', () => {
+      refreshExistingEvents().catch(() => setExistingEvents([]));
+    });
+  })();
+</script>
 {% endblock %}

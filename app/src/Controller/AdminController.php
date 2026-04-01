@@ -166,6 +166,18 @@ class AdminController extends AbstractController
         $users = $this->entityManager->getRepository(User::class)->findBy([], ['name' => 'ASC', 'firstname' => 'ASC']);
         $eventChoices = EventType::getChoices();
         $selectedUserId = $request->query->getInt('user', 0);
+        $existingEvents = [];
+
+        if ($selectedUserId > 0) {
+            $selectedUser = $this->entityManager->getRepository(User::class)->find($selectedUserId);
+            if ($selectedUser) {
+                $regs = $this->registrationRepository->findBy(['user' => $selectedUser]);
+                $existingEvents = array_values(array_unique(array_filter(array_map(
+                    static fn (Registration $r) => $r->getEvent(),
+                    $regs
+                ))));
+            }
+        }
 
         if ($request->isMethod('POST')) {
             if (!$this->isCsrfTokenValid('admin_add_participation', $request->request->get('_csrf_token'))) {
@@ -217,7 +229,30 @@ class AdminController extends AbstractController
             'users' => $users,
             'eventChoices' => $eventChoices,
             'selectedUserId' => $selectedUserId,
+            'existingEvents' => $existingEvents,
         ]);
+    }
+
+    #[Route('/admin/add-participation/existing-events', name: 'app_admin_add_participation_existing_events', methods: ['GET'])]
+    public function addParticipationExistingEvents(Request $request): JsonResponse
+    {
+        $userId = $request->query->getInt('user', 0);
+        if ($userId <= 0) {
+            return new JsonResponse(['success' => true, 'events' => []]);
+        }
+
+        $user = $this->entityManager->getRepository(User::class)->find($userId);
+        if (!$user) {
+            return new JsonResponse(['success' => false, 'error' => 'Joueur non trouvé.'], 404);
+        }
+
+        $regs = $this->registrationRepository->findBy(['user' => $user]);
+        $events = array_values(array_unique(array_filter(array_map(
+            static fn (Registration $r) => $r->getEvent(),
+            $regs
+        ))));
+
+        return new JsonResponse(['success' => true, 'events' => $events]);
     }
 
     #[Route('/admin/import-tickets', name: 'app_admin_import_tickets', methods: ['GET', 'POST'])]
