@@ -169,6 +169,16 @@ class CharacterController extends AbstractController
             return $this->json(['error' => $e->getMessage()], 400);
         }
 
+        if ($character->isMain()) {
+            $owner = $character->getUser();
+            foreach ($owner->getCharacters() as $other) {
+                if ($other !== $character && $other->isSecondary()) {
+                    $other->setType(CharacterType::MAIN);
+                    break;
+                }
+            }
+        }
+
         // Supprimer les possessions
         foreach ($character->getPossessions() as $possession) {
             $this->entityManager->remove($possession);

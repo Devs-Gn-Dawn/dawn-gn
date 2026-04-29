@@ -225,7 +225,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getSecondaryCharacter(): ?Character
     {
         return $this->characters->filter(function (Character $character) {
-            return !$character->isSecondary();
+            return $character->isSecondary();
         })->first();
     }
 
