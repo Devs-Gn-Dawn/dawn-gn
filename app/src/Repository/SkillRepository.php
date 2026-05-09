@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Character;
+use App\Entity\ClassType;
 use App\Entity\Skill;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -57,6 +58,20 @@ class SkillRepository extends ServiceEntityRepository
         }
 
         return $qb->getQuery()->getResult();
+    }
+
+    /**
+     * Doit rester aligné avec la logique de filtrage de findAvailableSkillsForCharacter
+     * (contraintes required_classes / required_factions : tableau vide = pas de contrainte sur cet axe).
+     */
+    public function skillMatchesFactionAndClass(Skill $skill, string $factionValue, ClassType $class): bool
+    {
+        $reqC = $skill->getRequiredClasses();
+        $reqF = $skill->getRequiredFactions();
+        $classOk = $reqC === [] || \in_array($class->value, $reqC, true);
+        $factionOk = $reqF === [] || \in_array($factionValue, $reqF, true);
+
+        return $classOk && $factionOk;
     }
 
     //    /**

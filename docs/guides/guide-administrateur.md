@@ -99,9 +99,11 @@ Le lien d'invitation permet à l'utilisateur de :
 
 ### Hiérarchie des rôles
 
-- `ROLE_ADMIN` inclut automatiquement tous les autres rôles
-- `ROLE_ORGA` inclut `ROLE_USER`
-- `ROLE_USER` est le rôle de base
+Configuration Symfony (`config/packages/security.yaml`) :
+
+- **`ROLE_ADMIN`** hérite de **`ROLE_ORGA`** et de **`ROLE_ALLOWED_TO_SWITCH`** (impersonation). Un administrateur accède donc aux écrans et API organisateur même sans rôle `ROLE_ORGA` explicite sur son compte.
+- **`ROLE_ORGA`** n’est pas déclaré comme parent de `ROLE_USER` dans la hiérarchie : en pratique les comptes organisateur ont en général aussi `ROLE_USER` pour jouer.
+- **`ROLE_USER`** est le rôle de base côté application (accès après connexion).
 
 ## Gestion globale
 

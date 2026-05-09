@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Entity\ValidationType;
 use Symfony\Component\HttpFoundation\Request;
 use App\Entity\FactionType;
+use App\Entity\ClassType;
 use App\Service\EmailService;
 use App\Entity\User;
 use App\Entity\EventType;
@@ -141,11 +142,123 @@ class OrgaController extends AbstractController
         return $this->render('orga/character_edit.html.twig', [
             'character' => $character,
             'navRelative' => false,
+            'factionChoices' => FactionType::getChoices(),
             'breadcrumb' => [
                 $this->generateUrl('app_orga_characters') => 'Liste des personnages',
                 'Fiche personnage : <b>' . $character->getName() . '</b>'
             ],
         ]);
+    }
+
+    #[Route('/orga/character/{id}/faction-class/preview', name: 'app_orga_character_faction_class_preview', methods: ['POST'])]
+    public function previewFactionClassChange(Character $character, Request $request): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true) ?? [];
+        $parse = $this->parseFactionClassRequestPayload($data);
+        if ($parse['error'] !== null) {
+            return $this->json(['error' => $parse['error']], 400);
+        }
+        /** @var FactionType $faction */
+        $faction = $parse['faction'];
+        /** @var ClassType $class */
+        $class = $parse['class'];
+
+        $actor = $this->getUser();
+        if (!$actor instanceof User) {
+            return $this->json(['error' => 'Utilisateur non authentifié.'], 401);
+        }
+
+        try {
+            $preview = $this->characterService->previewFactionClassChangeForStaff($character, $faction, $class, $actor);
+
+            return $this->json(array_merge(['success' => true], $preview));
+        } catch (\Exception $e) {
+            return $this->json(['error' => $e->getMessage()], 400);
+        }
+    }
+
+    #[Route('/orga/character/{id}/faction-class', name: 'app_orga_character_faction_class', methods: ['POST'])]
+    public function applyFactionClassChange(Character $character, Request $request): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true) ?? [];
+        $parse = $this->parseFactionClassRequestPayload($data);
+        if ($parse['error'] !== null) {
+            return $this->json(['error' => $parse['error']], 400);
+        }
+        /** @var FactionType $faction */
+        $faction = $parse['faction'];
+        /** @var ClassType $class */
+        $class = $parse['class'];
+
+        $actor = $this->getUser();
+        if (!$actor instanceof User) {
+            return $this->json(['error' => 'Utilisateur non authentifié.'], 401);
+        }
+
+        try {
+            $result = $this->characterService->changeFactionAndClassForStaff($character, $faction, $class, $actor);
+
+            return $this->json(array_merge(['success' => true], $result));
+        } catch (\Exception $e) {
+            return $this->json(['error' => $e->getMessage()], 400);
+        }
+    }
+
+    /**
+     * @return array{error: ?string, faction: ?FactionType, class: ?ClassType}
+     */
+    private function parseFactionClassRequestPayload(array $data): array
+    {
+        $factionRaw = $data['faction'] ?? null;
+        $classRaw = $data['class'] ?? null;
+        if (!\is_string($factionRaw) || $factionRaw === '') {
+            return ['error' => 'Le champ « faction » est obligatoire (valeur d\'enum, ex. Nomads).', 'faction' => null, 'class' => null];
+        }
+        if (!\is_string($classRaw) || $classRaw === '') {
+            return ['error' => 'Le champ « class » est obligatoire (valeur d\'enum, ex. Runners).', 'faction' => null, 'class' => null];
+        }
+
+        $faction = FactionType::tryFrom($factionRaw);
+        if ($faction === null) {
+            return ['error' => sprintf('Faction inconnue : « %s ».', $factionRaw), 'faction' => null, 'class' => null];
+        }
+
+        $class = ClassType::tryFrom($classRaw);
+        if ($class === null) {
+            return ['error' => sprintf('Classe inconnue : « %s ».', $classRaw), 'faction' => null, 'class' => null];
+        }
+
+        return ['error' => null, 'faction' => $faction, 'class' => $class];
+    }
+
+    #[Route('/orga/character/{id}/type', name: 'app_orga_character_type', methods: ['POST'])]
+    public function changeCharacterType(Character $character, Request $request): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true) ?? [];
+        $typeRaw = $data['type'] ?? null;
+        if (!\is_string($typeRaw) || $typeRaw === '') {
+            return $this->json(['error' => 'Le champ « type » est obligatoire (valeurs acceptées : Main, Secondary, Draft).'], 400);
+        }
+
+        $newType = CharacterType::tryFrom($typeRaw);
+        if ($newType === null) {
+            return $this->json([
+                'error' => sprintf('Type inconnu : « %s ». Utilisez Main, Secondary ou Draft.', $typeRaw),
+            ], 400);
+        }
+
+        $actor = $this->getUser();
+        if (!$actor instanceof User) {
+            return $this->json(['error' => 'Utilisateur non authentifié.'], 401);
+        }
+
+        try {
+            $result = $this->characterService->changeCharacterTypeForStaff($character, $newType, $actor);
+
+            return $this->json(array_merge(['success' => true], $result));
+        } catch (\Exception $e) {
+            return $this->json(['error' => $e->getMessage()], 400);
+        }
     }
 
     #[Route('/api/contact_player', name: 'api_contact_player', methods: ['POST'])]

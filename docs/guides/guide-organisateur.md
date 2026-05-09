@@ -59,6 +59,15 @@ Le personnage retourne au joueur avec vos commentaires. Le joueur peut le modifi
    - Assets
    - XP Skills et XP Gear
 
+### Type de fiche, faction et classe (corrections staff)
+
+Sur la page d’édition orga (`/orga/character/{id}/edit`), en haut de la fiche :
+
+- **Type de fiche (orga)** : définir le personnage comme Principal, Reroll ou Brouillon sans passer par le flux joueur. Si vous promouvez un personnage en principal ou reroll alors qu’une autre fiche du même joueur occupe déjà ce rôle, l’autre fiche est repassée en brouillon (confirmation affichée).
+- **Faction / classe (orga)** : choisir la nouvelle faction puis la classe (liste chargée selon la faction). Utilisez **Prévisualiser** pour voir les compétences qui seront supprimées ; **Appliquer** demande une confirmation. Les PA dépensés sur les compétences retirées ne sont pas restitués ; équipements et assets ne sont pas modifiés automatiquement.
+
+Ces actions sont possibles quel que soit l’état de validation du personnage.
+
 ### Ajouter des compétences à un personnage
 
 1. Dans la page d'édition d'un personnage

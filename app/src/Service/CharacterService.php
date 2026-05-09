@@ -12,16 +12,19 @@ use App\Entity\CharacterAsset;
 use App\Entity\SkillLearned;
 use App\Entity\Possession;
 use App\Entity\FactionType;
+use App\Entity\ClassType;
 use App\Entity\CharacterType;
 use App\Entity\ValidationType;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\SkillRepository;
+use Psr\Log\LoggerInterface;
 
 class CharacterService
 {
     public function __construct(
         private EntityManagerInterface $entityManager,
-        private SkillRepository $skillRepository
+        private SkillRepository $skillRepository,
+        private LoggerInterface $logger
     ) {}
 
     /**
@@ -397,5 +400,260 @@ class CharacterService
     {
         $character->setValidationType(ValidationType::NON_VALIDE);
         $this->entityManager->flush();
+    }
+
+    /**
+     * Changement de type (Principal / Reroll / Brouillon) par orga ou admin.
+     * Ne applique pas les contraintes du flux joueur (validation, etc.).
+     * Si la cible devient Principal ou Reroll, les autres fiches du même joueur
+     * occupant ce slot passent automatiquement en brouillon.
+     *
+     * @return array{previousType: string, newType: string, demotedCharacters: list<array{id: int, name: string, previousType: string}>}
+     */
+    public function changeCharacterTypeForStaff(Character $character, CharacterType $newType, User $actor): array
+    {
+        if (!$actor->isOrga() && !$actor->isAdmin()) {
+            throw new \Exception('Cette action est réservée aux organisateurs et aux administrateurs.');
+        }
+
+        $previousType = $character->getType();
+        if ($previousType === $newType) {
+            return [
+                'previousType' => $previousType->value,
+                'newType' => $newType->value,
+                'demotedCharacters' => [],
+            ];
+        }
+
+        $owner = $character->getUser();
+        $demoted = [];
+
+        if ($newType === CharacterType::MAIN) {
+            foreach ($owner->getCharacters() as $other) {
+                if ($other === $character) {
+                    continue;
+                }
+                if ($other->isMain()) {
+                    $other->setType(CharacterType::DRAFT);
+                    $demoted[] = [
+                        'id' => $other->getId(),
+                        'name' => (string) $other->getName(),
+                        'previousType' => CharacterType::MAIN->value,
+                    ];
+                }
+            }
+        } elseif ($newType === CharacterType::SECONDARY) {
+            foreach ($owner->getCharacters() as $other) {
+                if ($other === $character) {
+                    continue;
+                }
+                if ($other->isSecondary()) {
+                    $other->setType(CharacterType::DRAFT);
+                    $demoted[] = [
+                        'id' => $other->getId(),
+                        'name' => (string) $other->getName(),
+                        'previousType' => CharacterType::SECONDARY->value,
+                    ];
+                }
+            }
+        }
+
+        $character->setType($newType);
+        $this->entityManager->flush();
+
+        $this->logger->info('character_type_changed_by_staff', [
+            'character_id' => $character->getId(),
+            'owner_user_id' => $owner->getId(),
+            'actor_id' => $actor->getId(),
+            'actor_email' => $actor->getUserIdentifier(),
+            'from' => $previousType->value,
+            'to' => $newType->value,
+            'demoted_character_ids' => array_column($demoted, 'id'),
+        ]);
+
+        return [
+            'previousType' => $previousType->value,
+            'newType' => $newType->value,
+            'demotedCharacters' => $demoted,
+        ];
+    }
+
+    public function assertClassBelongsToFaction(ClassType $class, FactionType $faction): void
+    {
+        if ($class->getRequiredFaction() !== $faction) {
+            throw new \Exception(sprintf(
+                'La classe « %s » n\'appartient pas à la faction « %s ».',
+                $class->getLabel(),
+                $faction->getLabel()
+            ));
+        }
+    }
+
+    /**
+     * @return list<SkillLearned>
+     */
+    public function getSkillLearnedToRemoveForFactionClassChange(Character $character, FactionType $newFaction, ClassType $newClass): array
+    {
+        $this->assertClassBelongsToFaction($newClass, $newFaction);
+
+        $learned = $character->getSkillsLearned()->toArray();
+        $keep = array_values(array_filter(
+            $learned,
+            fn (SkillLearned $sl) => $this->skillRepository->skillMatchesFactionAndClass(
+                $sl->getSkill(),
+                $newFaction->value,
+                $newClass
+            )
+        ));
+
+        $changed = true;
+        while ($changed) {
+            $changed = false;
+            $skillIdKept = [];
+            foreach ($keep as $sl) {
+                $skillIdKept[$sl->getSkill()->getId()] = true;
+            }
+            $nextKeep = [];
+            foreach ($keep as $sl) {
+                $ok = true;
+                foreach ($sl->getSkill()->getRequiredSkills() as $req) {
+                    if (empty($skillIdKept[$req->getId()])) {
+                        $ok = false;
+                        break;
+                    }
+                }
+                if ($ok) {
+                    $nextKeep[] = $sl;
+                } else {
+                    $changed = true;
+                }
+            }
+            $keep = $nextKeep;
+        }
+
+        $keepSlIds = array_fill_keys(array_map(fn (SkillLearned $sl) => $sl->getId(), $keep), true);
+
+        return array_values(array_filter(
+            $learned,
+            fn (SkillLearned $sl) => !isset($keepSlIds[$sl->getId()])
+        ));
+    }
+
+    /**
+     * @param list<SkillLearned> $removed
+     *
+     * @return list<array{id: int|null, skillId: int|null, label: string|null, cost: int|null}>
+     */
+    public function serializeRemovedSkillLearned(array $removed): array
+    {
+        $out = [];
+        foreach ($removed as $sl) {
+            if (!$sl instanceof SkillLearned) {
+                continue;
+            }
+            $out[] = [
+                'id' => $sl->getId(),
+                'skillId' => $sl->getSkill()->getId(),
+                'label' => $sl->getSkill()->getLabel(),
+                'cost' => $sl->getCost(),
+            ];
+        }
+
+        return $out;
+    }
+
+    /**
+     * @return array{skillsToRemove: list<array{id: int|null, skillId: int|null, label: string|null, cost: int|null}>, removedCount: int, totalCostRemoved: int}
+     */
+    public function previewFactionClassChangeForStaff(
+        Character $character,
+        FactionType $newFaction,
+        ClassType $newClass,
+        User $actor
+    ): array {
+        if (!$actor->isOrga() && !$actor->isAdmin()) {
+            throw new \Exception('Cette action est réservée aux organisateurs et aux administrateurs.');
+        }
+
+        $toRemove = $this->getSkillLearnedToRemoveForFactionClassChange($character, $newFaction, $newClass);
+        $serialized = $this->serializeRemovedSkillLearned($toRemove);
+        $totalCost = 0;
+        foreach ($toRemove as $sl) {
+            $totalCost += (int) $sl->getCost();
+        }
+
+        return [
+            'skillsToRemove' => $serialized,
+            'removedCount' => \count($toRemove),
+            'totalCostRemoved' => $totalCost,
+        ];
+    }
+
+    /**
+     * @return array{
+     *   previousFaction: string,
+     *   previousClass: string,
+     *   newFaction: string,
+     *   newClass: string,
+     *   removedSkills: list<array{id: int|null, skillId: int|null, label: string|null, cost: int|null}>,
+     *   unchanged: bool
+     * }
+     */
+    public function changeFactionAndClassForStaff(
+        Character $character,
+        FactionType $newFaction,
+        ClassType $newClass,
+        User $actor
+    ): array {
+        if (!$actor->isOrga() && !$actor->isAdmin()) {
+            throw new \Exception('Cette action est réservée aux organisateurs et aux administrateurs.');
+        }
+
+        $previousFaction = (string) $character->getFaction();
+        $previousClass = $character->getClass()->value;
+
+        if ($previousFaction === $newFaction->value && $previousClass === $newClass->value) {
+            return [
+                'previousFaction' => $previousFaction,
+                'previousClass' => $previousClass,
+                'newFaction' => $newFaction->value,
+                'newClass' => $newClass->value,
+                'removedSkills' => [],
+                'unchanged' => true,
+            ];
+        }
+
+        $toRemove = $this->getSkillLearnedToRemoveForFactionClassChange($character, $newFaction, $newClass);
+        $removedPayload = $this->serializeRemovedSkillLearned($toRemove);
+
+        foreach ($toRemove as $sl) {
+            $this->entityManager->remove($sl);
+        }
+
+        $character->setFaction($newFaction->value);
+        $character->setClass($newClass);
+        $this->entityManager->flush();
+
+        $this->logger->info('character_faction_class_changed_by_staff', [
+            'character_id' => $character->getId(),
+            'owner_user_id' => $character->getUser()?->getId(),
+            'actor_id' => $actor->getId(),
+            'actor_email' => $actor->getUserIdentifier(),
+            'previous_faction' => $previousFaction,
+            'previous_class' => $previousClass,
+            'new_faction' => $newFaction->value,
+            'new_class' => $newClass->value,
+            'removed_skill_learned_ids' => array_map(fn (array $r) => $r['id'], $removedPayload),
+            'removed_skill_ids' => array_map(fn (array $r) => $r['skillId'], $removedPayload),
+        ]);
+
+        return [
+            'previousFaction' => $previousFaction,
+            'previousClass' => $previousClass,
+            'newFaction' => $newFaction->value,
+            'newClass' => $newClass->value,
+            'removedSkills' => $removedPayload,
+            'unchanged' => false,
+        ];
     }
 }

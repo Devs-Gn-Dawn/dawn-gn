@@ -100,6 +100,8 @@ Cette page détaille toutes les fonctionnalités disponibles dans l'application 
 
 - **Consultation de tous les personnages** : Accès à tous les personnages validés
 - **Édition des personnages** : Modification des personnages validés
+- **Type de fiche (staff)** : Sur la fiche orga, changement du type Principal / Reroll / Brouillon hors parcours joueur (conflits éventuels repassés en brouillon sur le même compte)
+- **Faction et classe (staff)** : Changement conjoint avec prévisualisation des compétences retirées (incompatibilité + prérequis) ; pas de restitution d’XP ; équipements/assets non purgés automatiquement
 - **Ajout de compétences** : Ajout de compétences aux personnages
 - **Ajout d'équipements** : Ajout d'équipements aux personnages
 - **Ajout d'assets** : Ajout d'assets spéciaux aux personnages

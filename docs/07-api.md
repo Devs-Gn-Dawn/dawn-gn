@@ -45,18 +45,20 @@ Cette page documente les principaux endpoints API de l'application Dawn GN.
 
 ### API Personnages
 
-- `GET /api/classes/{faction}` - Liste des classes pour une faction
-- `GET /api/character/{id}/background` - Récupération du background
-- `POST /api/character/{id}/background` - Mise à jour du background
-- `GET /api/character/{id}/available-skills` - Compétences disponibles
-- `POST /api/character/{id}/skill/add` - Ajout d'une compétence
-- `POST /api/character/{id}/skill/delete` - Suppression d'une compétence
-- `POST /api/character/{id}/skill/xp/add` - Ajout d'XP Skills
-- `GET /api/character/{id}/available-gear` - Équipements disponibles
-- `POST /api/character/{id}/gear/add` - Ajout d'un équipement
-- `POST /api/character/{id}/gear/delete` - Suppression d'un équipement
-- `POST /api/character/{id}/gear/xp/add` - Ajout d'XP Gear
-- `POST /api/character/{id}/name/update` - Mise à jour du nom
+Ces routes sont déclarées dans `CharacterController`, sous le préfixe **`/characters`** (chemins complets ci-dessous).
+
+- `GET /characters/api/classes/{faction}` - Liste des classes pour une faction
+- `GET /characters/api/character/{id}/background` - Récupération du background
+- `POST /characters/api/character/{id}/background` - Mise à jour du background
+- `GET /characters/api/character/{id}/available-skills` - Compétences disponibles
+- `POST /characters/api/character/{id}/skill/add` - Ajout d'une compétence
+- `POST /characters/api/character/{id}/skill/delete` - Suppression d'une compétence
+- `POST /characters/api/character/{id}/skill/xp/add` - Ajout d'XP Skills
+- `GET /characters/api/character/{id}/available-gear` - Équipements disponibles
+- `POST /characters/api/character/{id}/gear/add` - Ajout d'un équipement
+- `POST /characters/api/character/{id}/gear/delete` - Suppression d'un équipement
+- `POST /characters/api/character/{id}/gear/xp/add` - Ajout d'XP Gear
+- `POST /characters/api/character/{id}/name/update` - Mise à jour du nom
 
 ### Compte utilisateur
 
@@ -93,12 +95,17 @@ Cette page documente les principaux endpoints API de l'application Dawn GN.
 
 ## Routes organisateur (ROLE_ORGA)
 
+Les comptes **ROLE_ADMIN** héritent également de `ROLE_ORGA` (hiérarchie des rôles dans `config/packages/security.yaml`) et peuvent donc utiliser les mêmes écrans et endpoints orga, y compris le changement de type et de faction/classe ci-dessous.
+
 ### Gestion des personnages
 
 - `GET /orga` - Page d'accueil organisateur
 - `GET /orga/characters` - Personnages en validation
 - `GET /orga/all_characters` - Tous les personnages
 - `GET /orga/character/{id}/edit` - Édition d'un personnage
+- `POST /orga/character/{id}/type` - Changement du type de fiche (Principal / Reroll / Brouillon) par orga ou admin ; corps JSON `{ "type": "Main" | "Secondary" | "Draft" }` ; si la cible devient principal ou reroll, toute autre fiche du même joueur occupant ce rôle est repassée en brouillon ; réponse `{ "success": true, "previousType", "newType", "demotedCharacters" }`
+- `POST /orga/character/{id}/faction-class/preview` - Prévisualisation du changement de faction et de classe (sans écriture) ; corps JSON `{ "faction": "<FactionType.value>", "class": "<ClassType.value>" }` ; la classe doit appartenir à la faction (`ClassType::getRequiredFaction`) ; réponse `{ "success", "skillsToRemove", "removedCount", "totalCostRemoved" }` (les PA listés ne sont pas restitués à l’enregistrement)
+- `POST /orga/character/{id}/faction-class` - Applique le changement de faction/classe, supprime les `SkillLearned` incompatibles (contraintes + prérequis) ; même corps JSON que la prévisualisation ; réponse `{ "success", "previousFaction", "previousClass", "newFaction", "newClass", "removedSkills", "unchanged" }`
 - `POST /api/character/{id}/validate` - Validation d'un personnage
 - `POST /api/character/{id}/reject` - Rejet d'un personnage
 - `POST /api/create_character` - Création d'un personnage pour un joueur
@@ -161,7 +168,7 @@ Content-Type: application/json
 ### Ajout d'une compétence
 
 ```http
-POST /api/character/1/skill/add
+POST /characters/api/character/1/skill/add
 Content-Type: application/json
 
 {
@@ -224,11 +231,11 @@ Toutes les routes API (sauf celles marquées comme publiques) nécessitent une a
 
 ## Permissions
 
-Les routes sont protégées par des attributs `#[IsGranted]` :
+Les routes sont protégées par des attributs `#[IsGranted]` et par la hiérarchie des rôles :
 
-- `ROLE_USER` : Accès aux routes joueur
-- `ROLE_ORGA` : Accès aux routes organisateur + joueur
-- `ROLE_ADMIN` : Accès à toutes les routes
+- `ROLE_USER` : Accès aux routes joueur (souvent combiné explicitement sur le compte)
+- `ROLE_ORGA` : Accès aux routes organisateur (contrôleurs sous `/orga`, etc.)
+- `ROLE_ADMIN` : Accès aux routes administrateur ; **hérite de `ROLE_ORGA`** (accès organisateur sans rôle orga distinct sur le compte) et de `ROLE_ALLOWED_TO_SWITCH` (impersonation)
 
 ## Services
 
@@ -254,6 +261,11 @@ Service pour la gestion des personnages :
 - Gestion des assets : `addAsset()`, `editAsset()`, `deleteAsset()`
 - Gestion de l'XP : `addSkillXp()`, `removeSkillXp()`, `addGearXp()`, `removeGearXp()`
 - Validation : `validateCharacter()`, `rejectCharacter()`
+- **Staff (orga / admin)** : `changeCharacterTypeForStaff()`, `previewFactionClassChangeForStaff()`, `changeFactionAndClassForStaff()` — voir routes `/orga/character/{id}/type` et `/orga/character/{id}/faction-class*`
+
+### SkillRepository (extrait)
+
+- `skillMatchesFactionAndClass(Skill $skill, string $factionValue, ClassType $class)` - Aligné avec les contraintes du référentiel ; utilisé pour le recalcul des compétences lors d'un changement de faction/classe staff
 
 ### UserService
 

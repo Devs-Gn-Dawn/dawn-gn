@@ -110,6 +110,59 @@
     </div>
   </div>
   {% endif %}
+  <div class="w-full px-6 mx-auto flex flex-row gap-4 mt-4">
+    <div class="w-full max-w-full px-3 xl:w-4/12 -mx-3">
+      <div class="p-4 pb-1 mb-0 break-words bg-white border-0 border-transparent border-solid shadow-soft-xl rounded-2xl bg-clip-border">
+        <div class="mb-2 font-semibold text-slate-600">Type de fiche (orga)</div>
+        <div class="mb-2 flex flex-wrap items-center gap-2">
+          <span class="text-xs font-medium uppercase text-slate-500">Affichage actuel</span>
+          {{ character.getTypeIcon()|raw }}
+        </div>
+        <label for="orgaCharacterTypeSelect" class="mb-1 block text-xs font-medium text-slate-600">Nouveau type</label>
+        <div class="flex flex-row gap-2 sm:flex-row sm:items-end">
+          <select id="orgaCharacterTypeSelect" data-current-type="{{ character.type.value }}" class="text-sm focus:shadow-soft-primary-outline ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-800 transition-all focus:border-cyan-300 focus:outline-none sm:max-w-xs">
+            <option value="Main" {% if character.type.value == 'Main' %}selected{% endif %}>Principal</option>
+            <option value="Secondary" {% if character.type.value == 'Secondary' %}selected{% endif %}>Reroll</option>
+            <option value="Draft" {% if character.type.value == 'Draft' %}selected{% endif %}>Brouillon</option>
+          </select>
+          <button type="button" onclick="confirmOrgaCharacterTypeChange()" class="inline-block whitespace-nowrap px-4 py-2 font-bold text-center text-white uppercase align-middle transition-all rounded-lg cursor-pointer bg-gradient-to-tl from-cyan-300 to-cyan-600 text-xs ease-soft-in tracking-tight-soft shadow-soft-md hover:scale-102 active:opacity-85 hover:shadow-soft-xs hover:text-cyan-100">Appliquer le type</button>
+        </div>
+        <p class="mt-2 text-xs leading-normal text-slate-500">En cas de conflit (déjà un principal ou un reroll sur le compte), l’autre fiche concernée est repassée en brouillon automatiquement. Le changement est possible quel que soit l’état de validation.</p>
+      </div>
+    </div>
+    <div id="orgaFactionClassBlock" class="w-full max-w-full px-3 xl:w-4/12"
+        data-current-faction="{{ character.faction }}"
+        data-current-class="{{ character.getClass().value }}"
+        data-preview-url="{{ path('app_orga_character_faction_class_preview', { id: character.id }) }}"
+        data-apply-url="{{ path('app_orga_character_faction_class', { id: character.id }) }}">
+      <div class="p-4 pb-1 mb-0 break-words bg-white border-0 border-transparent border-solid shadow-soft-xl rounded-2xl bg-clip-border">
+        <div class="mb-2 font-semibold text-slate-600">Faction / classe (orga)</div>
+        <p class="mb-3 text-xs leading-normal text-slate-600">Actuellement : <strong>{{ character.getFactionType().getLabel() }}</strong> — <strong>{{ character.getClassLabel() }}</strong></p>
+        <div class="flex flex-row gap-3 sm:flex-row sm:flex-wrap sm:items-end">
+          <div class="sm:flex-1 sm:min-w-[10rem]">
+            <label for="orgaFactionSelect" class="mb-1 block text-xs font-medium text-slate-600">Nouvelle faction</label>
+            <select id="orgaFactionSelect" class="text-sm focus:shadow-soft-primary-outline ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-800 transition-all focus:border-cyan-300 focus:outline-none">
+              {% for label, value in factionChoices|default({}) %}
+                <option value="{{ value|e('html_attr') }}" {% if character.faction == value %}selected{% endif %}>{{ label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="sm:flex-1 sm:min-w-[10rem]">
+            <label for="orgaClassSelect" class="mb-1 block text-xs font-medium text-slate-600">Nouvelle classe</label>
+            <select id="orgaClassSelect" class="text-sm focus:shadow-soft-primary-outline ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-800 transition-all focus:border-cyan-300 focus:outline-none">
+            </select>
+          </div>
+          <button type="button" onclick="orgaPreviewFactionClassChange()" class="inline-block whitespace-nowrap px-4 py-2 font-bold text-center text-white uppercase align-middle transition-all rounded-lg cursor-pointer bg-gradient-to-tl from-slate-500 to-slate-700 text-xs ease-soft-in tracking-tight-soft shadow-soft-md hover:scale-102 active:opacity-85">Prévisualiser</button>
+          <button type="button" onclick="orgaConfirmApplyFactionClass()" class="inline-block whitespace-nowrap px-4 py-2 font-bold text-center text-white uppercase align-middle transition-all rounded-lg cursor-pointer bg-gradient-to-tl from-cyan-300 to-cyan-600 text-xs ease-soft-in tracking-tight-soft shadow-soft-md hover:scale-102 active:opacity-85 hover:text-cyan-100">Appliquer</button>
+        </div>
+        <div id="orgaFactionClassPreviewWrap" class="mt-3 hidden rounded-lg border border-amber-200 bg-amber-50/80 px-3 py-2 text-xs text-amber-950">
+          <div class="font-semibold">Compétences qui seront retirées (<span id="orgaFactionClassPreviewCount">0</span>) — total PA sur ces lignes : <span id="orgaFactionClassPreviewCost">0</span></div>
+          <ul id="orgaFactionClassPreviewList" class="mt-2 list-disc pl-5 text-left"></ul>
+        </div>
+        <p class="mt-2 text-xs leading-normal text-slate-500">Les compétences incompatibles avec la nouvelle combinaison (y compris par prérequis) sont supprimées. Équipements et assets ne sont pas modifiés automatiquement.</p>
+      </div>
+    </div>
+  </div>
   <div id="compTab" class="block p-6 mx-auto" active-tab>
     <div class="flex flex-wrap -mx-3">
       <!-- Compétences -->
@@ -530,6 +583,19 @@
           theme: 'snow'
       });
 
+      const orgaFactionSelect = document.getElementById('orgaFactionSelect');
+      const orgaFactionClassBlock = document.getElementById('orgaFactionClassBlock');
+      if (orgaFactionSelect && orgaFactionClassBlock) {
+        orgaFactionSelect.addEventListener('change', function () {
+          orgaFillClassSelectFromApi(orgaFactionSelect.value, null);
+          const wrap = document.getElementById('orgaFactionClassPreviewWrap');
+          if (wrap) {
+            wrap.classList.add('hidden');
+          }
+        });
+        orgaFillClassSelectFromApi(orgaFactionSelect.value, orgaFactionClassBlock.dataset.currentClass || null);
+      }
+
     });
 
     function hideCompTab() {
@@ -578,6 +644,232 @@
             successTitle: "Type modifié !",
             successMessage: "Le type du personnage a été modifié avec succès."
         });
+    }
+
+    function orgaCharacterTypeLabels() {
+        return { Main: 'Principal', Secondary: 'Reroll', Draft: 'Brouillon' };
+    }
+
+    function confirmOrgaCharacterTypeChange() {
+        const select = document.getElementById('orgaCharacterTypeSelect');
+        if (!select) return;
+        const newType = select.value;
+        const currentType = select.getAttribute('data-current-type') || '';
+        const labels = orgaCharacterTypeLabels();
+        if (newType === currentType) {
+            showErrorAlert({ message: 'Le type sélectionné est identique au type actuel.' });
+            return;
+        }
+        Swal.fire({
+            title: 'Confirmer le changement de type',
+            html: '<p class="text-left text-sm">Type actuel : <strong>' + escapeHtml(labels[currentType] || currentType) + '</strong></p>'
+                + '<p class="text-left text-sm">Nouveau type : <strong>' + escapeHtml(labels[newType] || newType) + '</strong></p>'
+                + '<p class="mt-3 text-left text-xs text-slate-600">Lae joueureuse verra ce type sur sa liste de personnages. Si une autre fiche du même compte est déjà principale ou reroll, elle sera repassée en brouillon.</p>',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Confirmer',
+            cancelButtonText: 'Annuler',
+            customClass: window.modalClasses,
+        }).then(function (result) {
+            if (!result.isConfirmed) return;
+            fetch("{{ path('app_orga_character_type', { id: character.id }) }}", {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ type: newType }),
+            })
+                .then(function (response) {
+                    return response.json().then(function (data) {
+                        if (!response.ok) {
+                            throw new Error(data.error || 'Une erreur est survenue.');
+                        }
+                        return data;
+                    });
+                })
+                .then(function (data) {
+                    var extra = '';
+                    if (data.demotedCharacters && data.demotedCharacters.length) {
+                        extra = '<ul class="mt-3 list-disc pl-5 text-left text-sm">' + data.demotedCharacters.map(function (d) {
+                            var was = d.previousType === 'Main' ? 'principal' : 'reroll';
+                            return '<li>« ' + escapeHtml(d.name) + ' » repassé·e en brouillon (était ' + was + ')</li>';
+                        }).join('') + '</ul>';
+                    }
+                    return Swal.fire({
+                        title: 'Type mis à jour',
+                        html: '<p class="text-sm">Le type du personnage a été enregistré.</p>' + extra,
+                        icon: 'success',
+                        customClass: window.modalClasses,
+                    }).then(function () { window.location.reload(); });
+                })
+                .catch(function (err) {
+                    showErrorAlert({ message: err.message || String(err) });
+                });
+        });
+    }
+
+    function orgaFillClassSelectFromApi(factionValue, selectedClassValue) {
+        const classSelect = document.getElementById('orgaClassSelect');
+        if (!classSelect || !factionValue) {
+            return Promise.resolve();
+        }
+        classSelect.innerHTML = '';
+        return fetch('/characters/api/classes/' + encodeURIComponent(factionValue))
+            .then(function (r) {
+                if (!r.ok) {
+                    throw new Error('Impossible de charger les classes pour cette faction.');
+                }
+                return r.json();
+            })
+            .then(function (data) {
+                classSelect.innerHTML = '';
+                const labels = Object.keys(data).sort(function (a, b) { return a.localeCompare(b, 'fr'); });
+                labels.forEach(function (label) {
+                    const val = data[label];
+                    const opt = document.createElement('option');
+                    opt.value = val;
+                    opt.textContent = label;
+                    if (selectedClassValue && selectedClassValue === val) {
+                        opt.selected = true;
+                    }
+                    classSelect.appendChild(opt);
+                });
+            })
+            .catch(function (e) {
+                showErrorAlert({ message: e.message || String(e) });
+            });
+    }
+
+    function orgaRenderFactionClassPreview(data) {
+        const wrap = document.getElementById('orgaFactionClassPreviewWrap');
+        const list = document.getElementById('orgaFactionClassPreviewList');
+        const cnt = document.getElementById('orgaFactionClassPreviewCount');
+        const costEl = document.getElementById('orgaFactionClassPreviewCost');
+        if (!wrap || !list || !cnt || !costEl) {
+            return;
+        }
+        const skills = data.skillsToRemove || [];
+        cnt.textContent = String(data.removedCount != null ? data.removedCount : skills.length);
+        costEl.textContent = String(data.totalCostRemoved != null ? data.totalCostRemoved : 0);
+        list.innerHTML = skills.length
+            ? skills.map(function (s) {
+                return '<li>' + escapeHtml(s.label || '') + ' — ' + (s.cost != null ? s.cost : '0') + ' PA</li>';
+            }).join('')
+            : '<li class="list-none pl-0 text-slate-600">Aucune compétence à retirer.</li>';
+        wrap.classList.remove('hidden');
+    }
+
+    function orgaPreviewFactionClassChange() {
+        const block = document.getElementById('orgaFactionClassBlock');
+        if (!block) {
+            return;
+        }
+        const faction = document.getElementById('orgaFactionSelect').value;
+        const cls = document.getElementById('orgaClassSelect').value;
+        if (!cls) {
+            showErrorAlert({ message: 'Choisissez une classe.' });
+            return;
+        }
+        fetch(block.dataset.previewUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ faction: faction, class: cls }),
+        })
+            .then(function (r) {
+                return r.json().then(function (d) {
+                    return { ok: r.ok, d: d };
+                });
+            })
+            .then(function (x) {
+                if (!x.ok) {
+                    throw new Error(x.d.error || 'Erreur lors de la prévisualisation.');
+                }
+                orgaRenderFactionClassPreview(x.d);
+            })
+            .catch(function (e) {
+                showErrorAlert({ message: e.message || String(e) });
+            });
+    }
+
+    function orgaConfirmApplyFactionClass() {
+        const block = document.getElementById('orgaFactionClassBlock');
+        if (!block) {
+            return;
+        }
+        const faction = document.getElementById('orgaFactionSelect').value;
+        const cls = document.getElementById('orgaClassSelect').value;
+        const curF = block.dataset.currentFaction;
+        const curC = block.dataset.currentClass;
+        if (!cls) {
+            showErrorAlert({ message: 'Choisissez une classe.' });
+            return;
+        }
+        if (faction === curF && cls === curC) {
+            showErrorAlert({ message: 'La faction et la classe sélectionnées sont déjà celles du personnage.' });
+            return;
+        }
+        fetch(block.dataset.previewUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ faction: faction, class: cls }),
+        })
+            .then(function (r) {
+                return r.json().then(function (d) {
+                    return { ok: r.ok, d: d };
+                });
+            })
+            .then(function (x) {
+                if (!x.ok) {
+                    throw new Error(x.d.error || 'Erreur.');
+                }
+                const p = x.d;
+                const skills = p.skillsToRemove || [];
+                const listHtml = skills.length
+                    ? '<ul class="mt-2 list-disc pl-5 text-left text-sm max-h-48 overflow-y-auto">' + skills.map(function (s) {
+                        return '<li>' + escapeHtml(s.label || '') + ' (' + (s.cost != null ? s.cost : 0) + ' PA)</li>';
+                    }).join('') + '</ul>'
+                    : '<p class="mt-2 text-sm">Aucune compétence à retirer.</p>';
+                const html = '<p class="text-left text-sm">Nouvelle combinaison : <strong>' + escapeHtml(faction) + '</strong> / <strong>' + escapeHtml(cls) + '</strong></p>'
+                    + '<p class="mt-2 text-left text-xs text-red-800 font-semibold">Les competances suivantes seront supprimees :</p>'
+                    + listHtml;
+                return Swal.fire({
+                    title: 'Confirmer le changement',
+                    html: html,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Confirmer',
+                    cancelButtonText: 'Annuler',
+                    customClass: window.modalClasses,
+                    width: '36rem',
+                }).then(function (result) {
+                    if (!result.isConfirmed) {
+                        return;
+                    }
+                    return fetch(block.dataset.applyUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ faction: faction, class: cls }),
+                    })
+                        .then(function (r) {
+                            return r.json().then(function (d) {
+                                return { ok: r.ok, d: d };
+                            });
+                        })
+                        .then(function (y) {
+                            if (!y.ok) {
+                                throw new Error(y.d.error || 'Erreur lors de l\'enregistrement.');
+                            }
+                            return Swal.fire({
+                                title: 'Faction / classe mises à jour',
+                                icon: 'success',
+                                customClass: window.modalClasses,
+                            }).then(function () {
+                                window.location.reload();
+                            });
+                        });
+                });
+            })
+            .catch(function (e) {
+                showErrorAlert({ message: e.message || String(e) });
+            });
     }
 
     function escapeHtml(unsafe) {
