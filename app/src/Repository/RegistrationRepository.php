@@ -80,6 +80,38 @@ class RegistrationRepository extends ServiceEntityRepository
         return $out;
     }
 
+    /**
+     * Inscriptions dont le tarif commence par « Place PJ », pour des événements donnés,
+     * utilisateur sans faction de profil (filtre `getResolvedFaction` côté appelant).
+     *
+     * @param list<string> $slugs Valeurs `Registration.event` / `EventType::value`
+     *
+     * @return list<Registration>
+     */
+    public function findPlacePjRegistrationsForEventSlugsWithUserFactionNull(array $slugs): array
+    {
+        if ($slugs === []) {
+            return [];
+        }
+
+        /** @var list<Registration> $rows */
+        $rows = $this->createQueryBuilder('r')
+            ->innerJoin('r.user', 'u')
+            ->addSelect('u')
+            ->where('r.event IN (:slugs)')
+            ->andWhere('u.faction IS NULL')
+            ->andWhere('r.item_name IS NOT NULL')
+            ->andWhere('LOWER(TRIM(r.item_name)) LIKE :prefix')
+            ->setParameter('slugs', $slugs)
+            ->setParameter('prefix', 'place pj%')
+            ->orderBy('u.id', 'ASC')
+            ->addOrderBy('r.id', 'ASC')
+            ->getQuery()
+            ->getResult();
+
+        return $rows;
+    }
+
     //    /**
     //     * @return Registration[] Returns an array of Registration objects
     //     */

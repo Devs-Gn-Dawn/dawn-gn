@@ -18,6 +18,7 @@ use App\Entity\Registration;
 use App\Repository\RegistrationRepository;
 use App\Service\EmailService;
 use App\Service\HelloAssoCsvImportService;
+use App\Service\PlacePjItemNameFactionResolver;
 use App\Service\UserService;
 
 #[IsGranted(RoleType::ROLE_ADMIN)]
@@ -30,7 +31,8 @@ class AdminController extends AbstractController
         private EmailService $emailService,
         private UserService $userService,
         private HelloAssoCsvImportService $csvImportService,
-        private RegistrationRepository $registrationRepository
+        private RegistrationRepository $registrationRepository,
+        private PlacePjItemNameFactionResolver $placePjItemNameFactionResolver
     ) {
         $this->entityManager = $entityManager;
     }
@@ -298,6 +300,141 @@ class AdminController extends AbstractController
         ]);
     }
 
+    #[Route('/admin/place-pj-faction-sync', name: 'app_admin_place_pj_faction_sync', methods: ['GET', 'POST'])]
+    public function placePjFactionSync(Request $request): Response
+    {
+        $openSlugs = array_map(
+            static fn (EventType $t) => $t->value,
+            EventType::getOpenEventTypes()
+        );
+        $openLabels = array_map(
+            static fn (EventType $t) => $t->getLabel(),
+            EventType::getOpenEventTypes()
+        );
+
+        if ($request->isMethod('POST')) {
+            if (!$this->isCsrfTokenValid('admin_place_pj_faction_sync', (string) $request->request->get('_csrf_token'))) {
+                $this->addFlash('error', 'Jeton de sécurité invalide. Veuillez réessayer.');
+            } elseif ($openSlugs === []) {
+                $this->addFlash('error', 'Aucun opus ouvert : rien à appliquer.');
+            } else {
+                $rawIds = $request->request->all('registration_ids');
+                $ids = \is_array($rawIds) ? $rawIds : [];
+                $ids = array_values(array_unique(array_map(static fn ($v) => (int) $v, $ids)));
+                $updated = 0;
+                foreach ($ids as $registrationId) {
+                    if ($registrationId <= 0) {
+                        continue;
+                    }
+                    $registration = $this->registrationRepository->find($registrationId);
+                    if (!$registration instanceof Registration) {
+                        continue;
+                    }
+                    $user = $registration->getUser();
+                    if (!$user instanceof User) {
+                        continue;
+                    }
+                    if (!\in_array($registration->getEvent(), $openSlugs, true)) {
+                        continue;
+                    }
+                    if ($user->getFaction() !== null) {
+                        continue;
+                    }
+                    if ($user->getResolvedFaction() !== null) {
+                        continue;
+                    }
+                    $itemName = $registration->getItemName();
+                    if ($itemName === null || trim($itemName) === '') {
+                        continue;
+                    }
+                    $faction = $this->placePjItemNameFactionResolver->resolve($itemName);
+                    if ($faction === null) {
+                        continue;
+                    }
+                    $user->setFaction($faction);
+                    ++$updated;
+                }
+                $this->entityManager->flush();
+                if ($updated === 0) {
+                    $this->addFlash('warning', 'Aucun profil mis à jour (sélection vide ou lignes non éligibles).');
+                } else {
+                    $this->addFlash('success', sprintf('%d profil(s) mis à jour.', $updated));
+                }
+            }
+
+            return $this->redirectToRoute('app_admin_place_pj_faction_sync');
+        }
+
+        $previewRows = $this->buildPlacePjFactionPreviewRows($openSlugs);
+
+        return $this->render('admin/place_pj_faction_sync.html.twig', [
+            'breadcrumb' => [
+                '/admin' => 'Administration',
+                '/admin/place-pj-faction-sync' => 'Faction depuis billet Place PJ',
+            ],
+            'place_pj_open_slugs' => $openSlugs,
+            'place_pj_open_labels' => $openLabels,
+            'place_pj_preview_rows' => $previewRows,
+        ]);
+    }
+
+    /**
+     * Une ligne par utilisateur : inscription « Place PJ » la plus récente, sans faction résolue.
+     *
+     * @param list<string> $openSlugs
+     *
+     * @return list<array{registration: Registration, user: User, inferred: ?FactionType, inferredLabel: ?string}>
+     */
+    private function buildPlacePjFactionPreviewRows(array $openSlugs): array
+    {
+        if ($openSlugs === []) {
+            return [];
+        }
+
+        $registrations = $this->registrationRepository->findPlacePjRegistrationsForEventSlugsWithUserFactionNull($openSlugs);
+
+        /** @var array<int, Registration> $latestByUserId */
+        $latestByUserId = [];
+        foreach ($registrations as $registration) {
+            $user = $registration->getUser();
+            if (!$user instanceof User) {
+                continue;
+            }
+            $uid = (int) $user->getId();
+            if (!isset($latestByUserId[$uid]) || $registration->getId() > $latestByUserId[$uid]->getId()) {
+                $latestByUserId[$uid] = $registration;
+            }
+        }
+
+        $rows = [];
+        foreach ($latestByUserId as $registration) {
+            $user = $registration->getUser();
+            if (!$user instanceof User || $user->getResolvedFaction() !== null) {
+                continue;
+            }
+            $inferred = $this->placePjItemNameFactionResolver->resolve($registration->getItemName());
+            $rows[] = [
+                'registration' => $registration,
+                'user' => $user,
+                'inferred' => $inferred,
+                'inferredLabel' => $inferred?->getLabel(),
+            ];
+        }
+
+        usort(
+            $rows,
+            static function (array $a, array $b): int {
+                /** @var User $ua */
+                $ua = $a['user'];
+                /** @var User $ub */
+                $ub = $b['user'];
+
+                return strcmp($ua->getEmail(), $ub->getEmail());
+            }
+        );
+
+        return $rows;
+    }
 
     #[Route('/api/send-invite', name: 'api_send_invite', methods: ['POST'])]
     public function sendInvite(Request $request): JsonResponse
