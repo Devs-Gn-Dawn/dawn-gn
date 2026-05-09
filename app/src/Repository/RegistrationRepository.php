@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\FactionType;
 use App\Entity\Registration;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -37,7 +38,7 @@ class RegistrationRepository extends ServiceEntityRepository
     /**
      * @param list<string> $slugs Valeurs `Registration.event` / `EventType::value`
      *
-     * @return array<string, int> Clé = `FactionType::value` ou `__null__` (profil sans faction)
+     * @return array<string, int> Clé = `FactionType::value`, ou `__null__` si `User::getResolvedFaction` est vide
      */
     public function countDistinctUsersByEventSlugsGroupedByUserFaction(array $slugs): array
     {
@@ -45,26 +46,35 @@ class RegistrationRepository extends ServiceEntityRepository
             return [];
         }
 
-        $rows = $this->createQueryBuilder('r')
-            ->select('u.faction AS faction', 'COUNT(DISTINCT u.id) AS cnt')
+        $idRows = $this->createQueryBuilder('r')
+            ->select('DISTINCT u.id AS uid')
             ->join('r.user', 'u')
             ->where('r.event IN (:slugs)')
             ->setParameter('slugs', $slugs)
-            ->groupBy('u.faction')
             ->getQuery()
-            ->getArrayResult();
+            ->getScalarResult();
 
+        $ids = array_values(array_unique(array_map(static fn (array $row): int => (int) $row['uid'], $idRows)));
+        if ($ids === []) {
+            return [];
+        }
+
+        /** @var User[] $users */
+        $users = $this->getEntityManager()->getRepository(User::class)->findBy(['id' => $ids]);
+
+        $known = array_map(static fn (FactionType $f) => $f->value, FactionType::cases());
         $out = [];
-        foreach ($rows as $row) {
-            $faction = $row['faction'];
-            if ($faction instanceof FactionType) {
-                $key = $faction->value;
-            } elseif ($faction === null) {
-                $key = '__null__';
+        foreach ($users as $user) {
+            $resolved = $user->getResolvedFaction();
+            if ($resolved instanceof FactionType) {
+                $key = $resolved->value;
             } else {
-                $key = (string) $faction;
+                $key = '__null__';
             }
-            $out[$key] = (int) $row['cnt'];
+            if ($key !== '__null__' && !\in_array($key, $known, true)) {
+                $key = '__null__';
+            }
+            $out[$key] = ($out[$key] ?? 0) + 1;
         }
 
         return $out;

@@ -99,7 +99,7 @@ class OrgaController extends AbstractController
         if ($nullReg > 0 || $otherVal > 0) {
             $rows[] = [
                 'label' => 'Non renseigné / autre',
-                'hint' => 'Inscrits : profil sans faction. Principaux validés : fiche sans faction ou valeur inconnue.',
+                'hint' => 'Inscrits : ni profil ni personnage principal avec faction reconnue. Principaux validés : fiche sans faction ou valeur inconnue.',
                 'registered' => $nullReg,
                 'validated_mains' => $otherVal,
             ];

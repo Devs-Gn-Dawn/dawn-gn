@@ -14,7 +14,7 @@ Sur cette page, des indicateurs sont affichés pour **l’opus en cours** : ce s
 
 - **Personnes inscrites** : nombre de **comptes distincts** ayant au moins une inscription (`Registration`) sur cet opus (ou sur plusieurs opus si plusieurs sont ouverts en même temps — cas rare). Plusieurs billets pour le même compte ne comptent qu’une fois.
 - **Principaux validés** : nombre de fiches **Principal** au statut **validé**, pour des joueurs **inscrits** à l’opus concerné (les rerolls et brouillons ne sont pas comptés).
-- **Tableau par faction** : ventilation des deux indicateurs — les **inscrits** sont répartis selon la faction renseignée sur le **profil** du joueur ; les **principaux validés** selon la **faction de la fiche** personnage. Une ligne supplémentaire apparaît s’il existe des profils sans faction ou des fiches sans faction / avec une valeur non reconnue.
+- **Tableau par faction** : ventilation des deux indicateurs — les **inscrits** utilisent la faction **résolue** (`User::getResolvedFaction`) : **profil** si renseigné, sinon faction du **personnage principal** ; les **principaux validés** selon la **faction de la fiche** personnage. Une ligne supplémentaire apparaît s’il reste des cas sans faction résolue ou des fiches sans faction reconnue.
 
 Si aucun opus n’est configuré comme ouvert, un message l’indique et les chiffres ne s’affichent pas.
 

@@ -92,7 +92,7 @@ Cette page détaille toutes les fonctionnalités disponibles dans l'application 
 ### Tableau de bord
 
 - **Page d’entrée** : comptes **organisateur** (sans rôle administrateur) arrivent sur **`/orga`** après connexion et en visitant la racine `/` du site (les administrateurs sont orientés vers `/admin`).
-- **Indicateurs opus en cours** : sur `/orga`, affichage du ou des opus « ouverts » en configuration (`EventType`), deux compteurs — **personnes inscrites** (utilisateurs distincts via `Registration`) et **principaux validés** (fiche Principal + statut validé, joueur inscrit à l’opus) ; **détail par faction** (inscrits selon la faction profil, principaux validés selon la faction de la fiche) ; interface alignée sur le style du tableau de bord administrateur.
+- **Indicateurs opus en cours** : sur `/orga`, affichage du ou des opus « ouverts » en configuration (`EventType`), deux compteurs — **personnes inscrites** (utilisateurs distincts via `Registration`) et **principaux validés** (fiche Principal + statut validé, joueur inscrit à l’opus) ; **détail par faction** (inscrits selon `User::getResolvedFaction` : profil puis personnage principal ; principaux validés selon la faction de la fiche) ; interface alignée sur le style du tableau de bord administrateur.
 
 ### Validation des personnages
 

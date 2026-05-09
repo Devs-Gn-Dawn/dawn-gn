@@ -73,7 +73,7 @@ Ce document détaille des évolutions produit souhaitées. Aucune implémentatio
 **Réalisation (résumé)** :
 
 - **Opus en cours** : `EventType::getOpenEventTypes()` (statut `open` dans `EventType::EVENT_STATUS`) ; plusieurs opus ouverts = union des slugs dans les requêtes.
-- **Personnes inscrites** : `RegistrationRepository::countDistinctUsersByEventSlugs` ; ventilation faction : `countDistinctUsersByEventSlugsGroupedByUserFaction` (clé = `User.faction`).
+- **Personnes inscrites** : `RegistrationRepository::countDistinctUsersByEventSlugs` ; ventilation faction : `countDistinctUsersByEventSlugsGroupedByUserFaction` (via `User::getResolvedFaction` : profil, sinon personnage principal).
 - **Principaux validés** : `CharacterRepository::countValidatedMainForUsersRegisteredToEvents` ; ventilation faction : `countValidatedMainForUsersRegisteredToEventsGroupedByCharacterFaction` (clé = `Character.faction`).
 - **Interface** : tableau de bord `/orga` (`orga/index.html.twig`) — présentation alignée sur le tableau de bord admin (cartes Soft UI) ; libellé(s) d’opus, cartes indicateurs, **tableau par faction** (ligne « Non renseigné / autre » si besoin), accès rapide vers la gestion des personnages ; si aucun opus `open`, message explicite sans métriques.
 - **Navigation** : après connexion, les comptes **ROLE_ORGA** (sans admin) et la visite de `/` une fois connecté·e sont redirigés vers `/orga` (`FormLoginSuccessHandler`, `HomeController`).
@@ -109,7 +109,7 @@ Ce document détaille des évolutions produit souhaitées. Aucune implémentatio
 | « Register » | Inscription liée au **billet HelloAsso** (`Registration`), pas la page d’inscription compte. |
 | Débloquer | **Réouverture workflow** : `POST /orga/character/{id}/reopen-validation` → `NON_VALIDE` depuis `VALIDE` / `EN_COURS` / `REJETE` ; distinct du rejet liste et du `locked` ligne à ligne. |
 | Changement de type | **Réservé orga / admin** uniquement. |
-| Statistiques (v1) | **Inscrits distincts** + **principaux validés** (MAIN + VALIDE, joueur inscrit à l’opus `open`) sur `/orga`, avec **détail par faction** (profil joueur vs fiche) ; pas d’API JSON dédiée. |
+| Statistiques (v1) | **Inscrits distincts** + **principaux validés** (MAIN + VALIDE, joueur inscrit à l’opus `open`) sur `/orga`, avec **détail par faction** (`User::getResolvedFaction` vs fiche) ; pas d’API JSON dédiée. |
 | Connexion orga | **ROLE_ORGA** (sans `ROLE_ADMIN`) : redirection vers **`/orga`** après login et depuis `/` ; les admins restent envoyés vers **`/admin`**. |
 | Faction / classe | Retrait des **compétences non éligibles** + **cascade prérequis**, **puis** mise à jour faction/classe ; **pas** de restitution d’XP ; **pas** de purge possessions/assets en v1 ; staff sans blocage `ValidationType`. |
 

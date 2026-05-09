@@ -99,7 +99,7 @@ Les comptes **ROLE_ADMIN** héritent également de `ROLE_ORGA` (hiérarchie des 
 
 ### Gestion des personnages
 
-- `GET /orga` - Tableau de bord organisateur : opus au statut « ouvert » (`EventType`), indicateurs **personnes inscrites** (comptes distincts) et **principaux validés** (MAIN + validé, joueur inscrit à l’opus), **détail par faction** (inscrits selon le profil `User.faction`, principaux validés selon `Character.faction`), accès rapide vers la gestion des personnages
+- `GET /orga` - Tableau de bord organisateur : opus au statut « ouvert » (`EventType`), indicateurs **personnes inscrites** (comptes distincts) et **principaux validés** (MAIN + validé, joueur inscrit à l’opus), **détail par faction** (inscrits selon `User::getResolvedFaction` — profil puis personnage principal ; principaux validés selon `Character.faction`), accès rapide vers la gestion des personnages
 - `GET /orga/characters` - Personnages en validation
 - `GET /orga/all_characters` - Tous les personnages
 - `GET /orga/character/{id}/edit` - Édition d'un personnage

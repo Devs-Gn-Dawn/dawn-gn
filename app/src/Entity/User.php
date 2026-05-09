@@ -425,14 +425,37 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    /**
+     * Faction « effective » pour affichage / stats : profil joueur si renseigné,
+     * sinon faction du personnage principal (même logique que le routage contact → orga).
+     */
+    public function getResolvedFaction(): ?FactionType
+    {
+        if ($this->faction !== null) {
+            return $this->faction;
+        }
+
+        if (!$this->hasMainCharacter()) {
+            return null;
+        }
+
+        $main = $this->getMainCharacter();
+        if (!$main instanceof Character) {
+            return null;
+        }
+
+        $factionValue = $main->getFaction();
+        if ($factionValue === null || $factionValue === '') {
+            return null;
+        }
+
+        return FactionType::tryFrom($factionValue);
+    }
+
     public function getOrgaEmail(): ?string
     {
-        $mainFaction = '';
-        if ($this->getFaction()) {
-            $mainFaction = $this->getFaction()->value;
-        } elseif ($this->hasMainCharacter()) {
-            $mainFaction = $this->getMainCharacter()->getFaction();
-        }
+        $mainFaction = $this->getResolvedFaction()?->value ?? '';
+
         return OrgasType::getEmail($mainFaction);
     }
 
