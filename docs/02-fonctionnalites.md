@@ -99,6 +99,7 @@ Cette page détaille toutes les fonctionnalités disponibles dans l'application 
 - **Consultation des personnages en validation** : Liste des personnages soumis pour validation
 - **Validation** : Approbation d'un personnage (devient principal ou secondaire)
 - **Rejet** : Refus d'un personnage avec possibilité de commentaires
+- **Réouverture du workflow** : depuis la fiche orga, repasser une fiche validée, en validation ou rejetée en « non validé » pour permettre au joueur de modifier et resoumettre (`POST /orga/character/{id}/reopen-validation`, e-mail dédié — distinct du rejet liste)
 - **Filtrage par faction** : Filtrage des personnages selon la faction de l'organisateur
 
 ### Gestion des personnages

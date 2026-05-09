@@ -113,10 +113,16 @@ class EmailService
             UrlGeneratorInterface::ABSOLUTE_URL
         );
 
-        $title = $status === 'validated' ? 'Personnage validé' : 'Personnage non validé';
-        $message = $status === 'validated'
-            ? 'Votre personnage a été validé. Vous pouvez le retrouver à l\'adresse suivante : ' . $characterUrl
-            : 'Votre personnage n\'a pas été validé. Vous pouvez le retrouver à l\'adresse suivante : ' . $characterUrl;
+        if ($status === 'validated') {
+            $title = 'Personnage validé';
+            $message = 'Votre personnage a été validé. Vous pouvez le retrouver à l\'adresse suivante : ' . $characterUrl;
+        } elseif ($status === 'reopened') {
+            $title = 'Fiche rouverte pour modification';
+            $message = 'Votre personnage a été rouvert par l\'organisation : vous pouvez à nouveau le modifier et le soumettre pour validation. Lien vers la fiche : ' . $characterUrl;
+        } else {
+            $title = 'Personnage non validé';
+            $message = 'Votre personnage n\'a pas été validé. Vous pouvez le retrouver à l\'adresse suivante : ' . $characterUrl;
+        }
 
         $this->sendContactEmail($user, $title, $message);
     }

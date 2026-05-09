@@ -191,6 +191,27 @@ class OrgaController extends AbstractController
         }
     }
 
+    #[Route('/orga/character/{id}/reopen-validation', name: 'app_orga_character_reopen_validation', methods: ['POST'])]
+    public function reopenValidationWorkflow(Character $character): JsonResponse
+    {
+        $actor = $this->getUser();
+        if (!$actor instanceof User) {
+            return $this->json(['error' => 'Utilisateur non authentifié.'], 401);
+        }
+
+        try {
+            $result = $this->characterService->reopenValidationWorkflowForStaff($character, $actor);
+            $this->emailService->sendCharacterValidationEmail($character, 'reopened');
+
+            return $this->json([
+                'success' => true,
+                'previousValidationType' => $result['previousValidationType'],
+            ]);
+        } catch (\Exception $e) {
+            return $this->json(['error' => $e->getMessage()], 400);
+        }
+    }
+
     #[Route('/orga/character/{id}/edit', name: 'app_orga_character_edit')]
     public function editCharacter(Character $character): Response
     {

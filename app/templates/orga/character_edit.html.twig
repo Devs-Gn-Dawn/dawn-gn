@@ -558,12 +558,14 @@
           <a href="#" onclick="confirmSetType('{{ path('character_set_type', {'id': character.id, 'type': 'secondary'}) }}', 'reroll')" class="inline-block px-6 py-3 font-bold text-center text-white uppercase align-middle transition-all rounded-lg cursor-pointer bg-gradient-to-tl from-cyan-300 to-cyan-600 leading-pro text-xs ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 hover:scale-102 active:opacity-85 hover:shadow-soft-xs hover:text-cyan-100">Définir comme personnage reroll</a>
       {% endif %}#}
 
-    {% if character.isInValidation() %}
-    <button type="button" onclick="confirmUnlockCharacter()" class="inline-block px-6 py-3 font-bold text-center text-white uppercase align-middle transition-all rounded-lg cursor-pointer bg-gradient-to-tl from-cyan-300 to-cyan-600 leading-pro text-xs ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 hover:scale-102 active:opacity-85 hover:shadow-soft-xs hover:text-cyan-100" data-target="tooltip_trigger" data-placement="top">Débloquer le personnage</button>
+    {% if character.isInValidation() or character.isValidated() or character.isRejected() %}
+    <button type="button" onclick="confirmReopenValidationWorkflow()" class="inline-block px-6 py-3 font-bold text-center text-white uppercase align-middle transition-all rounded-lg cursor-pointer bg-gradient-to-tl from-cyan-300 to-cyan-600 leading-pro text-xs ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 hover:scale-102 active:opacity-85 hover:shadow-soft-xs hover:text-cyan-100" data-target="tooltip_trigger" data-placement="top">Rouvrir le workflow</button>
     <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-cyan-600 rounded-lg text-sm" role="tooltip">
-      Débloquer le personnage, lae joueureuse peut à nouveau le modifier
+      Réouverture du workflow de validation. Le joueur pourra modifier la fiche et la resoumettre.
       <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow></div>
-    </div>          
+    </div>
+    {% endif %}
+    {% if character.isInValidation() %}
     <button type="button" onclick="confirmValidateCharacter()" class="inline-block px-6 py-3 font-bold text-center text-white uppercase align-middle transition-all rounded-lg cursor-pointer bg-gradient-to-tl from-green-600 to-green-700 leading-pro text-xs ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 hover:scale-102 active:opacity-85 hover:text-lime-300 hover:shadow-soft-xs" data-target="tooltip_trigger" data-placement="top">Valider ce personnage</button>
     <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-green-700 rounded-lg text-sm" role="tooltip">
       Permet à lae joueureuse d'imprimer sa fiche
@@ -1335,16 +1337,16 @@
         });
     }
 
-    function confirmUnlockCharacter() {
+    function confirmReopenValidationWorkflow() {
         createModal({
-            title: "Confirmation de déblocage",
-            html: `Êtes-vous sûr de vouloir débloquer ce personnage ?<br/><br/><span class="text-cyan-700">Cette action permettra à lae joueureuse de modifier à nouveau son personnage.</span>`,
-            confirmButtonText: "Débloquer",
+            title: "Rouvrir le workflow de validation",
+            html: `Êtes-vous sûr de vouloir rouvrir cette fiche ?<br/><br/><span class="text-cyan-700">Le personnage repassera en « non validé » : la joueuse pourra le modifier et le soumettre à nouveau pour validation. Un e-mail de notification lui sera envoyé.</span>`,
+            confirmButtonText: "Rouvrir",
             getData: () => ({}),
             validate: () => true,
-            url: "{{ path('api_character_reject', {'id': character.id}) }}",
-            successTitle: "Personnage débloqué !",
-            successMessage: "Le personnage a été débloqué avec succès."
+            url: "{{ path('app_orga_character_reopen_validation', {'id': character.id}) }}",
+            successTitle: "Workflow rouvert",
+            successMessage: "La fiche a été rouverte. La joueuse peut à nouveau la modifier."
         });
     }
 

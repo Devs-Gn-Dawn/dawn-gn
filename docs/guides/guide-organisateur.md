@@ -20,6 +20,16 @@ Si aucun opus n’est configuré comme ouvert, un message l’indique et les chi
 
 ## Validation des personnages
 
+### Rouvrir le workflow (fiche validée ou bloquée)
+
+Sur la fiche orga (`/orga/character/{id}/edit`), le bouton **« Rouvrir le workflow »** est proposé lorsque le personnage est **en cours de validation**, **validé** ou **rejeté** (état `REJETE`).
+
+- Il repasse la fiche en **non validé** : le joueur peut à nouveau la modifier et la **soumettre** pour validation.
+- Ce n’est **pas** le déverrouillage ligne à ligne des compétences / équipements / assets (`locked`).
+- Un **e-mail** neutre est envoyé au joueur (« fiche rouverte pour modification »).
+
+Pour un **refus** depuis la liste des personnages en validation, utilisez l’action **Rejeter** : le message joueur est celui d’un **non-validation**, pas celui d’une simple réouverture.
+
 ### Consulter les personnages en validation
 
 1. Accédez à "Gestion des personnages" dans le menu

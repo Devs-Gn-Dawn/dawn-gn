@@ -403,6 +403,37 @@ class CharacterService
     }
 
     /**
+     * Réouverture du workflow de validation (retour en « non validé ») par orga ou admin.
+     * Permet au joueur de modifier à nouveau la fiche et de la resoumettre.
+     *
+     * @return array{previousValidationType: string}
+     */
+    public function reopenValidationWorkflowForStaff(Character $character, User $actor): array
+    {
+        if (!$actor->isOrga() && !$actor->isAdmin()) {
+            throw new \Exception('Cette action est réservée aux organisateurs et aux administrateurs.');
+        }
+
+        $current = $character->getValidationType();
+        if ($current === ValidationType::NON_VALIDE) {
+            throw new \Exception('Ce personnage est déjà en brouillon de validation : le joueur peut déjà le modifier.');
+        }
+
+        $character->setValidationType(ValidationType::NON_VALIDE);
+        $this->entityManager->flush();
+
+        $this->logger->info('character_validation_reopened_by_staff', [
+            'character_id' => $character->getId(),
+            'owner_user_id' => $character->getUser()?->getId(),
+            'actor_id' => $actor->getId(),
+            'actor_email' => $actor->getUserIdentifier(),
+            'previous_validation' => $current->name,
+        ]);
+
+        return ['previousValidationType' => $current->name];
+    }
+
+    /**
      * Changement de type (Principal / Reroll / Brouillon) par orga ou admin.
      * Ne applique pas les contraintes du flux joueur (validation, etc.).
      * Si la cible devient Principal ou Reroll, les autres fiches du même joueur

@@ -107,7 +107,8 @@ Les comptes **ROLE_ADMIN** héritent également de `ROLE_ORGA` (hiérarchie des 
 - `POST /orga/character/{id}/faction-class/preview` - Prévisualisation du changement de faction et de classe (sans écriture) ; corps JSON `{ "faction": "<FactionType.value>", "class": "<ClassType.value>" }` ; la classe doit appartenir à la faction (`ClassType::getRequiredFaction`) ; réponse `{ "success", "skillsToRemove", "removedCount", "totalCostRemoved" }` (les PA listés ne sont pas restitués à l’enregistrement)
 - `POST /orga/character/{id}/faction-class` - Applique le changement de faction/classe, supprime les `SkillLearned` incompatibles (contraintes + prérequis) ; même corps JSON que la prévisualisation ; réponse `{ "success", "previousFaction", "previousClass", "newFaction", "newClass", "removedSkills", "unchanged" }`
 - `POST /api/character/{id}/validate` - Validation d'un personnage
-- `POST /api/character/{id}/reject` - Rejet d'un personnage
+- `POST /api/character/{id}/reject` - Rejet depuis la liste orga (passe en `NON_VALIDE`, e-mail « non validé ») — à ne pas confondre avec la réouverture workflow ci-dessous
+- `POST /orga/character/{id}/reopen-validation` - Réouverture du **workflow** de validation par orga/admin : depuis `VALIDE`, `EN_COURS` ou `REJETE` → `NON_VALIDE` ; e-mail « fiche rouverte pour modification » ; corps JSON `{}` ; réponse `{ "success": true, "previousValidationType": "<nom enum>" }` ou `{ "error" }` (400 si déjà `NON_VALIDE`, etc.)
 - `POST /api/create_character` - Création d'un personnage pour un joueur
 
 ### API Personnages (Organisateur)
@@ -247,7 +248,7 @@ Service centralisé pour l'envoi d'emails :
 - `sendInviteEmail(User $user)` - Email d'invitation
 - `sendContactEmail(User $to, string $subject, string $message, ?User $from)` - Contact organisateur → joueur
 - `sendContactToOrga(string $toEmail, string $subject, string $message, ?string $replyToEmail, ?User $user)` - Contact joueur → organisateur
-- `sendCharacterValidationEmail(Character $character, string $status)` - Notification de validation/rejet
+- `sendCharacterValidationEmail(Character $character, string $status)` - Notification : `validated` | `rejected` | `reopened`
 - `sendPasswordResetEmail(User $user, ResetPasswordToken $token, string $expiresAtDiffForHumans)` - Réinitialisation de mot de passe
 
 ### CharacterService
@@ -260,8 +261,8 @@ Service pour la gestion des personnages :
 - Gestion des équipements : `addGear()`, `editGear()`, `deleteGear()`
 - Gestion des assets : `addAsset()`, `editAsset()`, `deleteAsset()`
 - Gestion de l'XP : `addSkillXp()`, `removeSkillXp()`, `addGearXp()`, `removeGearXp()`
-- Validation : `validateCharacter()`, `rejectCharacter()`
-- **Staff (orga / admin)** : `changeCharacterTypeForStaff()`, `previewFactionClassChangeForStaff()`, `changeFactionAndClassForStaff()` — voir routes `/orga/character/{id}/type` et `/orga/character/{id}/faction-class*`
+- Validation : `validateCharacter()`, `rejectCharacter()`, `reopenValidationWorkflowForStaff()`
+- **Staff (orga / admin)** : `changeCharacterTypeForStaff()`, `previewFactionClassChangeForStaff()`, `changeFactionAndClassForStaff()` — voir routes `/orga/character/{id}/type`, `/orga/character/{id}/faction-class*` et `/orga/character/{id}/reopen-validation`
 
 ### SkillRepository (extrait)
 

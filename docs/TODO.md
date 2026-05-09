@@ -45,15 +45,19 @@ Ce document détaille des évolutions produit souhaitées. Aucune implémentatio
 
 ---
 
-## 3. Débloquer un personnage (réouverture workflow de validation)
+## 3. Débloquer un personnage (réouverture workflow de validation) — **livré**
 
 **Besoin** : **rouvrir** la fiche côté **workflow de validation** — c’est-à-dire permettre à nouveau l’édition / le cycle de validation en ajustant l’état (`ValidationType`), et non pas le simple déverrouillage des lignes compétences / équipements / assets (`locked`).
 
-**Critères d’acceptation (brouillon)** :
+**Réalisation (résumé)** :
 
-- Action réservée orga / admin ; effet visible immédiatement sur la fiche joueur (état affiché, actions possibles).
-- Règles métier explicites : depuis quels états on peut rouvrir (ex. validé → à repasser en brouillon / non validé), impact sur l’historique ou les notifications.
-- Ne pas confondre avec le déverrouillage ligne à ligne des compétences / possessions / assets (fonctionnalité distincte si besoin plus tard).
+- **États source** : `VALIDE`, `EN_COURS`, `REJETE` → cible **`NON_VALIDE`** (déjà `NON_VALIDE` → erreur explicite). Pas de changement de `CharacterType` ni des flags `locked`.
+- **Service** : `CharacterService::reopenValidationWorkflowForStaff` ; log `character_validation_reopened_by_staff`.
+- **API** : `POST /orga/character/{id}/reopen-validation` (corps JSON `{}` accepté) ; réponse `{ "success", "previousValidationType" }` ; e-mail joueur via `sendCharacterValidationEmail(..., 'reopened')` (texte neutre, distinct du **rejet** liste).
+- **Rejet liste** : `POST /api/character/{id}/reject` inchangé (refus + mail « non validé »).
+- **Interface** : bouton « Rouvrir le workflow » sur `/orga/character/{id}/edit` si la fiche est en validation, validée ou rejetée ; confirmation avant envoi.
+
+**Critères d’acceptation (brouillon)** — couverts par la livraison ci-dessus.
 
 ---
 
@@ -103,7 +107,7 @@ Ce document détaille des évolutions produit souhaitées. Aucune implémentatio
 | Sujet | Décision |
 |--------|----------|
 | « Register » | Inscription liée au **billet HelloAsso** (`Registration`), pas la page d’inscription compte. |
-| Débloquer | **Réouverture côté workflow de validation** (`ValidationType`), pas le flag `locked` des lignes. |
+| Débloquer | **Réouverture workflow** : `POST /orga/character/{id}/reopen-validation` → `NON_VALIDE` depuis `VALIDE` / `EN_COURS` / `REJETE` ; distinct du rejet liste et du `locked` ligne à ligne. |
 | Changement de type | **Réservé orga / admin** uniquement. |
 | Statistiques (v1) | **Inscrits distincts** + **principaux validés** (MAIN + VALIDE, joueur inscrit à l’opus `open`) sur `/orga`, avec **détail par faction** (profil joueur vs fiche) ; pas d’API JSON dédiée. |
 | Connexion orga | **ROLE_ORGA** (sans `ROLE_ADMIN`) : redirection vers **`/orga`** après login et depuis `/` ; les admins restent envoyés vers **`/admin`**. |
@@ -118,4 +122,4 @@ Ce document détaille des évolutions produit souhaitées. Aucune implémentatio
 
 ---
 
-*Dernière mise à jour : §4 statistiques organisateur — livraison figée (ventilation par faction, UI `/orga`, redirection connexion orga) ; documentation `docs/` alignée.*
+*Dernière mise à jour : §3 réouverture workflow validation (livré) ; §4 stats orga figées ; docs alignées.*
