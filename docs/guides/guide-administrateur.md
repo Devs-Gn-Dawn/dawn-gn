@@ -116,11 +116,7 @@ En tant qu'administrateur, vous avez accès à :
 
 ### Statistiques
 
-Consultez les statistiques de l'application :
-- Nombre total d'utilisateurs
-- Nombre de personnages
-- Nombre d'inscriptions
-- Répartition par faction
+Les **indicateurs par opus en cours** (inscrits distincts, principaux validés, détail par faction) sont affichés sur **`/orga`**, accessible avec `ROLE_ORGA` (y compris via la hiérarchie admin). Le hub **`/admin`** regroupe les actions d’administration (utilisateurs, invitations, import billets, etc.) ; il ne reprend pas ce tableau de bord métier.
 
 ### Configuration
 

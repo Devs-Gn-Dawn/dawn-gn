@@ -7,7 +7,7 @@ Cette page documente les principaux endpoints API de l'application Dawn GN.
 ### Authentification
 
 - `GET /login` - Page de connexion
-- `POST /login` - Traitement de la connexion
+- `POST /login` - Traitement de la connexion ; redirection gérée par `App\Security\FormLoginSuccessHandler` : compte **admin** → `/admin`, compte **orga** (sans admin) → `/orga`, sinon → `/characters/` (liste des personnages du joueur)
 - `GET /logout` - Déconnexion
 - `GET /register` - Page d'inscription
 - `POST /register` - Traitement de l'inscription
@@ -99,7 +99,7 @@ Les comptes **ROLE_ADMIN** héritent également de `ROLE_ORGA` (hiérarchie des 
 
 ### Gestion des personnages
 
-- `GET /orga` - Page d'accueil organisateur
+- `GET /orga` - Tableau de bord organisateur : opus au statut « ouvert » (`EventType`), indicateurs **personnes inscrites** (comptes distincts) et **principaux validés** (MAIN + validé, joueur inscrit à l’opus), **détail par faction** (inscrits selon le profil `User.faction`, principaux validés selon `Character.faction`), accès rapide vers la gestion des personnages
 - `GET /orga/characters` - Personnages en validation
 - `GET /orga/all_characters` - Tous les personnages
 - `GET /orga/character/{id}/edit` - Édition d'un personnage

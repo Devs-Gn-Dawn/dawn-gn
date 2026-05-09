@@ -4,7 +4,19 @@ Ce guide vous accompagne dans l'utilisation de l'application Dawn GN en tant qu'
 
 ## Accès à l'interface organisateur
 
-Après connexion avec un compte ayant le rôle `ROLE_ORGA`, vous êtes automatiquement redirigé vers l'interface organisateur.
+Après connexion avec un compte ayant le rôle `ROLE_ORGA`, vous êtes automatiquement redirigé vers le tableau de bord organisateur (`/orga`). En accédant à la racine du site (`/`) une fois connecté·e, la même page s’affiche.
+
+## Tableau de bord (`/orga`)
+
+C’est la **page d’accueil** après connexion pour les comptes organisateur (sauf administrateurs, orientés vers `/admin`). La présentation reprend le même type de cartes que le tableau de bord administrateur.
+
+Sur cette page, des indicateurs sont affichés pour **l’opus en cours** : ce sont les événements dont le statut de configuration est « ouvert » (`EventType`, même logique que pour les listes déroulantes d’inscription).
+
+- **Personnes inscrites** : nombre de **comptes distincts** ayant au moins une inscription (`Registration`) sur cet opus (ou sur plusieurs opus si plusieurs sont ouverts en même temps — cas rare). Plusieurs billets pour le même compte ne comptent qu’une fois.
+- **Principaux validés** : nombre de fiches **Principal** au statut **validé**, pour des joueurs **inscrits** à l’opus concerné (les rerolls et brouillons ne sont pas comptés).
+- **Tableau par faction** : ventilation des deux indicateurs — les **inscrits** sont répartis selon la faction renseignée sur le **profil** du joueur ; les **principaux validés** selon la **faction de la fiche** personnage. Une ligne supplémentaire apparaît s’il existe des profils sans faction ou des fiches sans faction / avec une valeur non reconnue.
+
+Si aucun opus n’est configuré comme ouvert, un message l’indique et les chiffres ne s’affichent pas.
 
 ## Validation des personnages
 

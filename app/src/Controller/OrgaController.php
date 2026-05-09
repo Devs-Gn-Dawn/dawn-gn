@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use App\Entity\Character;
+use App\Entity\Registration;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Entity\ValidationType;
@@ -46,11 +47,65 @@ class OrgaController extends AbstractController
     #[Route('/orga', name: 'app_orga')]
     public function index(): Response
     {
+        $openEventTypes = EventType::getOpenEventTypes();
+        $openSlugs = array_map(static fn (EventType $t) => $t->value, $openEventTypes);
+        $openLabels = array_map(static fn (EventType $t) => $t->getLabel(), $openEventTypes);
+
+        $registeredDistinct = null;
+        $validatedMainCount = null;
+        $orgaFactionRows = [];
+        if ($openSlugs !== []) {
+            $registrationRepo = $this->entityManager->getRepository(Registration::class);
+            $characterRepo = $this->entityManager->getRepository(Character::class);
+            $registeredDistinct = $registrationRepo->countDistinctUsersByEventSlugs($openSlugs);
+            $validatedMainCount = $characterRepo->countValidatedMainForUsersRegisteredToEvents($openSlugs);
+            $byUserFaction = $registrationRepo->countDistinctUsersByEventSlugsGroupedByUserFaction($openSlugs);
+            $byCharFaction = $characterRepo->countValidatedMainForUsersRegisteredToEventsGroupedByCharacterFaction($openSlugs);
+            $orgaFactionRows = $this->buildOrgaFactionBreakdownRows($byUserFaction, $byCharFaction);
+        }
+
         return $this->render('orga/index.html.twig', [
             'breadcrumb' => [
                 '/orga' => 'Organisation',
             ],
+            'orga_open_event_labels' => $openLabels,
+            'orga_no_open_event' => $openSlugs === [],
+            'orga_registered_distinct' => $registeredDistinct,
+            'orga_validated_main_count' => $validatedMainCount,
+            'orga_faction_rows' => $orgaFactionRows,
         ]);
+    }
+
+    /**
+     * @param array<string, int> $registeredByUserFaction
+     * @param array<string, int> $validatedByCharacterFaction
+     *
+     * @return list<array{label: string, registered: int, validated_mains: int, hint?: string}>
+     */
+    private function buildOrgaFactionBreakdownRows(array $registeredByUserFaction, array $validatedByCharacterFaction): array
+    {
+        $rows = [];
+        foreach (FactionType::cases() as $f) {
+            $v = $f->value;
+            $rows[] = [
+                'label' => $f->getLabel(),
+                'registered' => $registeredByUserFaction[$v] ?? 0,
+                'validated_mains' => $validatedByCharacterFaction[$v] ?? 0,
+            ];
+        }
+
+        $nullReg = $registeredByUserFaction['__null__'] ?? 0;
+        $otherVal = $validatedByCharacterFaction['__other__'] ?? 0;
+        if ($nullReg > 0 || $otherVal > 0) {
+            $rows[] = [
+                'label' => 'Non renseigné / autre',
+                'hint' => 'Inscrits : profil sans faction. Principaux validés : fiche sans faction ou valeur inconnue.',
+                'registered' => $nullReg,
+                'validated_mains' => $otherVal,
+            ];
+        }
+
+        return $rows;
     }
 
     #[Route('/orga/characters', name: 'app_orga_characters')]

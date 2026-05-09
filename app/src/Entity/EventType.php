@@ -2,8 +2,6 @@
 
 namespace App\Entity;
 
-use Psr\Log\LoggerInterface;
-
 enum EventType: string
 {
     case DAWN31 = self::EVENTS[10];
@@ -92,6 +90,24 @@ enum EventType: string
     {
         $status = self::EVENT_STATUS[$this->value];
         return $status;
+    }
+
+    /**
+     * Opus actuellement « ouverts » pour les inscriptions (config métier).
+     * En pratique un seul `open` est visé ; plusieurs slugs restent supportés (union).
+     *
+     * @return list<self>
+     */
+    public static function getOpenEventTypes(): array
+    {
+        $open = [];
+        foreach (self::cases() as $case) {
+            if ($case->getStatus() === self::STATUS_OPEN) {
+                $open[] = $case;
+            }
+        }
+
+        return $open;
     }
 
     /**

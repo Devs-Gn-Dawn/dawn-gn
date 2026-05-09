@@ -20,6 +20,7 @@ L'application a été conçue pour faciliter la gestion d'un GN post-apocalyptiq
 ### Pour les organisateurs
 - Valider les personnages créés par les joueurs
 - Gérer les personnages et leurs attributs
+- Consulter un **tableau de bord** (`/orga`) avec indicateurs sur l’opus en cours (inscrits, principaux validés, ventilation par faction)
 - Communiquer avec les joueurs
 - Suivre les inscriptions aux événements
 

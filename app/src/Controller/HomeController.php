@@ -16,7 +16,7 @@ class HomeController extends AbstractController
         } elseif ($this->getUser()->isAdmin()) {
             return $this->redirectToRoute('app_admin');
         } elseif ($this->getUser()->isOrga()) {
-            return $this->redirectToRoute('app_orga_characters');
+            return $this->redirectToRoute('app_orga');
         }
 
         return $this->redirectToRoute('app_character_index');

@@ -106,9 +106,10 @@ L'application suit le pattern Model-View-Controller avec une couche de services 
 
 ### Contrôleurs principaux
 
-- `HomeController` : Page d'accueil et redirections
+- `HomeController` : Page d'accueil `/` et redirections (admin → admin, orga → `/orga`, joueur → liste personnages)
 - `CharacterController` : Gestion des personnages (joueurs)
-- `OrgaController` : Gestion organisateur (validation, édition)
+- `OrgaController` : Gestion organisateur (tableau de bord `/orga` avec statistiques opus, validation, édition)
+- `FormLoginSuccessHandler` (`src/Security/`) : cible après `POST /login` selon le rôle (cohérent avec `HomeController`)
 - `AdminController` : Administration (utilisateurs, invitations)
 - `AccountController` : Gestion du compte utilisateur
 - `SecurityController` : Authentification
@@ -131,7 +132,7 @@ L'application suit le pattern Model-View-Controller avec une couche de services 
 
 ### Repositories
 
-Chaque entité possède son repository pour les requêtes personnalisées :
+Chaque entité possède son repository pour les requêtes personnalisées (ex. agrégations orga sur `Registration` et `Character` pour le tableau de bord `/orga`) :
 
 - `UserRepository`
 - `CharacterRepository`

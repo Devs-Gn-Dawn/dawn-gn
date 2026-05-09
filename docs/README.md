@@ -51,6 +51,7 @@ Bienvenue dans la documentation complète de l'application Dawn GN. Cette docume
   - Gestion du profil
 
 - [👥 Guide organisateur](guides/guide-organisateur.md)
+  - Tableau de bord `/orga` (statistiques opus, ventilation par faction)
   - Validation d'un personnage
   - Gestion des personnages
   - Communication avec les joueurs

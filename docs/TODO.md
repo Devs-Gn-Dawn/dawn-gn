@@ -57,25 +57,24 @@ Ce document détaille des évolutions produit souhaitées. Aucune implémentatio
 
 ---
 
-## 4. Statistiques organisateur
+## 4. Statistiques organisateur — **livré**
 
 **Besoin** : indicateurs simples pour l’équipe orga, **pour l’opus en cours** (l’événement actuellement pertinent pour les inscriptions — en pratique l’événement « ouvert » côté configuration métier, ex. statut `open` dans la configuration des opus).
 
-**Métriques (première livraison)** :
+**Métriques (livraison)** :
 
-1. **Nombre de personnes inscrites** à l’opus en cours (dénombrement des inscriptions distinctes / joueurs uniques selon la définition retenue : une ligne `Registration` par billet, ou un joueur unique même avec plusieurs billets — à trancher si cas limite).
-2. **Nombre de personnages validés** (selon `ValidationType` : état « validé » dans le modèle actuel).
+1. **Personnes inscrites** à l’opus « ouvert » : **comptes distincts** (`COUNT(DISTINCT user)` sur `Registration`).
+2. **Principaux validés** : fiches **Principal** (`CharacterType::MAIN`) au statut **validé**, dont le joueur a au moins une inscription sur l’opus concerné.
 
-**À préciser** :
+**Réalisation (résumé)** :
 
-- Affichage : tuile(s) sur un écran orga existant, page dédiée, export CSV ?
-- Libellé affiché : nom de l’opus (ex. Dawn 39) pour éviter toute ambiguïté.
+- **Opus en cours** : `EventType::getOpenEventTypes()` (statut `open` dans `EventType::EVENT_STATUS`) ; plusieurs opus ouverts = union des slugs dans les requêtes.
+- **Personnes inscrites** : `RegistrationRepository::countDistinctUsersByEventSlugs` ; ventilation faction : `countDistinctUsersByEventSlugsGroupedByUserFaction` (clé = `User.faction`).
+- **Principaux validés** : `CharacterRepository::countValidatedMainForUsersRegisteredToEvents` ; ventilation faction : `countValidatedMainForUsersRegisteredToEventsGroupedByCharacterFaction` (clé = `Character.faction`).
+- **Interface** : tableau de bord `/orga` (`orga/index.html.twig`) — présentation alignée sur le tableau de bord admin (cartes Soft UI) ; libellé(s) d’opus, cartes indicateurs, **tableau par faction** (ligne « Non renseigné / autre » si besoin), accès rapide vers la gestion des personnages ; si aucun opus `open`, message explicite sans métriques.
+- **Navigation** : après connexion, les comptes **ROLE_ORGA** (sans admin) et la visite de `/` une fois connecté·e sont redirigés vers `/orga` (`FormLoginSuccessHandler`, `HomeController`).
 
-**Critères d’acceptation (brouillon)** :
-
-- Les deux chiffres sont calculés de façon reproductible pour les mêmes données.
-- L’opus concerné est identifiable clairement dans l’UI.
-- Performance acceptable sur la volumétrie actuelle.
+**Critères d’acceptation (brouillon)** — couverts par la livraison ci-dessus.
 
 ---
 
@@ -106,7 +105,8 @@ Ce document détaille des évolutions produit souhaitées. Aucune implémentatio
 | « Register » | Inscription liée au **billet HelloAsso** (`Registration`), pas la page d’inscription compte. |
 | Débloquer | **Réouverture côté workflow de validation** (`ValidationType`), pas le flag `locked` des lignes. |
 | Changement de type | **Réservé orga / admin** uniquement. |
-| Statistiques (v1) | **Inscrits à l’opus en cours** + **personnages validés**. |
+| Statistiques (v1) | **Inscrits distincts** + **principaux validés** (MAIN + VALIDE, joueur inscrit à l’opus `open`) sur `/orga`, avec **détail par faction** (profil joueur vs fiche) ; pas d’API JSON dédiée. |
+| Connexion orga | **ROLE_ORGA** (sans `ROLE_ADMIN`) : redirection vers **`/orga`** après login et depuis `/` ; les admins restent envoyés vers **`/admin`**. |
 | Faction / classe | Retrait des **compétences non éligibles** + **cascade prérequis**, **puis** mise à jour faction/classe ; **pas** de restitution d’XP ; **pas** de purge possessions/assets en v1 ; staff sans blocage `ValidationType`. |
 
 ---
@@ -114,10 +114,8 @@ Ce document détaille des évolutions produit souhaitées. Aucune implémentatio
 ## Questions encore ouvertes
 
 1. **Réassignation de billet** : faut-il un **journal** obligatoire des transferts (audit) ?
-2. **Stat « inscrits »** : compter les **utilisateurs uniques** ou les **inscriptions** (plusieurs billets / même compte) ?
-3. **Personnages validés** : tous les personnages validés de la base, ou **uniquement ceux rattachés à l’opus en cours** (si une telle notion existe métier) ?
-4. **Changement faction/classe** : évolutions futures — **restituer l’XP** des compétences retirées ? **Purger** possessions / assets incompatibles ? (v1 livrée : non / non)
+2. **Changement faction/classe** : évolutions futures — **restituer l’XP** des compétences retirées ? **Purger** possessions / assets incompatibles ? (v1 livrée : non / non)
 
 ---
 
-*Dernière mise à jour : §5 changement faction/classe (staff) marqué comme livré ; alignement tableau décisions et questions ouvertes.*
+*Dernière mise à jour : §4 statistiques organisateur — livraison figée (ventilation par faction, UI `/orga`, redirection connexion orga) ; documentation `docs/` alignée.*
